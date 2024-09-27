@@ -1,4 +1,4 @@
-- Stracture:
+- Structure:
     Project:
     |
     |_ _ Front-end
