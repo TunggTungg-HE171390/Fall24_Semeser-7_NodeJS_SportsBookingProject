@@ -56,7 +56,7 @@ const TabBarComponent = ({ state, descriptors, navigation }) => {
             <FontAwesome
               name={navItems[index].icon}
               size={24}
-              color={isFocused ? "orange" : "gray"} // Màu cam cho icon khi được chọn
+              color={isFocused ? "orange" : "gray"} 
             />
             <Text style={[styles.text, { color: isFocused ? "orange" : "gray" }]}>
               {label}
