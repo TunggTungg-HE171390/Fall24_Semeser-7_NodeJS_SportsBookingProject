@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Tab_bar from "./components/Tab_bar"; // Tab_bar đã được định nghĩa
+import Tab_bar from "./components/Tab_bar"; 
 import Home_screen from "./screens/Home_screen";
 import Profile_screen from "./screens/Profile_screen";
 import Booking_screen from "./screens/Booking_screen";
