@@ -5,7 +5,7 @@ import { X } from 'lucide-react-native';
 const CreatePostModal = ({ visible, onClose, onAdd }) => {
   const [newEvent, setNewEvent] = React.useState({ title: '', date: '', location: '', genre: '', image: require('../assets/images/san-nhan-tao.jpg') });
 
-  const handleAddEvent = () => {
+  const handleAddPost = () => {
     if (!newEvent.title || !newEvent.date || !newEvent.location || !newEvent.genre) {
       Alert.alert('Error', 'Please fill in all fields.');
       return;
@@ -74,7 +74,7 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
 
           <Pressable
             style={[styles.button, styles.buttonClose]}
-            onPress={handleAddEvent}
+            onPress={handleAddPost}
           >
             <Text style={styles.textStyle}>Add Event</Text>
           </Pressable>

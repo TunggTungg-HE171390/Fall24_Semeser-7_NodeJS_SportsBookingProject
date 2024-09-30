@@ -1,9 +1,19 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Search, MapPin, Share2, Plus } from 'lucide-react-native';
+import { Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+
 import CreatePostModal from "../components/Create_post_modal";
+import DetailedPostModal from "../components/Detailed_post_modal";
 const Explore_screen = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [createPostModalVisible, setCreatePostModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [detailedPostModalVisible, setDetailedPostModalVisible] = useState(false);
+
 
   const [posts, setPosts] = useState([
     {
@@ -52,8 +62,28 @@ const Explore_screen = () => {
   ];
   const timeFilters = ["Tomorrow", "Next week", "Next Month", "All upcoming"];
 
-  const EventCard = ({ post }) => (
-    <View style={styles.eventCard}>
+  const handleDeleteEvent = (eventId) => {
+    setPosts(posts.filter(post => post.id !== eventId));
+  };
+
+  const EventCard = ({ post }) => {
+    const renderRightActions = () => (
+      <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => handleDeleteEvent(post.id)}
+      >
+        <FontAwesome name="trash" size={24} color="#fff" />
+      </TouchableOpacity>
+    )
+    return (
+      <Swipeable renderRightActions={renderRightActions}>
+      <TouchableOpacity
+      style={styles.eventCard}
+      onPress={() => {
+        setSelectedEvent(post);
+        setDetailedPostModalVisible(true);
+      }}
+    >
       <Image source={post.image} style={styles.eventImage} />
       <View style={styles.eventInfo}>
         <Text style={styles.eventTitle}>{post.title}</Text>
@@ -66,8 +96,10 @@ const Explore_screen = () => {
       <TouchableOpacity style={styles.shareButton}>
         <Share2 color="#888" size={24} />
       </TouchableOpacity>
-    </View>
-  );
+    </TouchableOpacity>
+    </Swipeable>
+    )
+  };
 
   const handleAddEvent = (newEvent) => {
     if (!newEvent.title || !newEvent.date || !newEvent.location || !newEvent.genre) {
@@ -80,6 +112,7 @@ const Explore_screen = () => {
   };
 
   return (
+    <GestureHandlerRootView style={{flex: 1}}>
     <View style={styles.container}>
       <ScrollView style={styles.container}>
         <View style={styles.header}>
@@ -123,17 +156,24 @@ const Explore_screen = () => {
 
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => setModalVisible(true)}
+        onPress={() => setCreatePostModalVisible(true)}
       >
         <Plus color="#fff" size={24} />
       </TouchableOpacity>
 
       <CreatePostModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        visible={createPostModalVisible}
+        onClose={() => setCreatePostModalVisible(false)}
         onAdd={handleAddEvent}
       />
+
+      <DetailedPostModal
+        visible={detailedPostModalVisible}
+        event={selectedEvent}
+        onClose={() => setDetailedPostModalVisible(false)}
+      />
     </View>
+    </GestureHandlerRootView>
   );
 };
 
@@ -261,10 +301,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
-  button: {
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2,
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 70,
+    height: '100%',
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  trashIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#fff',
   },
 });
 
