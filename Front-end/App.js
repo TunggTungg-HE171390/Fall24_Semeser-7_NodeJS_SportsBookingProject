@@ -25,7 +25,7 @@ function BookingStack() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator tabBar={(props) => <Tab_bar {...props} />}>
+      <Tab.Navigator tabBar={(props) => <Tab_bar {...props} /> } screenOptions={{ headerShown: false }}>
         <Tab.Screen name="Home" component={Home_screen} />
         <Tab.Screen name="Explore" component={Explore_screen} />
         <Tab.Screen
