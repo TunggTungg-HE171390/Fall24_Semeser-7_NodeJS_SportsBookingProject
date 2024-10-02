@@ -7,6 +7,7 @@ const navItems = [
   { name: "Booking", icon: "ticket" },
   { name: "Inbox", icon: "inbox" },
   { name: "Profile", icon: "user" },
+  { name: "Field", icon: "plus" },
 ];
 
 const TabBarComponent = ({ state, descriptors, navigation }) => {
@@ -56,9 +57,11 @@ const TabBarComponent = ({ state, descriptors, navigation }) => {
             <FontAwesome
               name={navItems[index].icon}
               size={24}
-              color={isFocused ? "orange" : "gray"} 
+              color={isFocused ? "orange" : "gray"}
             />
-            <Text style={[styles.text, { color: isFocused ? "orange" : "gray" }]}>
+            <Text
+              style={[styles.text, { color: isFocused ? "orange" : "gray" }]}
+            >
               {label}
             </Text>
           </TouchableOpacity>
