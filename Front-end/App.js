@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 function BookingStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Booking" component={Booking_screen} />
+      <Stack.Screen name="BookingList" component={Booking_screen} />
       <Stack.Screen name="FieldDetail" component={FieldDetailScreen} />
     </Stack.Navigator>
   );

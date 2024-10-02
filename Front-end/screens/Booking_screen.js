@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   TextInput,
-  ScrollView,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
+import DropDownPicker from "react-native-dropdown-picker"; // Import DropDownPicker
 import { useNavigation } from "@react-navigation/native";
 
 const data = [
@@ -67,36 +66,52 @@ const data = [
 ];
 
 const BookingScreen = () => {
-  const [selectedSport, setSelectedSport] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedSport, setSelectedSport] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [minPrice, setMinPrice] = useState(50000);
   const [maxPrice, setMaxPrice] = useState(300000);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [sortOrder, setSortOrder] = useState("price-asc"); // Mặc định sắp xếp tăng dần
+  const [openFilter, setOpenFilter] = useState(false);
+  const [openSport, setOpenSport] = useState(false); // Trạng thái dropdown môn thể thao
+  const [openLocation, setOpenLocation] = useState(false); // Trạng thái dropdown địa chỉ
 
   const navigation = useNavigation();
 
-  const handleSportChange = (itemValue) => {
-    setSelectedSport(itemValue);
+  // Đảm bảo chỉ một dropdown mở tại một thời điểm
+  const closeAllDropdowns = () => {
+    setOpenFilter(!openFilter);
+    setOpenSport(false);
+    setOpenLocation(false);
   };
 
-  const handleLocationChange = (itemValue) => {
-    setSelectedLocation(itemValue);
-  };
-
-  const filterData = data.filter((item) => {
-    const matchesSport = selectedSport === "" || item.sport === selectedSport;
-    const matchesLocation =
-      selectedLocation === "" || item.location === selectedLocation;
-    const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
-    const matchesSearchQuery =
-      searchQuery === "" ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-    return (
-      matchesSport && matchesLocation && matchesPrice && matchesSearchQuery
+  // Hàm thay đổi thứ tự sắp xếp giá
+  const toggleSortOrder = () => {
+    setSortOrder((prevSortOrder) =>
+      prevSortOrder === "price-asc" ? "price-desc" : "price-asc"
     );
-  });
+  };
+
+  const filterData = data
+    .filter((item) => {
+      const matchesSport =
+        selectedSport === null || item.sport === selectedSport;
+      const matchesLocation =
+        selectedLocation === null || item.location === selectedLocation;
+      const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
+      const matchesSearchQuery =
+        searchQuery === "" ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return (
+        matchesSport && matchesLocation && matchesPrice && matchesSearchQuery
+      );
+    })
+    .sort((a, b) => {
+      if (sortOrder === "price-asc") return a.price - b.price;
+      if (sortOrder === "price-desc") return b.price - a.price;
+      return 0;
+    });
 
   const renderField = ({ item }) => (
     <TouchableOpacity
@@ -126,49 +141,76 @@ const BookingScreen = () => {
       </View>
     </TouchableOpacity>
   );
+
   return (
     <View style={styles.container}>
       <View style={styles.searchFilterContainer}>
-        {/* Search bar và nút mở/đóng bộ lọc */}
+        {/* Search bar */}
         <TextInput
           style={styles.searchBar}
           placeholder="Tìm kiếm theo tên..."
           value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
+          onChangeText={(text) => setSearchQuery(text)} // Đóng các dropdown khi tìm kiếm
         />
-        <TouchableOpacity onPress={() => setShowFilters(!showFilters)}>
+
+        {/* Nút sắp xếp theo giá */}
+        <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+          <Text style={styles.sortText}>Giá</Text>
+          <Ionicons
+            name={
+              sortOrder === "price-asc"
+                ? "arrow-up-outline"
+                : "arrow-down-outline"
+            }
+            size={16}
+            color="gray"
+          />
+        </TouchableOpacity>
+
+        {/* Nút mở/đóng bộ lọc */}
+        <TouchableOpacity onPress={closeAllDropdowns}>
           <Ionicons name="options-outline" size={24} color="gray" />
         </TouchableOpacity>
       </View>
 
-      {/* Bộ lọc ẩn/hiện */}
-      {showFilters && (
-        <ScrollView contentContainerStyle={styles.filterContainer}>
-          <View style={styles.pickerContainer}>
-            {/* Sport Picker */}
-            <Picker
-              selectedValue={selectedSport}
-              style={styles.picker}
-              onValueChange={handleSportChange}
-            >
-              <Picker.Item label="All Sports" value="" />
-              <Picker.Item label="Tennis" value="Tennis" />
-              <Picker.Item label="Football" value="Football" />
-              <Picker.Item label="Badminton" value="Badminton" />
-            </Picker>
-          </View>
+      {/* Bộ lọc */}
+      {openFilter && (
+        <View style={styles.filterContainer}>
+          <View style={styles.dropdownRow}>
+            {/* Dropdown môn thể thao */}
+            <DropDownPicker
+              open={openSport}
+              value={selectedSport}
+              items={[
+                { label: "Tất cả", value: null },
+                { label: "Tennis", value: "Tennis" },
+                { label: "Football", value: "Football" },
+                { label: "Badminton", value: "Badminton" },
+              ]}
+              setOpen={(open) => {
+                setOpenSport(open);
+              }}
+              setValue={setSelectedSport}
+              placeholder="Chọn môn thể thao"
+              containerStyle={styles.dropdownContainer}
+            />
 
-          <View style={styles.pickerContainer}>
-            {/* Location Picker */}
-            <Picker
-              selectedValue={selectedLocation}
-              style={styles.picker}
-              onValueChange={handleLocationChange}
-            >
-              <Picker.Item label="All Locations" value="" />
-              <Picker.Item label="Hoa Lac" value="Hoa Lac" />
-              <Picker.Item label="Cau Giay" value="Cau Giay" />
-            </Picker>
+            {/* Dropdown địa chỉ */}
+            <DropDownPicker
+              open={openLocation}
+              value={selectedLocation}
+              items={[
+                { label: "Tất cả", value: null },
+                { label: "Hoa Lac", value: "Hoa Lac" },
+                { label: "Cau Giay", value: "Cau Giay" },
+              ]}
+              setOpen={(open) => {
+                setOpenLocation(open);
+              }}
+              setValue={setSelectedLocation}
+              placeholder="Chọn địa chỉ"
+              containerStyle={styles.dropdownContainer}
+            />
           </View>
 
           {/* Price range filter */}
@@ -198,7 +240,7 @@ const BookingScreen = () => {
               thumbTintColor="#1EB1FC"
             />
           </View>
-        </ScrollView>
+        </View>
       )}
 
       {/* Danh sách sân */}
@@ -207,7 +249,7 @@ const BookingScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderField}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<View style={{ height: 10 }} />} // Thêm khoảng cách trên cùng
+        ListHeaderComponent={<View style={{ height: 10 }} />}
       />
     </View>
   );
@@ -234,16 +276,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 14,
   },
+  sortButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5,
+  },
+  sortText: {
+    fontSize: 14,
+    marginRight: 5,
+    color: "gray",
+  },
   filterContainer: {
     paddingVertical: 10,
   },
-  pickerContainer: {
+  dropdownRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
   },
-  picker: {
-    height: 40,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
+  dropdownContainer: {
+    flex: 1,
+    marginHorizontal: 5,
   },
   priceFilterContainer: {
     marginVertical: 10,

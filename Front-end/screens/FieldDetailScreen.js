@@ -71,19 +71,8 @@ const FieldDetailScreen = ({ route }) => {
         </Text>
       </View>
 
-      {/* Phần đánh giá từ người dùng */}
-      <View style={styles.reviewContainer}>
-        <Text style={styles.reviewTitle}>Đánh giá từ người dùng:</Text>
-        {field.reviews.map((review, index) => (
-          <View key={index} style={styles.reviewItem}>
-            <Text style={styles.reviewUser}>{review.user}</Text>
-            <Text style={styles.reviewComment}>{review.comment}</Text>
-            <Text style={styles.reviewRating}>Đánh giá: {review.rating} ★</Text>
-          </View>
-        ))}
-      </View>
-
       {/* Chọn ngày */}
+      {/* Chọn ngày, Giờ bắt đầu và Giờ kết thúc trên cùng một hàng */}
       <View style={styles.pickerWrapper}>
         <TouchableOpacity
           style={styles.timeButton}
@@ -94,26 +83,24 @@ const FieldDetailScreen = ({ route }) => {
             {selectedDate.toLocaleDateString()}
           </Text>
         </TouchableOpacity>
-      </View>
 
-      {/* Chọn giờ bắt đầu và kết thúc */}
-      <View style={styles.dateTimePickerContainer}>
         <TouchableOpacity
           style={styles.timeButton}
           onPress={() => setShowStartTime(true)}
         >
           <Text style={styles.timeText}>
-            <Ionicons name="time-outline" size={18} /> Giờ bắt đầu:{" "}
-            {startTime.toLocaleTimeString()}
+            {/* <Ionicons name="time-outline" size={18} /> Giờ bắt đầu:{" "} */}
+            {` ${startTime.toLocaleTimeString()}`}
           </Text>
         </TouchableOpacity>
+        <Ionicons name="chevron-forward-outline" size={24} color="gray" />
         <TouchableOpacity
           style={styles.timeButton}
           onPress={() => setShowEndTime(true)}
         >
           <Text style={styles.timeText}>
-            <Ionicons name="time-outline" size={18} /> Giờ kết thúc:{" "}
-            {endTime.toLocaleTimeString()}
+            {/* <Ionicons name="time-outline" size={18} /> Giờ kết thúc:{" "} */}
+            {`${endTime.toLocaleTimeString()}`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -153,6 +140,18 @@ const FieldDetailScreen = ({ route }) => {
       {/* Nút đặt sân */}
       <View style={styles.buttonContainer}>
         <Button title="Đặt sân" onPress={() => setShowModal(true)} />
+      </View>
+
+      {/* Phần đánh giá từ người dùng */}
+      <View style={styles.reviewContainer}>
+        <Text style={styles.reviewTitle}>Đánh giá từ người dùng:</Text>
+        {field.reviews.map((review, index) => (
+          <View key={index} style={styles.reviewItem}>
+            <Text style={styles.reviewUser}>{review.user}</Text>
+            <Text style={styles.reviewComment}>{review.comment}</Text>
+            <Text style={styles.reviewRating}>Đánh giá: {review.rating} ★</Text>
+          </View>
+        ))}
       </View>
 
       {/* Modal để hiển thị thông tin xác nhận */}
@@ -232,6 +231,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#3498db",
   },
+
+  // Đặt phần chọn ngày và giờ trên cùng một hàng
+  pickerWrapper: {
+    flexDirection: "row", // Đặt các phần tử theo hàng ngang
+    justifyContent: "space-between", // Căn chỉnh đều các phần tử
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  timeButton: {
+    flex: 1, // Đảm bảo mỗi phần tử chiếm cùng tỷ lệ
+    padding: 10,
+    borderRadius: 5,
+    borderColor: "#ccc", // Thêm border thay vì nền
+    borderWidth: 1, // Border width
+    marginHorizontal: 5, // Thêm khoảng cách giữa các phần tử
+    alignItems: "center", // Căn giữa văn bản trong nút
+  },
+  timeText: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    color: "#333", // Chỉnh màu chữ
+    fontWeight: "bold",
+  },
+
+  // Đặt phần đánh giá xuống dưới cùng
   reviewContainer: {
     marginBottom: 20,
   },
@@ -264,33 +289,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#f39c12",
   },
-  pickerWrapper: {
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 2,
-  },
-  dateTimePickerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  timeButton: {
-    backgroundColor: "#1EB1FC",
-    padding: 15,
-    borderRadius: 10,
-    width: "48%",
-  },
-  timeText: {
-    color: "#fff",
-    fontWeight: "bold",
-    textAlign: "center",
-  },
+
   buttonContainer: {
     marginBottom: 50,
   },
