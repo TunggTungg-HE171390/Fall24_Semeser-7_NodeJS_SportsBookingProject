@@ -14,9 +14,9 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
             </TouchableOpacity>
 
           <Image source={event.image} style={styles.eventImage} />
-          <Text style={styles.eventTitle}>{event.title}</Text>
-          <Text style={styles.eventGenre}>{event.genre}</Text>
-          <Text style={styles.eventDate}>{event.date}</Text>
+          <Text style={styles.eventTitle}>Title: {event.title}</Text>
+          <Text style={styles.eventGenre}>Genre: {event.genre}</Text>
+          <Text style={styles.eventDate}>Date: {event.date}</Text>
           <Text style={styles.eventLocation}>Location: {event.location}</Text>
 
           <TouchableOpacity style={styles.editButton} onPress={onClose}>
