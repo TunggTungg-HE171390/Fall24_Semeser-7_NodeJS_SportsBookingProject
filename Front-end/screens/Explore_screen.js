@@ -108,7 +108,7 @@ const Explore_screen = () => {
     }
 
     setPosts([...posts, { ...newEvent, id: posts.length + 1 }]);
-    setModalVisible(false);
+    setCreatePostModalVisible(false);
   };
 
   return (
