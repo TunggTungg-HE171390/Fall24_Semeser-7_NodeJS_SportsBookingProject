@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Tab_bar from "./components/Tab_bar";
@@ -12,7 +12,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import FieldDetailScreen from "./screens/FieldDetailScreen";
 import FieldListScreen from "./screens/FieldListScreen";
 import FieldAdminDetailScreen from "./screens/FieldAdminsDetail";
-
+import Header from "./layout/Header";
+import ManageAccount from "./screens/ManageAccount";
+import AccountDetail from "./screens/AccountDetail";
+import Dashboard from "./screens/Dashbord";
+import { ROUTER } from "./utils/contant";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -42,6 +46,22 @@ function FieldStack() {
   );
 }
 
+function DashboardStack() {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header />
+      <Stack.Navigator
+        initialRouteName={ROUTER.DASHBOARD}
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name={ROUTER.MANAGE_ACCOUNT} component={ManageAccount} />
+        <Stack.Screen name={ROUTER.ACCOUNT_DETAIL} component={AccountDetail} />
+        <Stack.Screen name={ROUTER.DASHBOARD} component={Dashboard} />
+      </Stack.Navigator>
+    </SafeAreaView>
+  );
+}
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -59,6 +79,7 @@ export default function App() {
         <Tab.Screen name="Inbox" component={Inbox_screen} />
         <Tab.Screen name="Profile" component={Profile_screen} />
         <Tab.Screen name="Field" component={FieldStack} />
+        <Tab.Screen name="Dash" component={DashboardStack} />
       </Tab.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
@@ -68,8 +89,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#F5F5F5",
   },
 });

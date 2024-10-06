@@ -101,7 +101,7 @@ const BookingScreen = () => {
       const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
       const matchesSearchQuery =
         searchQuery === "" ||
-        item.name.toLowerCase().includes(searchQuery.toLowerCase());
+        item.username.toLowerCase().includes(searchQuery.toLowerCase());
 
       return (
         matchesSport && matchesLocation && matchesPrice && matchesSearchQuery
