@@ -13,6 +13,8 @@
     npx create-expo-app <Name_APP> --template -> Select "Blank"
     npx expo start   
     npm i axios
+    npm i react-native-vector-icons
+    npm i react-native-calendars
     <RUN>: npm start
 
 - Back-end:
