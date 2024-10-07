@@ -18,6 +18,7 @@ import AccountDetail from "./screens/AccountDetail";
 import Dashboard from "./screens/Dashbord";
 import { ROUTER } from "./utils/contant";
 import RentalEquipmentScreen from "./screens/RentalEquipmentScreen";
+import EquipmentDetailScreen from "./screens/EquipmentDetailsScreen";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -43,6 +44,15 @@ function FieldStack() {
         component={FieldAdminDetailScreen}
         options={{ title: "Chi tiết sân" }}
       />
+    </Stack.Navigator>
+  );
+}
+
+function EquipmentRental() {
+  return (
+    <Stack.Navigator initialRouteName="RentalEquipment">
+      <Stack.Screen name="RentalEquipment" component={RentalEquipmentScreen} />
+      <Stack.Screen name="EquipmentDetail" component={EquipmentDetailScreen} />
     </Stack.Navigator>
   );
 }
@@ -79,8 +89,8 @@ export default function App() {
         />
         <Tab.Screen name="Inbox" component={Inbox_screen} />
         <Tab.Screen name="Profile" component={Profile_screen} />
-        <Tab.Screen name="Field" component={FieldStack} />
-        <Tab.Screen name="Field" component={RentalEquipmentScreen} />
+        {/* <Tab.Screen name="Field" component={FieldStack} /> */}
+        <Tab.Screen name="Field" component={EquipmentRental} />
         <Tab.Screen name="Dash" component={DashboardStack} />
       </Tab.Navigator>
       <StatusBar style="auto" />

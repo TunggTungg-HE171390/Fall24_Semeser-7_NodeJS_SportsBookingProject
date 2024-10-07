@@ -8,7 +8,16 @@ import {
   TextInput,
   FlatList,
 } from "react-native";
+import {
+  ShoppingCart,
+  Heart,
+  HeartOff,
+  Ban,
+  Filter,
+} from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 
+// Sample equipment data
 const equipmentData = [
   {
     id: "1",
@@ -45,13 +54,18 @@ const equipmentData = [
   },
 ];
 
-const RentalEquipmentScreen = () => {
-  const [favorites, setFavorites] = useState({}); // State to manage favorite status for each item
+// Array of time filter options
+const timeFilters = ["Soccer", "Volleyball", "Badminton", "All sports"];
 
+const RentalEquipmentScreen = () => {
+  const [favorites, setFavorites] = useState({});
+  const navigation = useNavigation(); // Initialize the navigation
+
+  // Function to toggle favorite status
   const toggleFavorite = (itemId) => {
     setFavorites((prevFavorites) => ({
       ...prevFavorites,
-      [itemId]: !prevFavorites[itemId], // Toggle favorite status
+      [itemId]: !prevFavorites[itemId],
     }));
   };
 
@@ -64,16 +78,27 @@ const RentalEquipmentScreen = () => {
           placeholder="Search by equipment name..."
         />
         <TouchableOpacity style={styles.filterButton}>
-          {/* <Icon name="filter-list" type="material" /> */}
+          <Filter size={24} color="#757575" />
         </TouchableOpacity>
       </View>
 
-      {/* Equipment List */}
+      {/* Time Filter Menu */}
+      <View style={styles.filterMenu}>
+        {timeFilters.map((filter, index) => (
+          <TouchableOpacity key={index} style={styles.filterButton}>
+            <Text style={styles.filterButtonText}>{filter}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <FlatList
         data={equipmentData}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => navigation.navigate("EquipmentDetail", { item })} // Navigate to details
+          >
             <View style={styles.cardContent}>
               <Image source={{ uri: item.image }} style={styles.image} />
               <View style={styles.cardDetails}>
@@ -91,7 +116,7 @@ const RentalEquipmentScreen = () => {
                   <Text style={styles.detailLabel}>Rating:</Text>
                   <Text style={styles.detailValue}>
                     {item.rating}
-                    <Text style={styles.starValue}>★</Text>
+                    <Text style={styles.starValue}> ★</Text>
                   </Text>
                 </View>
                 <View style={styles.detailRow}>
@@ -105,69 +130,82 @@ const RentalEquipmentScreen = () => {
                   </Text>
                 </View>
               </View>
+
               {/* Favorite and Rental Buttons */}
               <View style={styles.actionButtons}>
                 {/* Rental Button */}
                 <TouchableOpacity style={styles.iconButton}>
-                  {/* {item.availability === "Available" ? (
-                    <Icon
-                      name="shopping-cart"
-                      type="material"
-                      color="#4caf50"
-                    />
+                  {item.availability === "Available" ? (
+                    <ShoppingCart size={24} color="#4caf50" />
                   ) : (
-                    <Icon name="outofstock" type="material" color="#d32f2f" />
-                  )} */}
+                    <Ban size={24} color="#d32f2f" />
+                  )}
                 </TouchableOpacity>
+
                 {/* Favorite Button with Toggle */}
                 <TouchableOpacity
                   style={styles.iconButton}
                   onPress={() => toggleFavorite(item.id)}
                 >
-                  {/* <Icon
-                    name="favorite"
-                    type="material"
-                    color={favorites[item.id] ? "#ff1744" : "#424242"} // Change color based on favorite status
-                  /> */}
+                  {favorites[item.id] ? (
+                    <Heart size={24} color="#ff1744" />
+                  ) : (
+                    <HeartOff size={24} color="#424242" />
+                  )}
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </TouchableOpacity> // Make the entire card pressable
         )}
       />
     </View>
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5", // Light background for better contrast
+    backgroundColor: "#f5f5f5",
     paddingTop: 10,
+  },
+  filterMenu: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  filterButton: {
+    padding: 10,
+    borderRadius: 20,
+    borderColor: "#b0bec5",
+    borderWidth: 1,
+    backgroundColor: "#fff",
+  },
+  filterButtonText: {
+    color: "#212121",
   },
   searchContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 20,
+    marginTop: 30, // Increased margin for more space
   },
   searchInput: {
     flex: 1,
     height: 40,
     borderWidth: 1,
-    borderColor: "#b0bec5", // Lighter border color
+    borderColor: "#b0bec5",
     borderRadius: 8,
     paddingLeft: 10,
-    backgroundColor: "#ffffff", // White background for search input
-  },
-  filterButton: {
-    marginLeft: 10,
+    backgroundColor: "#ffffff",
   },
   card: {
     borderRadius: 10,
     padding: 10,
     margin: 10,
-    backgroundColor: "#ffffff", // White background for cards
+    backgroundColor: "#ffffff",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -190,7 +228,7 @@ const styles = StyleSheet.create({
   equipmentName: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#212121", // Darker text for better readability
+    color: "#212121",
   },
   price: {
     color: "#B8860B",
@@ -202,20 +240,20 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontWeight: "bold",
-    color: "#757575", // Gray for labels
+    color: "#757575",
   },
   detailValue: {
     marginLeft: 5,
-    color: "#424242", // Dark gray for values
+    color: "#424242",
   },
   starValue: {
     color: "#EEC900",
   },
   available: {
-    color: "#388e3c", // Dark green for available
+    color: "#388e3c",
   },
   rented: {
-    color: "#d32f2f", // Red for rented
+    color: "#d32f2f",
   },
   actionButtons: {
     flexDirection: "row",
@@ -225,11 +263,6 @@ const styles = StyleSheet.create({
   iconButton: {
     padding: 5,
     alignItems: "center",
-  },
-  buttonLabel: {
-    marginTop: 5,
-    fontSize: 12,
-    color: "#000",
   },
 });
 
