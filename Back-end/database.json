@@ -1,0 +1,114 @@
+{
+    "User": [
+      {
+        "userId": "1",
+        "username": "string",
+        "password": "string",
+        "role": "string",
+        "email": "string",
+        "profile": {
+          "phone": "string",
+          "avatar": "string"
+        },
+        "status": 1,
+        "deleted": false
+      }
+    ],
+    "Equipment": [
+      {
+        "equipment_id": "1",
+        "equipment_name": "string",
+        "image": "string",
+        "price": 100,
+        "quantity": 10,
+        "deleted": false
+      }
+    ],
+    "EquipmentOrder": [
+      {
+        "equipment_order_id": "1",
+        "customer_id": "1",
+        "equipmentId": "1",
+        "quantity_order": 2,
+        "status": "string",
+        "deleted": false
+      }
+    ],
+    "Post": [
+      {
+        "postId": "1",
+        "customer_id": "1",
+        "name": "string",
+        "startAt": "2024-10-07T00:00:00",
+        "endAt": "2024-10-07T00:00:00",
+        "description": "string",
+        "image": "string",
+        "location": "string",
+        "deleted": false
+      }
+    ],
+    "Field": [
+      {
+        "fieldId": "1",
+        "name": "string",
+        "sportId": "1",
+        "location": "string",
+        "ownerId": "string",
+        "feedBackId": "1",
+        "price": 100,
+        "deleted": false
+      }
+    ],
+    "FieldOrder": [
+      {
+        "field_order_id": "1",
+        "customer_id": "1",
+        "fieldTimeId": "1",
+        "order_date": "2024-10-07T00:00:00",
+        "equipment_order_id": "1",
+        "status": "string",
+        "deleted": false
+      }
+    ],
+    "FieldTime": [
+      {
+        "fieldTimeId": "1",
+        "fieldId": "1",
+        "start": "2024-10-07T07:00:00",
+        "end": "2024-10-07T18:00:00"
+      }
+    ],
+    "Sport": [
+      {
+        "sportId": "1",
+        "sportName": "string",
+        "image": "string"
+      }
+    ],
+    "Report": [
+      {
+        "reportId": "1",
+        "title": "string",
+        "description": "string",
+        "reportTypeId": "1",
+        "deleted": false
+      }
+    ],
+    "ReportType": [
+      {
+        "reportTypeId": "1",
+        "type": "string",
+        "deleted": false
+      }
+    ],
+    "Feedbacks": [
+      {
+        "feedBackId": "1",
+        "starNumber": 5,
+        "detail": "string",
+        "userId": "1",
+        "deleted": false
+      }
+    ]
+  }
+  

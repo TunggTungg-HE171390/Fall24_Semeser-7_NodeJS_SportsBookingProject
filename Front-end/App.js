@@ -2,13 +2,15 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import Tab_bar from "./components/Tab_bar";
 import Home_screen from "./screens/Home_screen";
 import Profile_screen from "./screens/Profile_screen";
 import Booking_screen from "./screens/Booking_screen";
 import Inbox_screen from "./screens/Inbox_screen";
 import Explore_screen from "./screens/Explore_screen";
-import { createStackNavigator } from "@react-navigation/stack";
+import LoginScreen from "./screens/Login_screen";
 import FieldDetailScreen from "./screens/FieldDetailScreen";
 import FieldListScreen from "./screens/FieldListScreen";
 import FieldAdminDetailScreen from "./screens/FieldAdminsDetail";
@@ -42,28 +44,50 @@ function FieldStack() {
   );
 }
 
+function MainTabs(){
+  return (
+    <Tab.Navigator tabBar={(props) => <Tab_bar {...props} />}>
+      <Tab.Screen name="Home" component={Home_screen} />
+      <Tab.Screen name="Explore" component={Explore_screen} />
+      <Tab.Screen name="Booking" component={BookingStack} options={{ title: "Booking" }} />
+      <Tab.Screen name="Inbox" component={Inbox_screen} />
+      <Tab.Screen name="Profile" component={Profile_screen} />
+      <Tab.Screen name="Field" component={FieldStack} />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
   return (
+    // <NavigationContainer>
+    //   <Tab.Navigator
+    //     tabBar={(props) => <Tab_bar {...props} />}
+    //     screenOptions={{ headerShown: false }}
+    //   >
+    //     <Tab.Screen name="Home" component={Home_screen} />
+    //     <Tab.Screen name="Explore" component={Explore_screen} />
+    //     <Tab.Screen
+    //       name="Booking"
+    //       component={BookingStack}
+    //       options={{ title: "Booking" }}
+    //     />
+    //     <Tab.Screen name="Inbox" component={Inbox_screen} />
+    //     <Tab.Screen name="Profile" component={Profile_screen} />
+    //     <Tab.Screen name="Field" component={FieldStack} />
+    //   </Tab.Navigator>
+    //   <StatusBar style="auto" />
+    // </NavigationContainer>
+
     <NavigationContainer>
-      <Tab.Navigator
-        tabBar={(props) => <Tab_bar {...props} />}
-        screenOptions={{ headerShown: false }}
-      >
-        <Tab.Screen name="Home" component={Home_screen} />
-        <Tab.Screen name="Explore" component={Explore_screen} />
-        <Tab.Screen
-          name="Booking"
-          component={BookingStack}
-          options={{ title: "Booking" }}
-        />
-        <Tab.Screen name="Inbox" component={Inbox_screen} />
-        <Tab.Screen name="Profile" component={Profile_screen} />
-        <Tab.Screen name="Field" component={FieldStack} />
-      </Tab.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Main" component={MainTabs} />
+      </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
