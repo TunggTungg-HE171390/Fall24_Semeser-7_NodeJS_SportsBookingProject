@@ -6,11 +6,34 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  FlatList,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { ShoppingCart, Heart, HeartOff } from "lucide-react-native";
 
-const EquipmentDetailScreen = () => {
+const relatedItems = [
+  {
+    id: "1",
+    title: "Tennis Ball Set",
+    price: "30,000 VND/h",
+    image: "https://via.placeholder.com/100",
+  },
+  {
+    id: "2",
+    title: "Tennis Net",
+    price: "70,000 VND/h",
+    image: "https://via.placeholder.com/100",
+  },
+  {
+    id: "3",
+    title: "Tennis Shoes",
+    price: "120,000 VND/h",
+    image: "https://via.placeholder.com/100",
+  },
+];
+
+const EquipmentDetailScreen = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -18,8 +41,8 @@ const EquipmentDetailScreen = () => {
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const availableQuantity = 8; // Set the available quantity here
-  const [isFavorite, setIsFavorite] = useState(false); // State to track if item is favorite
+  const availableQuantity = 8;
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -74,8 +97,16 @@ const EquipmentDetailScreen = () => {
     );
   };
 
+  const renderRelatedItem = ({ item }) => (
+    <View style={styles.relatedItem}>
+      <Image source={{ uri: item.image }} style={styles.relatedItemImage} />
+      <Text style={styles.relatedItemTitle}>{item.title}</Text>
+      <Text style={styles.relatedItemPrice}>{item.price}</Text>
+    </View>
+  );
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>Equipment Detail</Text>
       <Image
         source={{ uri: "https://via.placeholder.com/400x200" }}
@@ -153,25 +184,34 @@ const EquipmentDetailScreen = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.rentButton} onPress={handleRent}>
-          <Icon name="shopping-cart" size={20} color="#fff" />
-          <Text style={styles.rentButtonText}> Rent Equipment</Text>
+          <ShoppingCart color="#fff" size={20} />
+          <Text style={styles.rentButtonText}>Rent Equipment</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.favoriteButton}
           onPress={toggleFavorite}
         >
-          <Icon
-            name={isFavorite ? "heart" : "heart-o"}
-            size={20}
-            color={isFavorite ? "red" : "black"}
-          />
+          {isFavorite ? (
+            <Heart color="red" size={20} />
+          ) : (
+            <HeartOff color="black" size={20} />
+          )}
           <Text style={styles.favoriteButtonText}>
             {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+
+      <Text style={styles.relatedItemsHeader}>Related Items</Text>
+      <FlatList
+        data={relatedItems}
+        renderItem={renderRelatedItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      />
+    </ScrollView>
   );
 };
 
@@ -189,7 +229,6 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 200,
-    borderRadius: 10,
     marginBottom: 20,
   },
   title: {
@@ -199,17 +238,15 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   price: {
-    fontSize: 18,
-    color: "green",
-    fontWeight: "bold",
-    marginBottom: 5,
+    fontSize: 16,
+    marginBottom: 10,
   },
   rating: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   availability: {
     fontSize: 16,
@@ -225,29 +262,25 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   quantityButton: {
-    backgroundColor: "#e0e0e0",
-    width: 30,
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 15,
+    backgroundColor: "lightgray",
+    padding: 10,
+    borderRadius: 5,
+    marginHorizontal: 5,
   },
   quantityButtonText: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 18,
   },
   quantityText: {
     fontSize: 18,
-    marginHorizontal: 10,
   },
   dateButton: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "lightblue",
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
   },
   timeButton: {
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "lightgreen",
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
@@ -255,33 +288,56 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginBottom: 20,
   },
   rentButton: {
+    backgroundColor: "blue",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 5,
     flex: 1,
-    marginRight: 10,
+    marginRight: 5,
   },
   rentButtonText: {
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    marginLeft: 5,
   },
   favoriteButton: {
+    backgroundColor: "lightgray",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#e0e0e0",
     padding: 15,
     borderRadius: 5,
     flex: 1,
+    marginLeft: 5,
   },
   favoriteButtonText: {
+    fontSize: 16,
     marginLeft: 5,
-    fontSize: 18,
+  },
+  relatedItemsHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 20,
+  },
+  relatedItem: {
+    marginRight: 10,
+    alignItems: "center",
+    paddingBottom: 50,
+  },
+  relatedItemImage: {
+    width: 100,
+    height: 100,
+  },
+  relatedItemTitle: {
+    fontSize: 14,
+    textAlign: "center",
+  },
+  relatedItemPrice: {
+    fontSize: 12,
+    color: "gray",
   },
 });
 
