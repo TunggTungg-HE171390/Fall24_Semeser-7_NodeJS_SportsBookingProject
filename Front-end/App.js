@@ -58,8 +58,6 @@ function FieldStack() {
   );
 }
 
-
-
 export default function App() {
   return (
     <NavigationContainer>
