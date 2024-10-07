@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import HeaderMenu from './HeaderMenu';
 
 export default function Profile() {
   const [viewType, setViewType] = useState('monthly');
 
   return (
     <View style={styles.container}>
-      <HeaderMenu />
-
+    
       {/* Khu vực để lựa chọn Monthly/Weekly View */}
       <View style={styles.header}>
         <TouchableOpacity

@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Tab_bar from "./components/Tab_bar";
 import Home_screen from "./screens/Home_screen";
 import Profile_screen from "./screens/Profile_screen";
@@ -12,6 +13,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import FieldDetailScreen from "./screens/FieldDetailScreen";
 import FieldListScreen from "./screens/FieldListScreen";
 import FieldAdminDetailScreen from "./screens/FieldAdminsDetail";
+import TabScreen from './components/TabNavigator';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,6 +24,20 @@ function BookingStack() {
       <Stack.Screen name="BookingList" component={Booking_screen} />
       <Stack.Screen name="FieldDetail" component={FieldDetailScreen} />
     </Stack.Navigator>
+  );
+}
+
+function ManageBooking() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="TabScreen">
+        <Stack.Screen
+          name="TabScreen"
+          component={TabScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -41,6 +57,8 @@ function FieldStack() {
     </Stack.Navigator>
   );
 }
+
+
 
 export default function App() {
   return (
