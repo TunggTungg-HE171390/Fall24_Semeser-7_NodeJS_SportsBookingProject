@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Tab_bar from "./components/Tab_bar";
 import Home_screen from "./screens/Home_screen";
 import Profile_screen from "./screens/Profile_screen";
@@ -12,11 +13,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import FieldDetailScreen from "./screens/FieldDetailScreen";
 import FieldListScreen from "./screens/FieldListScreen";
 import FieldAdminDetailScreen from "./screens/FieldAdminsDetail";
-import Header from "./layout/Header";
-import ManageAccount from "./screens/ManageAccount";
-import AccountDetail from "./screens/AccountDetail";
-import Dashboard from "./screens/Dashbord";
-import { ROUTER } from "./utils/contant";
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -26,6 +23,20 @@ function BookingStack() {
       <Stack.Screen name="BookingList" component={Booking_screen} />
       <Stack.Screen name="FieldDetail" component={FieldDetailScreen} />
     </Stack.Navigator>
+  );
+}
+
+function ManageBooking() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="TabScreen">
+        <Stack.Screen
+          name="TabScreen"
+          component={TabScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -43,22 +54,6 @@ function FieldStack() {
         options={{ title: "Chi tiết sân" }}
       />
     </Stack.Navigator>
-  );
-}
-
-function DashboardStack() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Header />
-      <Stack.Navigator
-        initialRouteName={ROUTER.DASHBOARD}
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name={ROUTER.MANAGE_ACCOUNT} component={ManageAccount} />
-        <Stack.Screen name={ROUTER.ACCOUNT_DETAIL} component={AccountDetail} />
-        <Stack.Screen name={ROUTER.DASHBOARD} component={Dashboard} />
-      </Stack.Navigator>
-    </SafeAreaView>
   );
 }
 
