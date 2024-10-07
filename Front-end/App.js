@@ -17,6 +17,7 @@ import ManageAccount from "./screens/ManageAccount";
 import AccountDetail from "./screens/AccountDetail";
 import Dashboard from "./screens/Dashbord";
 import { ROUTER } from "./utils/contant";
+import RentalEquipmentScreen from "./screens/RentalEquipmentScreen";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -79,6 +80,7 @@ export default function App() {
         <Tab.Screen name="Inbox" component={Inbox_screen} />
         <Tab.Screen name="Profile" component={Profile_screen} />
         <Tab.Screen name="Field" component={FieldStack} />
+        <Tab.Screen name="Field" component={RentalEquipmentScreen} />
         <Tab.Screen name="Dash" component={DashboardStack} />
       </Tab.Navigator>
       <StatusBar style="auto" />
