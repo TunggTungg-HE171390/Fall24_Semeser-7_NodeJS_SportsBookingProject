@@ -46,6 +46,8 @@ export default function HeaderMenu() {
                 navigation.navigate('Profile');
               }else if (feature.name === 'History') {
                 navigation.navigate('History');
+              }else if (feature.name === 'Setting') {
+                navigation.navigate('Setting');
               }
             }}
           >
@@ -60,27 +62,41 @@ export default function HeaderMenu() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    marginTop: 60,
+    paddingVertical: 20,
+    backgroundColor: '#f8f8f8',
+    paddingHorizontal: 10,
+    width: '100%',
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#ff6b01',
+    marginBottom: 15,
   },
   profileName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
   },
   touchableContainer: {
     alignItems: 'center',
     backgroundColor: '#ff6b01',
     borderRadius: 25,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   textContainer: {
     flexDirection: 'row',
@@ -89,24 +105,41 @@ const styles = StyleSheet.create({
   },
   navBar: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    width: '100%', // Đảm bảo navBar chiếm toàn bộ chiều ngang
+    backgroundColor: '#ffffff',
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
     borderColor: '#ddd',
-
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    marginHorizontal: 10,
   },
   navItem: {
     alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 5,
   },
   navText: {
-    fontSize: 12,
-    color: '#000',
+    fontSize: 14,
+    color: '#555',
+    marginTop: 5,
   },
   activeButton: {
     backgroundColor: '#ff6b01',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  activeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
