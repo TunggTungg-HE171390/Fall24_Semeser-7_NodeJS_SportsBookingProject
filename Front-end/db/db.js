@@ -6,7 +6,7 @@ export const AccountsData = [
     email: "john@example.com",
     profile: {
       phone: "0963101234",
-      avatar: require("../assets/images/avatar/avatar.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -17,7 +17,7 @@ export const AccountsData = [
     email: "john@example.com",
     profile: {
       phone: "0945678901",
-      avatar: require("../assets/images/avatar/avatar-1.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -28,7 +28,7 @@ export const AccountsData = [
     email: "bruce@example.com",
     profile: {
       phone: "0334567890",
-      avatar: require("../assets/images/avatar/avatar-2.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -39,7 +39,7 @@ export const AccountsData = [
     email: "bob@example.com",
     profile: {
       phone: "0445678901",
-      avatar: require("../assets/images/avatar/avatar-3.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -50,7 +50,7 @@ export const AccountsData = [
     email: "mary@example.com",
     profile: {
       phone: "0987654321",
-      avatar: require("../assets/images/avatar/avatar-4.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -61,7 +61,7 @@ export const AccountsData = [
     email: "Samail@example.com",
     profile: {
       phone: "0998765432",
-      avatar: require("../assets/images/avatar/avatar-5.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -72,7 +72,7 @@ export const AccountsData = [
     email: "zjT3b@example.com",
     profile: {
       phone: "0112345678",
-      avatar: require("../assets/images/avatar/avatar-6.png"),
+      avatar: "",
     },
     status: 1,
   },
@@ -83,7 +83,7 @@ export const AccountsData = [
     email: "olivia@example.com",
     profile: {
       phone: "0223456789",
-      avatar: require("../assets/images/avatar/avatar-7.png"),
+      avatar: "",
     },
     status: 1,
   },
