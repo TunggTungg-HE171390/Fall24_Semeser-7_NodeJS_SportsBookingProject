@@ -20,7 +20,7 @@ import AccountDetail from "./screens/AccountDetail";
 import Dashboard from "./screens/Dashbord";
 import { ROUTER } from "./utils/contant";
 
-import Profile from "./Manage_History_Booking/Profile";
+import TabScreen from './components/Tab_Navigator';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -31,6 +31,18 @@ function BookingStack() {
       <Stack.Screen name="BookingList" component={Booking_screen} />
       <Stack.Screen name="FieldDetail" component={FieldDetailScreen} />
     </Stack.Navigator>
+  );
+}
+
+function ManageBooking() {
+  return (
+      <Stack.Navigator initialRouteName="TabScreen" screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="TabScreen"
+          component={TabScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
   );
 }
 
@@ -58,7 +70,7 @@ function MainTabs(){
       <Tab.Screen name="Explore" component={Explore_screen} />
       <Tab.Screen name="Booking" component={BookingStack} options={{ title: "Booking" }} />
       <Tab.Screen name="Inbox" component={Inbox_screen} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Profile" component={ManageBooking} options={{ headerShown: false }}/>
       <Tab.Screen name="Field" component={FieldStack} />
       <Tab.Screen name="Dash" component={DashboardStack} />
     </Tab.Navigator>

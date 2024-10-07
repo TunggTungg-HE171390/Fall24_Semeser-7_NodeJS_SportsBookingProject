@@ -33,8 +33,6 @@ export default function Report() {
 
   return (
     <View style={styles.container}>
-
-      
       <ScrollView style={styles.reviewContainer} contentContainerStyle={styles.scrollContentContainer}>
         <Text style={styles.label}>Đánh giá trước đó về các sân:</Text>
         {reviews.slice(0, 10).map((review, index) => (
@@ -55,9 +53,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    marginBottom: 120,
     paddingHorizontal: 20,
-    paddingTop: 40,
+    
   },
 
   label: {
