@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Profile from './Manage_History_Booking/Profile';
-import History from './Manage_History_Booking/History';
-import Report from './Manage_History_Booking/Report';
-import Setting from './Manage_History_Booking/Setting';
+import Profile from '../Manage_History_Booking/Profile';
+import History from '../Manage_History_Booking/History';
+import Report from '../Manage_History_Booking/Report';
+import Setting from '../Manage_History_Booking/Setting';
 
 export default function CustomTabScreen() {
   const [selectedTab, setSelectedTab] = useState('Profile');
