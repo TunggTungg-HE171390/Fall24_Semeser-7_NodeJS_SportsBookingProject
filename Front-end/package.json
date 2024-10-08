@@ -9,18 +9,23 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/vector-icons": "^14.0.3",
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-community/slider": "^4.5.3",
     "@react-native-picker/picker": "^2.8.1",
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
+    "@react-navigation/native-stack": "^6.11.0",
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.7",
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",
     "lucide-react-native": "^0.446.0",
+    "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-native": "0.74.5",
+    "react-native-calendars": "^1.1307.0",
+    "react-native-chart-kit": "^6.12.0",
     "react-native-calendars": "^1.1307.0",
     "react-native-swiper": "^1.6.0",
     "react-native-dropdown-picker": "^5.4.6",
@@ -32,7 +37,8 @@
     "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@types/react": "^18.3.11"
   },
   "private": true
 }
