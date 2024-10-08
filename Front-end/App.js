@@ -3,7 +3,6 @@ import { StyleSheet, SafeAreaView } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import Tab_bar from "./components/Tab_bar";
 import Home_screen from "./screens/Home_screen";
 import Profile_screen from "./screens/Profile_screen";
@@ -19,9 +18,11 @@ import ManageAccount from "./screens/ManageAccount";
 import AccountDetail from "./screens/AccountDetail";
 import Dashboard from "./screens/Dashbord";
 import { ROUTER } from "./utils/contant";
+import RentalEquipmentScreen from "./screens/RentalEquipmentScreen";
+import EquipmentDetailScreen from "./screens/EquipmentDetailsScreen";
+
 
 import TabScreen from './components/Tab_Navigator';
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -63,6 +64,16 @@ function FieldStack() {
   );
 }
 
+function EquipmentRental() {
+  return (
+    <Stack.Navigator initialRouteName="RentalEquipment">
+      <Stack.Screen name="RentalEquipment" component={RentalEquipmentScreen} />
+      <Stack.Screen name="EquipmentDetail" component={EquipmentDetailScreen} />
+    </Stack.Navigator>
+  );
+}
+
+
 function MainTabs(){
   return (
     <Tab.Navigator tabBar={(props) => <Tab_bar {...props} screenOptions={{ headerShown: false }}/>}>
@@ -76,6 +87,7 @@ function MainTabs(){
     </Tab.Navigator>
   )
 };
+
 function DashboardStack() {
   return (
     <SafeAreaView style={styles.container}>
@@ -97,6 +109,24 @@ export default function App() {
   return (
 
     <NavigationContainer>
+      <Tab.Navigator
+        tabBar={(props) => <Tab_bar {...props} />}
+        screenOptions={{ headerShown: false }}
+      >
+        <Tab.Screen name="Home" component={Home_screen} />
+        <Tab.Screen name="Explore" component={Explore_screen} />
+        <Tab.Screen
+          name="Booking"
+          component={BookingStack}
+          options={{ title: "Booking" }}
+        />
+        <Tab.Screen name="Inbox" component={Inbox_screen} />
+        <Tab.Screen name="Profile" component={Profile_screen} />
+        {/* <Tab.Screen name="Field" component={FieldStack} /> */}
+        <Tab.Screen name="Field" component={EquipmentRental} />
+        <Tab.Screen name="Dash" component={DashboardStack} />
+      </Tab.Navigator>
+
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
@@ -105,7 +135,6 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
