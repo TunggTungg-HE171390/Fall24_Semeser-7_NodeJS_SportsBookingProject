@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal, View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { X } from 'lucide-react-native';
 
 const DetailedPostModal = ({ visible, event, onClose }) => {
   if (!event) return null;
@@ -9,9 +8,6 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.closeIcon} onPress={onClose}>
-                <X color="#000" size={24} />
-            </TouchableOpacity>
 
           <Image source={event.image} style={styles.eventImage} />
           <Text style={styles.eventTitle}>Title: {event.title}</Text>
@@ -19,8 +15,8 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
           <Text style={styles.eventDate}>Date: {event.date}</Text>
           <Text style={styles.eventLocation}>Location: {event.location}</Text>
 
-          <TouchableOpacity style={styles.editButton} onPress={onClose}>
-            <Text style={styles.editButtonText}>Edit</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>Close</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -40,13 +36,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     position: 'relative',
-    paddingTop: 40,
-  },
-  closeIcon: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 5,
   },
   eventImage: {
     width: '100%',
@@ -72,13 +61,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  editButton: {
+  closeButton: {
     backgroundColor: 'orange',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
   },
-  editButtonText: {
+  closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },
