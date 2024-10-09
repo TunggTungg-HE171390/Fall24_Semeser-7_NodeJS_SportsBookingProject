@@ -21,8 +21,7 @@ import { ROUTER } from "./utils/contant";
 import RentalEquipmentScreen from "./screens/RentalEquipmentScreen";
 import EquipmentDetailScreen from "./screens/EquipmentDetailsScreen";
 
-
-import TabScreen from './components/Tab_Navigator';
+import TabScreen from "./components/Tab_Navigator";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -37,13 +36,16 @@ function BookingStack() {
 
 function ManageBooking() {
   return (
-      <Stack.Navigator initialRouteName="TabScreen" screenOptions={{ headerShown: false }}>
-        <Stack.Screen
-          name="TabScreen"
-          component={TabScreen}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
+    <Stack.Navigator
+      initialRouteName="TabScreen"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen
+        name="TabScreen"
+        component={TabScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
   );
 }
 
@@ -73,20 +75,31 @@ function EquipmentRental() {
   );
 }
 
-
-function MainTabs(){
+function MainTabs() {
   return (
-    <Tab.Navigator tabBar={(props) => <Tab_bar {...props} screenOptions={{ headerShown: false }}/>}>
+    <Tab.Navigator
+      tabBar={(props) => (
+        <Tab_bar {...props} screenOptions={{ headerShown: false }} />
+      )}
+    >
       <Tab.Screen name="Home" component={Home_screen} />
       <Tab.Screen name="Explore" component={Explore_screen} />
-      <Tab.Screen name="Booking" component={BookingStack} options={{ title: "Booking" }} />
+      <Tab.Screen
+        name="Booking"
+        component={BookingStack}
+        options={{ title: "Booking" }}
+      />
       <Tab.Screen name="Inbox" component={Inbox_screen} />
-      <Tab.Screen name="Profile" component={ManageBooking} options={{ headerShown: false }}/>
+      <Tab.Screen
+        name="Profile"
+        component={ManageBooking}
+        options={{ headerShown: false }}
+      />
       <Tab.Screen name="Field" component={FieldStack} />
       <Tab.Screen name="Dash" component={DashboardStack} />
     </Tab.Navigator>
-  )
-};
+  );
+}
 
 function DashboardStack() {
   return (
@@ -104,29 +117,9 @@ function DashboardStack() {
   );
 }
 
-
 export default function App() {
   return (
-
     <NavigationContainer>
-      <Tab.Navigator
-        tabBar={(props) => <Tab_bar {...props} />}
-        screenOptions={{ headerShown: false }}
-      >
-        <Tab.Screen name="Home" component={Home_screen} />
-        <Tab.Screen name="Explore" component={Explore_screen} />
-        <Tab.Screen
-          name="Booking"
-          component={BookingStack}
-          options={{ title: "Booking" }}
-        />
-        <Tab.Screen name="Inbox" component={Inbox_screen} />
-        <Tab.Screen name="Profile" component={Profile_screen} />
-        {/* <Tab.Screen name="Field" component={FieldStack} /> */}
-        <Tab.Screen name="Field" component={EquipmentRental} />
-        <Tab.Screen name="Dash" component={DashboardStack} />
-      </Tab.Navigator>
-
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
