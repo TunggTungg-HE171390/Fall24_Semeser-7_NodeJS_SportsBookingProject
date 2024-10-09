@@ -96,7 +96,11 @@ function MainTabs() {
         options={{ headerShown: false }}
       />
       <Tab.Screen name="Field" component={FieldStack} />
-      <Tab.Screen name="Dash" component={DashboardStack} />
+      <Tab.Screen
+        name="Dash"
+        component={DashboardStack}
+        options={{ headerShown: false }}
+      />
     </Tab.Navigator>
   );
 }
