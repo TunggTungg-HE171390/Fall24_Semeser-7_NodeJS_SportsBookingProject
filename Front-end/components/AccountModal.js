@@ -11,18 +11,13 @@ import {
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import {
-  isValidEmail,
-  isValidPhone,
-  isValidField,
-  isValidUsername,
-} from "../utils/util";
+import { isValidEmail, isValidPhone, isValidField } from "../utils/util";
 import PropTypes from "prop-types";
 
-const AccountModal = ({ visible, onClose, onSubmit, account }) => {
-  const isEditMode = !!account;
-  const [username, setUsername] = useState("");
-  const [role, setRole] = useState("Customer");
+const AccountModal = ({ visible, onClose, onSubmit, data }) => {
+  const isEditMode = !!data;
+  const [name, setName] = useState("");
+  const [role, setRole] = useState(1);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -30,34 +25,27 @@ const AccountModal = ({ visible, onClose, onSubmit, account }) => {
 
   useEffect(() => {
     if (isEditMode) {
-      setUsername(account.username);
-      setEmail(account.email);
-      setPhone(account.profile.phone);
-      setRole(account.role);
+      setName(data.profile.name);
+      setEmail(data.account.email);
+      setPhone(data.profile.phone);
+      setRole(data.role);
     } else {
       // Reset fields khi ở chế độ thêm mới
-      setUsername("");
+      setName("");
       setEmail("");
       setPhone("");
-      setRole("Customer");
+      setRole(1);
       setErrors({});
     }
-  }, [account, isEditMode, visible]);
+  }, [data, isEditMode, visible]);
 
   const handleSubmit = () => {
     const newErrors = {};
-    if (!isValidField(username)) {
-      newErrors.username = "Username is required";
-    }
-
-    if (username && !isValidUsername(username)) {
-      newErrors.username =
-        "Only 3-20 digits, letters, numbers, underscores and periods are allowed.";
-    }
 
     if (!isValidField(email)) {
       newErrors.email = "Email is required";
     }
+
     if (email && !isValidEmail(email)) {
       newErrors.email = "Email must contain @ and .";
     }
@@ -72,10 +60,13 @@ const AccountModal = ({ visible, onClose, onSubmit, account }) => {
     }
 
     const accountData = {
-      username,
+      account: {
+        email,
+        password: "1",
+      },
       role,
-      email,
       profile: {
+        name,
         phone,
         avatar: require("../assets/images/avatar/avatar.png"),
       },
@@ -134,18 +125,13 @@ const AccountModal = ({ visible, onClose, onSubmit, account }) => {
               keyboardShouldPersistTaps="handled"
             >
               <View style={styles.fieldContainer}>
-                <Text style={styles.label}>
-                  User Name <Text style={styles.required}>*</Text>
-                </Text>
+                <Text style={styles.label}>Name</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="User Name"
-                  value={username}
-                  onChangeText={setUsername}
+                  placeholder="Name"
+                  value={name}
+                  onChangeText={setName}
                 />
-                {errors.username && (
-                  <Text style={styles.errorText}>{errors.username}</Text>
-                )}
               </View>
 
               <View style={styles.fieldContainer}>
@@ -187,10 +173,10 @@ const AccountModal = ({ visible, onClose, onSubmit, account }) => {
                     style={styles.picker}
                     onValueChange={(itemValue) => setRole(itemValue)}
                   >
-                    <Picker.Item label="Customer" value="Customer" />
-                    <Picker.Item label="Admin" value="Admin" />
-                    <Picker.Item label="Field Owner" value="Field Owner" />
-                    <Picker.Item label="Staff" value="Staff" />
+                    <Picker.Item label="Customer" value={1} />
+                    <Picker.Item label="Staff" value={2} />
+                    <Picker.Item label="Field Owner" value={3} />
+                    <Picker.Item label="Admin" value={4} />
                   </Picker>
                 </View>
               </View>
@@ -315,7 +301,7 @@ AccountModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  account: PropTypes.object,
+  data: PropTypes.object,
 };
 
 export default AccountModal;
