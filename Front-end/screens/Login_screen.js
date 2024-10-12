@@ -8,19 +8,30 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/authSlice";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function Login({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [email, setEmail] = useState("");
-
+  const dispatch = useDispatch();
   const handleForgotPassword = () => {
     Alert.alert("Password reset sent to mail", email);
     setModalVisible(false);
   };
 
+  // const handleLogin = () => {
+  //   navigation.replace("Customer");
+  // };
   const handleLogin = () => {
-    navigation.replace("Customer");
+    // Giả sử bạn đã xác thực thành công và nhận được thông tin người dùng
+    const userData = {
+      id: 1,
+      name: "Nguyen Van A",
+      role: 4,
+    };
+    dispatch(login(userData));
   };
 
   return (

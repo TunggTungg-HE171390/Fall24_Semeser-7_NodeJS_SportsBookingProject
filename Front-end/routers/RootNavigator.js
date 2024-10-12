@@ -3,9 +3,7 @@ import { SafeAreaView, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import Tab_bar from "../components/Tab_bar";
-import Home_screen from "../screens/Home_screen";
 import Booking_screen from "../screens/Booking_screen";
-import Inbox_screen from "../screens/Inbox_screen";
 import Explore_screen from "../screens/Explore_screen";
 import LoginScreen from "../screens/Login_screen";
 import FieldDetailScreen from "../screens/FieldDetailScreen";
@@ -21,6 +19,7 @@ import EquipmentDetailScreen from "../screens/EquipmentDetailsScreen";
 import TabScreen from "../components/Tab_Navigator";
 import SportSelected from "../screens/SportSelected";
 import RegisterScreen from "../screens/Register_screen";
+import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -92,33 +91,6 @@ function Explore_Sports_Stack() {
   );
 }
 
-function CustomerRole() {
-  return (
-    <Tab.Navigator
-      tabBar={(props) => <Tab_bar {...props} />}
-      screenOptions={{ headerShown: false }}
-    >
-      <Tab.Screen name="Explore" component={Explore_Sports_Stack} />
-      <Tab.Screen name="Booking" component={BookingStack} />
-
-      <Tab.Screen name="Equipment" component={Equipment_Rental_Stack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
-  );
-}
-
-function FieldOwnerRole() {
-  return (
-    <Tab.Navigator
-      tabBar={(props) => <Tab_bar {...props} />}
-      screenOptions={{ headerShown: false }}
-    >
-      <Tab.Screen name="Field" component={FieldStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
-  );
-}
-
 function AdminRole() {
   return (
     <SafeAreaView style={styles.container}>
@@ -136,14 +108,42 @@ function AdminRole() {
   );
 }
 
+function Main() {
+  const role = useSelector((state) => state.auth.user?.role);
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <Tab_bar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      {role === 1 && (
+        <>
+          <Tab.Screen name="Explore" component={Explore_Sports_Stack} />
+          <Tab.Screen name="Booking" component={BookingStack} />
+          <Tab.Screen name="Equipment" component={Equipment_Rental_Stack} />
+        </>
+      )}
+
+      {role === 2 && <>{/**Hiện chưa có màn hình nào */}</>}
+      {role === 3 && <Tab.Screen name="Field" component={FieldStack} />}
+      {role === 4 && <Stack.Screen name="Admin" component={AdminRole} />}
+
+      <Tab.Screen name="Profile" component={ProfileStack} />
+    </Tab.Navigator>
+  );
+}
+
 function RootNavigator() {
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Customer" component={CustomerRole} />
-      <Stack.Screen name="Field_Owner" component={FieldOwnerRole} />
-      <Stack.Screen name="Admin" component={AdminRole} />
+      {!isLoggedIn ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
+      ) : (
+        <Stack.Screen name="Main" component={Main} />
+      )}
     </Stack.Navigator>
   );
 }
