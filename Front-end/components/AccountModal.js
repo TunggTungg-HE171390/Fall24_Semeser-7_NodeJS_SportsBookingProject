@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { isValidEmail, isValidPhone, isValidField } from "../utils/util";
+import { isValidEmail, isValidPhone, isValidField } from "../utils/validation";
 import PropTypes from "prop-types";
 
 const AccountModal = ({ visible, onClose, onSubmit, data }) => {
