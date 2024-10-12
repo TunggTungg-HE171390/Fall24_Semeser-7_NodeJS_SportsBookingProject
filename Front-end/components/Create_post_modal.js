@@ -9,7 +9,6 @@ import {
   Alert,
 } from "react-native";
 import { X } from "lucide-react-native";
-import { ImagePicker } from "react-native-image-crop-picker";
 
 const CreatePostModal = ({ visible, onClose, onAdd }) => {
   const [newEvent, setNewEvent] = React.useState({
@@ -37,16 +36,6 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
       location: "",
       genre: "",
       image: require("../assets/images/san-nhan-tao.jpg"),
-    });
-  };
-
-  const selectPhoto = () => {
-    ImagePicker.openPicker({
-      width: 400,
-      height: 400,
-      cropping: true,
-    }).then((image) => {
-      console.log(image);
     });
   };
 

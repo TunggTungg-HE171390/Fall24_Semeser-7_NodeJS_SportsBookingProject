@@ -1,21 +1,36 @@
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 
-const navItems = [
-  { name: "Home", icon: "home" },
-  { name: "Explore", icon: "compass" },
-  { name: "Booking", icon: "ticket" },
-  { name: "Inbox", icon: "inbox" },
-  { name: "Profile", icon: "user" },
-  { name: "Field", icon: "plus" },
-  { name: "Dashboard", icon: "dashboard" },
-  { name: "Equipment", icon: "list" },
-];
+const getNavItems = (role) => {
+  const commonItems = [{ name: "Profile", icon: "user" }];
+
+  const roleSpecificItems = {
+    1: [
+      { name: "Explore", icon: "admin" },
+      { name: "Booking", icon: "ticket" },
+      { name: "Equipment", icon: "list" },
+    ],
+    2: [],
+    3: [{ name: "Field", icon: "plus" }],
+    4: [{ name: "Admin", icon: "dashboard" }],
+  };
+
+  return [...(roleSpecificItems[role] || []), ...commonItems];
+};
 
 const TabBarComponent = ({ state, descriptors, navigation }) => {
+  const role = useSelector((state) => state.auth.user?.role);
+  const navItems = getNavItems(role);
+
   return (
     <View style={styles.container}>
       {state.routes.map((route, index) => {
+        const navItem = navItems.find(
+          (item) => item.name.toLowerCase() === route.name.toLowerCase()
+        );
+        if (!navItem) return null;
+
         const { options } = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
@@ -57,7 +72,7 @@ const TabBarComponent = ({ state, descriptors, navigation }) => {
             style={styles.tab}
           >
             <FontAwesome
-              name={navItems[index].icon}
+              name={navItem.icon}
               size={24}
               color={isFocused ? "orange" : "gray"}
             />
