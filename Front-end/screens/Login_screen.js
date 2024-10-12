@@ -33,6 +33,32 @@ export default function Login({ navigation }) {
     };
     dispatch(login(userData));
   };
+  const handleLoginAdmin = () => {
+    const userData = {
+      id: 1,
+      name: "Admin",
+      role: 4,
+    };
+    dispatch(login(userData));
+  };
+
+  const handleLoginCustomer = () => {
+    const userData = {
+      id: 2,
+      name: "Customer",
+      role: 1,
+    };
+    dispatch(login(userData));
+  };
+
+  const handleLoginOwner = () => {
+    const userData = {
+      id: 3,
+      name: "Owner",
+      role: 3,
+    };
+    dispatch(login(userData));
+  };
 
   return (
     <View style={styles.container}>
@@ -59,9 +85,25 @@ export default function Login({ navigation }) {
       <TouchableOpacity
         style={styles.continueButton}
         accessibilityLabel="Continue with email"
-        onPress={handleLogin}
+        onPress={handleLoginAdmin}
       >
-        <Text style={styles.continueButtonText}>Login</Text>
+        <Text style={styles.continueButtonText}>Login Admin</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.continueButton}
+        accessibilityLabel="Continue with email"
+        onPress={handleLoginCustomer}
+      >
+        <Text style={styles.continueButtonText}>Login Customer</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.continueButton}
+        accessibilityLabel="Continue with email"
+        onPress={handleLoginOwner}
+      >
+        <Text style={styles.continueButtonText}>Login Owner</Text>
       </TouchableOpacity>
 
       <Text style={styles.orText}>----------------OR----------------</Text>
