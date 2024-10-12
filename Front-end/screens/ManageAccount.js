@@ -13,7 +13,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import AccountModal from "../components/AccountModal";
 import Pagination from "../components/Pagination";
 import { useNavigation } from "@react-navigation/native";
-import { ROUTER, ROLE_NAME } from "../utils/contant";
+import { ROUTER, ROLE_NAME } from "../utils/constant";
 import { AccountsData } from "../db/db";
 
 const ManageAccount = () => {
@@ -201,16 +201,18 @@ const ManageAccount = () => {
           {Object.keys(ROLE_NAME).map((key) => (
             <TouchableOpacity
               key={key}
-              onPress={() => toggleRoleSelection(key)}
+              onPress={() => toggleRoleSelection(parseInt(key))}
               style={[
                 styles.roleButton,
-                selectedRoles.includes(key) && styles.selectedRoleButton,
+                selectedRoles.includes(parseInt(key)) &&
+                  styles.selectedRoleButton,
               ]}
             >
               <Text
                 style={[
                   styles.roleButtonText,
-                  selectedRoles.includes(key) && styles.selectedRoleButtonText,
+                  selectedRoles.includes(parseInt(key)) &&
+                    styles.selectedRoleButtonText,
                 ]}
               >
                 {ROLE_NAME[key]}
