@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import PropTypes from "prop-types";
 import TabScreen from "../components/Tab_Navigator";
-import { ROLE_NAME } from "../utils/contant";
+import { ROLE_NAME } from "../utils/constant";
 const AccountDetail = ({ route }) => {
   const navigation = useNavigation();
   const { account } = route.params;

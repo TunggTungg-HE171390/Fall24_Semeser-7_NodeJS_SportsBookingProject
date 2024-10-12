@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { ROUTER } from "../utils/contant";
+import { ROUTER } from "../utils/constant";
 import PropTypes from "prop-types";
 const SideBar = ({ visible, onClose }) => {
   const [currentTab, setCurrentTab] = useState(ROUTER.DASHBOARD);
@@ -15,6 +15,8 @@ const SideBar = ({ visible, onClose }) => {
       navigation.navigate(ROUTER.DASHBOARD);
     } else if (tab === ROUTER.MANAGE_ACCOUNT) {
       navigation.navigate(ROUTER.MANAGE_ACCOUNT);
+    } else if (tab === "Profile") {
+      navigation.navigate("Profile");
     }
 
     onClose();
@@ -66,6 +68,17 @@ const SideBar = ({ visible, onClose }) => {
           <Text style={[styles.tabText, { marginLeft: 10 }]}>
             Manage Account
           </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => handleTabChange("Profile")}
+          style={[styles.tab, currentTab === "Profile" && styles.activeTab]}
+        >
+          <Ionicons
+            name="people-outline"
+            size={24}
+            color={currentTab === "Profile" ? "#fff" : "#000"}
+          />
+          <Text style={[styles.tabText, { marginLeft: 10 }]}>Profile</Text>
         </TouchableOpacity>
       </View>
 

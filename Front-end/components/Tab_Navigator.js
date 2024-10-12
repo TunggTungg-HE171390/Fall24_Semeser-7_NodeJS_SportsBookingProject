@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Profile from "../Manage_History_Booking/Profile";
-import History from "../Manage_History_Booking/History";
-import Report from "../Manage_History_Booking/Report";
-import Setting from "../Manage_History_Booking/Setting";
+import Profile from "../Account_Profile/Profile";
+import History from "../Account_Profile/History";
+import Report from "../Account_Profile/Report";
+import Setting from "../Account_Profile/Setting";
 
-export default function CustomTabScreen() {
+export default function CustomTabScreen({ navigation }) {
   const [selectedTab, setSelectedTab] = useState("Profile");
 
   const renderContent = () => {
@@ -18,7 +18,7 @@ export default function CustomTabScreen() {
       case "Report":
         return <Report />;
       case "Setting":
-        return <Setting />;
+        return <Setting navigation={navigation} />;
       default:
         return <Profile />;
     }
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   profileContainer: {
+    marginTop: 40,
     alignItems: "center",
   },
   touchableContainer: {
