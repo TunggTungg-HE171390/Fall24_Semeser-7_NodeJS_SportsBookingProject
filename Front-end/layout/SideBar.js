@@ -69,17 +69,6 @@ const SideBar = ({ visible, onClose }) => {
             Manage Account
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => handleTabChange("Profile")}
-          style={[styles.tab, currentTab === "Profile" && styles.activeTab]}
-        >
-          <Ionicons
-            name="people-outline"
-            size={24}
-            color={currentTab === "Profile" ? "#fff" : "#000"}
-          />
-          <Text style={[styles.tabText, { marginLeft: 10 }]}>Profile</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.separator} />

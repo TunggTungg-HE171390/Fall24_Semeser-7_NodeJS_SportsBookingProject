@@ -8,8 +8,9 @@ import {
   TextInput,
   FlatList,
 } from "react-native";
-
-export default function Setting({ navigation }) {
+import { logout } from "../redux/authSlice";
+import { useDispatch } from "react-redux";
+export default function Setting() {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -17,12 +18,9 @@ export default function Setting({ navigation }) {
     newPassword: "",
     confirmPassword: "",
   });
-
+  const dispatch = useDispatch();
   const handleLogout = () => {
-    // Logic for logout
-    // alert('Logged out');
-    // console.log("Check: ", navigation);
-    navigation.replace("Login");
+    dispatch(logout());
   };
 
   const handleChangePassword = () => {
