@@ -9,6 +9,7 @@ const navItems = [
   { name: "Profile", icon: "user" },
   { name: "Field", icon: "plus" },
   { name: "Dashboard", icon: "dashboard" },
+  { name: "Equipment", icon: "list" },
 ];
 
 const TabBarComponent = ({ state, descriptors, navigation }) => {
