@@ -21,15 +21,16 @@ export default function Login({ navigation }) {
     setModalVisible(false);
   };
 
-  // const handleLogin = () => {
-  //   navigation.replace("Customer");
-  // };
   const handleLogin = () => {
     // Giả sử bạn đã xác thực thành công và nhận được thông tin người dùng
+    // sửa role bên dưới để về màn hình tương ứng từng role
+    // role 1 là Customer
+    // 2 là Fied Owner
+    // 3 là Admin
     const userData = {
       id: 1,
       name: "Nguyen Van A",
-      role: 4,
+      role: 2,
     };
     dispatch(login(userData));
   };
