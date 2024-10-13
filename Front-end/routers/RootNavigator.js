@@ -23,6 +23,8 @@ import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+// Function Main bên dưới là nơi khai báo các router chính
+
 // Đạt
 function BookingStack() {
   return (
@@ -110,6 +112,10 @@ function AdminRole() {
 
 function Main() {
   const role = useSelector((state) => state.auth.user?.role);
+  // role 1 là Customer
+  // 2 là Fied Owner
+  // 3 là Admin
+  // vào Login Screen đổi role để điều hướng màn hình tương ứng
   return (
     <Tab.Navigator
       tabBar={(props) => <Tab_bar {...props} />}
@@ -122,10 +128,8 @@ function Main() {
           <Tab.Screen name="Equipment" component={Equipment_Rental_Stack} />
         </>
       )}
-
-      {role === 2 && <>{/**Hiện chưa có màn hình nào */}</>}
-      {role === 3 && <Tab.Screen name="Field" component={FieldStack} />}
-      {role === 4 && <Stack.Screen name="Admin" component={AdminRole} />}
+      {role === 2 && <Tab.Screen name="Field" component={FieldStack} />}
+      {role === 3 && <Stack.Screen name="Admin" component={AdminRole} />}
 
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
