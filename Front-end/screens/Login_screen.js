@@ -21,24 +21,24 @@ export default function Login({ navigation }) {
     setModalVisible(false);
   };
 
-  const handleLogin = () => {
-    // Giả sử bạn đã xác thực thành công và nhận được thông tin người dùng
-    // sửa role bên dưới để về màn hình tương ứng từng role
-    // role 1 là Customer
-    // 2 là Fied Owner
-    // 3 là Admin
-    const userData = {
-      id: 1,
-      name: "Nguyen Van A",
-      role: 2,
-    };
-    dispatch(login(userData));
-  };
+  // const handleLogin = () => {
+  //   // Giả sử bạn đã xác thực thành công và nhận được thông tin người dùng
+  //   // sửa role bên dưới để về màn hình tương ứng từng role
+  //   // role 1 là Customer
+  //   // 2 là Fied Owner
+  //   // 3 là Admin
+  //   const userData = {
+  //     id: 1,
+  //     name: "",
+  //     role: 2,
+  //   };
+  //   dispatch(login(userData));
+  // };
   const handleLoginAdmin = () => {
     const userData = {
       id: 1,
       name: "Admin",
-      role: 4,
+      role: 3,
     };
     dispatch(login(userData));
   };
@@ -56,7 +56,7 @@ export default function Login({ navigation }) {
     const userData = {
       id: 3,
       name: "Owner",
-      role: 3,
+      role: 2,
     };
     dispatch(login(userData));
   };
