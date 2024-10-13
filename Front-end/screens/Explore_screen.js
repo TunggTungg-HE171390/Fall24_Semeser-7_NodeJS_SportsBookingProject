@@ -13,7 +13,6 @@ import { Search, MapPin, Share2, Plus } from "lucide-react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import axios from "axios";
 
 import CreatePostModal from "../components/Create_post_modal";
 import DetailedPostModal from "../components/Detailed_post_modal";

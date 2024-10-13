@@ -7,7 +7,7 @@ const getNavItems = (role) => {
 
   const roleSpecificItems = {
     1: [
-      { name: "Explore", icon: "admin" },
+      { name: "Explore", icon: "compass" },
       { name: "Booking", icon: "ticket" },
       { name: "Equipment", icon: "list" },
     ],
