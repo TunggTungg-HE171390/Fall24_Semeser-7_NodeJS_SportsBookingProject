@@ -11,9 +11,8 @@ const getNavItems = (role) => {
       { name: "Booking", icon: "ticket" },
       { name: "Equipment", icon: "list" },
     ],
-    2: [],
-    3: [{ name: "Field", icon: "plus" }],
-    4: [{ name: "Admin", icon: "dashboard" }],
+    2: [{ name: "Field", icon: "plus" }],
+    3: [{ name: "Admin", icon: "dashboard" }],
   };
 
   return [...(roleSpecificItems[role] || []), ...commonItems];
