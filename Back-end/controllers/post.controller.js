@@ -62,9 +62,16 @@ const updatePost = async (req, res) => {
   }
 };
 
+const uploadImage = async (req, res) => {
+  res.json({
+    message: "File uploaded successfully",
+  });
+};
+
 module.exports = {
   getAllPosts,
   getPostById,
   createPost,
   updatePost,
+  uploadImage,
 };
