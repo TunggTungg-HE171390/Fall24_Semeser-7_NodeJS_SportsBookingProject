@@ -69,4 +69,4 @@ PostSchema.pre("save", async function (next) {
   }
 });
 
-module.exports = mongoose.model("Posts", PostSchema);
+module.exports = mongoose.model("Posts", PostSchema, "posts");

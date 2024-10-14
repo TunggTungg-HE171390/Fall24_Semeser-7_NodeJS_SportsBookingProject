@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const EquipmentsSchema = new mongoose.Schema({
-  equipment_name: String,
+  equipmentName: String,
   image: [
     {
       type: String,
@@ -24,4 +24,4 @@ const EquipmentsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Equipments", EquipmentsSchema);
+module.exports = mongoose.model("Equipments", EquipmentsSchema, "equipments");
