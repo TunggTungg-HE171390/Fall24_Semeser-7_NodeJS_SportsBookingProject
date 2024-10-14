@@ -7,50 +7,83 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Animated,
 } from "react-native";
 import { Search, MapPin, Share2, Plus } from "lucide-react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import axios from "axios";
+import { getIpAddress } from "../utils/ipUtil";
 
 import CreatePostModal from "../components/Create_post_modal";
 import DetailedPostModal from "../components/Detailed_post_modal";
 import EditPostModal from "../components/Edit_post_modal";
 const Explore_screen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [createPostModalVisible, setCreatePostModalVisible] = useState(false);
   const [editPostModalVisible, setEditPostModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [detailedPostModalVisible, setDetailedPostModalVisible] =
     useState(false);
 
-  const posts = [
-    {
-      id: 1,
-      title: "Saturday Morning Tennis",
-      genre: "Tennis",
-      date: "7AM - 6PM",
-      image: require("../assets/images/san-tennis.jpg"),
-      location: "Hoa Lac",
-    },
-    {
-      id: 2,
-      title: "Saturday Morning Football",
-      genre: "Football",
-      date: "7AM - 6PM",
-      image: require("../assets/images/san-nhan-tao.jpg"),
-      location: "Hoa Lac",
-    },
-    {
-      id: 3,
-      title: "Saturday Morning Badminton",
-      genre: "Badminton",
-      date: "7AM - 6PM",
-      image: require("../assets/images/san-cau-long.jpg"),
-      location: "Hoa Lac",
-    },
-  ];
+  const [posts, setPosts] = useState([]);
+  const [ipAddress, setIpAddress] = useState("");
+
+  useEffect(() => {
+    const fetchIpAddress = async () => {
+      const ip = await getIpAddress();
+      if (ip) {
+        console.log(ip);
+        setIpAddress(ip);
+      }
+    };
+
+    fetchIpAddress();
+  }, []);
+
+  const fetchPosts = async () => {
+    if (!ipAddress) return;
+
+    try {
+      const response = await axios.get(`http://${ipAddress}:3000/post/`);
+      console.log(response.data);
+      setPosts(response.data.result);
+    } catch (error) {
+      console.log("Error fetching posts:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (ipAddress) {
+      fetchPosts();
+    }
+  }, [ipAddress]);
+
+  // const posts = [
+  //   {
+  //     id: 1,
+  //     title: "Saturday Morning Tennis",
+  //     genre: "Tennis",
+  //     date: "7AM - 6PM",
+  //     image: require("../assets/images/san-tennis.jpg"),
+  //     location: "Hoa Lac",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "Saturday Morning Football",
+  //     genre: "Football",
+  //     date: "7AM - 6PM",
+  //     image: require("../assets/images/san-nhan-tao.jpg"),
+  //     location: "Hoa Lac",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Saturday Morning Badminton",
+  //     genre: "Badminton",
+  //     date: "7AM - 6PM",
+  //     image: require("../assets/images/san-cau-long.jpg"),
+  //     location: "Hoa Lac",
+  //   },
+  // ];
 
   // const [posts, setPosts] = useState([]);
 
@@ -148,13 +181,17 @@ const Explore_screen = () => {
           }}
         >
           {/* sửa chỗ này */}
-          <Image source={post.image} style={styles.eventImage} />
+          <Image source={{ uri: post.image[0] }} style={styles.eventImage} />
           <View style={styles.eventInfo}>
             <Text style={styles.eventTitle}>{post.title}</Text>
-            <Text style={styles.eventDetails}>{post.date}</Text>
+            <Text style={styles.eventDetails}>
+              {new Date(post.date).toLocaleDateString()}
+            </Text>
             <View style={styles.eventLocation}>
               <MapPin color="#888" size={16} />
-              <Text style={styles.eventLocationText}>{post.location}</Text>
+              <Text style={styles.eventLocationText}>
+                {post.location.address}
+              </Text>
             </View>
           </View>
           <TouchableOpacity style={styles.shareButton}>
@@ -191,9 +228,10 @@ const Explore_screen = () => {
             ))}
           </ScrollView>
 
+          {/* Post here */}
           <Text style={styles.sectionTitle}>Your posts</Text>
           {posts.map((post) => (
-            <EventCard key={post.id} post={post} />
+            <EventCard key={post._id} post={post} />
           ))}
 
           <Text style={styles.sectionTitle}>Explore by genre</Text>
