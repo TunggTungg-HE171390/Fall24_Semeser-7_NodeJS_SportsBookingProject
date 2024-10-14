@@ -12,6 +12,7 @@ const app = express();
 const db = require("./models/index");
 
 // Middleware
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
@@ -32,9 +33,8 @@ app.use("/post", require("./routes/post.route"));
 app.use("/user", require("./routes/user.route"));
 app.use("/field", require("./routes/field.route"));
 
-app.use(async (req, res, next) => {
-  res.status = err.status;
-  res.send({
+app.use(async (err, req, res, next) => {
+  res.status(err.status || 500).send({
     error: {
       status: err.status || 500,
       message: err.message,
