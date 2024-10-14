@@ -13,8 +13,8 @@ const UsersSchema = new mongoose.Schema({
     },
   },
   role: {
-    type: String,
-    enum: ["Customer", "Admin", "Field Owner"],
+    type: Number,
+    enum: [1, 2, 3],
     required: true,
   },
   profile: {
