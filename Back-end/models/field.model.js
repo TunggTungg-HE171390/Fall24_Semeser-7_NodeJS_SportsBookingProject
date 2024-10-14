@@ -64,4 +64,4 @@ const FieldsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Fields", FieldsSchema);
+module.exports = mongoose.model("Fields", FieldsSchema, "fields");
