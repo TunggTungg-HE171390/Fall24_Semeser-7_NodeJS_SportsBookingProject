@@ -20,4 +20,8 @@ const EquipmentOrderSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("EquipmentOrders", EquipmentOrderSchema);
+module.exports = mongoose.model(
+  "EquipmentOrders",
+  EquipmentOrderSchema,
+  "equipment_orders"
+);

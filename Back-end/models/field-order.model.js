@@ -23,7 +23,7 @@ const FieldOrdersSchema = new mongoose.Schema({
       },
     },
   ],
-  order_date: {
+  orderDate: {
     type: Date,
   },
   status: {
@@ -38,4 +38,8 @@ const FieldOrdersSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("FieldOrders", FieldOrdersSchema);
+module.exports = mongoose.model(
+  "FieldOrders",
+  FieldOrdersSchema,
+  "field_orders"
+);
