@@ -13,6 +13,8 @@ import { Swipeable } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
+import { getIpAddress } from "../utils/ipUtil";
+
 import CreatePostModal from "../components/Create_post_modal";
 import DetailedPostModal from "../components/Detailed_post_modal";
 import EditPostModal from "../components/Edit_post_modal";
@@ -24,21 +26,37 @@ const Explore_screen = () => {
     useState(false);
 
   const [posts, setPosts] = useState([]);
+  const [ipAddress, setIpAddress] = useState("");
+
+  useEffect(() => {
+    const fetchIpAddress = async () => {
+      const ip = await getIpAddress();
+      if (ip) {
+        console.log(ip);
+        setIpAddress(ip);
+      }
+    };
+
+    fetchIpAddress();
+  }, []);
 
   const fetchPosts = async () => {
+    if (!ipAddress) return;
+
     try {
-      await axios.get("http://192.168.1.13:3000/post/").then((res) => {
-        console.log(res.data);
-        setPosts(res.data.result);
-      });
+      const response = await axios.get(`http://${ipAddress}:3000/post/`);
+      console.log(response.data);
+      setPosts(response.data.result);
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching posts:", error);
     }
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (ipAddress) {
+      fetchPosts();
+    }
+  }, [ipAddress]);
 
   // const posts = [
   //   {
@@ -171,7 +189,9 @@ const Explore_screen = () => {
             </Text>
             <View style={styles.eventLocation}>
               <MapPin color="#888" size={16} />
-              <Text style={styles.eventLocationText}>{post.location}</Text>
+              <Text style={styles.eventLocationText}>
+                {post.location.address}
+              </Text>
             </View>
           </View>
           <TouchableOpacity style={styles.shareButton}>

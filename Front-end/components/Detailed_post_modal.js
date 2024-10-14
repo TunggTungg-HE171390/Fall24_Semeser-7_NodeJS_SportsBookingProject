@@ -38,7 +38,9 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
           <Text style={styles.eventDate}>
             Date: {new Date(event.date).toLocaleDateString()}
           </Text>
-          <Text style={styles.eventLocation}>Location: {event.location}</Text>
+          <Text style={styles.eventLocation}>
+            Location: {event.location.address}
+          </Text>
 
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Close</Text>
