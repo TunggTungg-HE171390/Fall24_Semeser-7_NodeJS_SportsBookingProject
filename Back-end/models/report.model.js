@@ -5,7 +5,7 @@ const ReportsSchema = new mongoose.Schema({
   description: String,
   reportTypeId: Number,
   status: Boolean,
-  field_order_id: { type: mongoose.Types.ObjectId, ref: "FieldOrders" },
+  fieldOrderId: { type: mongoose.Types.ObjectId, ref: "FieldOrders" },
 });
 
-module.exports = mongoose.model("Reports", ReportsSchema);
+module.exports = mongoose.model("Reports", ReportsSchema, "reports");

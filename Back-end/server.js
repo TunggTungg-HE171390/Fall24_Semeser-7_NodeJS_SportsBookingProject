@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const httpErrors = require("http-errors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
+const getLocalIP = require("./utils/ipconfig");
 
 const app = express();
 
@@ -17,6 +18,12 @@ app.use(morgan("dev"));
 
 app.get("/", async (req, res, next) => {
   res.status(200).json({ message: "Hello World" });
+});
+
+// get local ip
+app.get("/get-ip", (req, res) => {
+  const ip = getLocalIP();
+  res.status(200).json({ ip });
 });
 
 //Routes
@@ -39,5 +46,8 @@ app.listen(process.env.PORT, process.env.HOST_NAME, () => {
   console.log(
     `Server running at http://${process.env.HOST_NAME}:${process.env.PORT}`
   );
+  const ip = getLocalIP();
+  console.log(`IP Address: ${ip}`);
+  // Connect DB
   db.connectDB();
 });
