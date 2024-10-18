@@ -26,23 +26,3 @@ export const isValidPhone = (phone) => {
   const phoneRegex = /^\d{10,11}$/;
   return phoneRegex.test(phone);
 };
-
-/**
- * Kiểm tra tính hợp lệ của tên người dùng.
- * @param {string} username - Tên người dùng cần kiểm tra.
- * @returns {boolean} - Trả về true nếu tên người dùng hợp lệ, ngược lại false.
- */
-export const isValidUsername = (username) => {
-  // Độ dài tối thiểu và tối đa (ví dụ: từ 3 đến 20 ký tự)
-  if (username.length < 3 || username.length > 20) {
-    return false;
-  }
-
-  // Chỉ cho phép các ký tự chữ cái, số, dấu gạch dưới và dấu chấm
-  const usernameRegex = /^[a-zA-Z0-9_.]+$/;
-  if (!usernameRegex.test(username)) {
-    return false;
-  }
-
-  return true;
-};

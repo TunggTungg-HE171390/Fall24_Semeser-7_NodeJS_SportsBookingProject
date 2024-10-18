@@ -3,24 +3,30 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import PropTypes from "prop-types";
+import TabScreen from "../components/Tab_Navigator";
+import { ROLE_NAME } from "../utils/constant";
 const AccountDetail = ({ route }) => {
   const navigation = useNavigation();
   const { account } = route.params;
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <AntDesign name="arrowleft" size={24} color="#000" />
-      </TouchableOpacity>
+    <TabScreen />
+    // <View style={styles.container}>
 
-      <Image source={account.profile.avatar} style={styles.avatar} />
-      <Text style={styles.nameText}>{account.username}</Text>
-      <Text style={styles.infoText}>Role: {account.role}</Text>
-      <Text style={styles.infoText}>Email: {account.email}</Text>
-      <Text style={styles.infoText}>Phone: {account.profile.phone}</Text>
-    </View>
+    //   <TouchableOpacity
+    //     style={styles.backButton}
+    //     onPress={() => navigation.goBack()}
+    //   >
+    //     <AntDesign name="arrowleft" size={24} color="#000" />
+    //   </TouchableOpacity>
+
+    //   <Image source={account.profile.avatar} style={styles.avatar} />
+    //   <Text style={styles.nameText}>{account.username}</Text>
+    //   <Text style={styles.infoText}>
+    //     Role: {ROLE_NAME[account.role] || "Unknown Role"}
+    //   </Text>
+    //   <Text style={styles.infoText}>Email: {account.account.email}</Text>
+    //   <Text style={styles.infoText}>Phone: {account.profile.phone}</Text>
+    // </View>
   );
 };
 

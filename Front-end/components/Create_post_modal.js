@@ -1,18 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, Modal, TouchableOpacity, Pressable, Alert } from 'react-native';
-import { X } from 'lucide-react-native';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Modal,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { X } from "lucide-react-native";
 
 const CreatePostModal = ({ visible, onClose, onAdd }) => {
-  const [newEvent, setNewEvent] = React.useState({ title: '', date: '', location: '', genre: '', image: require('../assets/images/san-nhan-tao.jpg') });
+  const [newEvent, setNewEvent] = React.useState({
+    title: "",
+    date: "",
+    location: "",
+    genre: "",
+    image: require("../assets/images/san-nhan-tao.jpg"),
+  });
 
   const handleAddPost = () => {
-    if (!newEvent.title || !newEvent.date || !newEvent.location || !newEvent.genre) {
-      Alert.alert('Error', 'Please fill in all fields.');
+    if (
+      !newEvent.title ||
+      !newEvent.date ||
+      !newEvent.location ||
+      !newEvent.genre
+    ) {
+      Alert.alert("Error", "Please fill in all fields.");
       return;
     }
-
     onAdd(newEvent);
-    setNewEvent({ title: '', genre: '', location: '', genre: '', image: require('../assets/images/san-nhan-tao.jpg') });
+    setNewEvent({
+      title: "",
+      genre: "",
+      location: "",
+      genre: "",
+      image: require("../assets/images/san-nhan-tao.jpg"),
+    });
   };
 
   return (
@@ -24,14 +48,11 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
     >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={onClose}
-          >
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X color="#000" size={24} />
           </TouchableOpacity>
           <Text style={styles.modalTitle}>Add New Event</Text>
-          
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Event Title</Text>
             <TextInput
@@ -58,7 +79,9 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
               style={styles.input}
               placeholder="Location"
               value={newEvent.location}
-              onChangeText={(text) => setNewEvent({ ...newEvent, location: text })}
+              onChangeText={(text) =>
+                setNewEvent({ ...newEvent, location: text })
+              }
             />
           </View>
 
@@ -72,12 +95,12 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
             />
           </View>
 
-          <Pressable
+          <TouchableOpacity
             style={[styles.button, styles.buttonClose]}
             onPress={handleAddPost}
           >
             <Text style={styles.textStyle}>Add Event</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -89,10 +112,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    width: '90%', 
+    width: "90%",
     backgroundColor: "white",
     borderRadius: 20,
     padding: 30,
@@ -107,7 +130,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     right: 10,
     top: 10,
   },
@@ -115,38 +138,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     marginBottom: 15,
   },
   label: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 5,
-    color: '#555',
+    color: "#555",
   },
   input: {
     height: 45,
-    width: '100%',
+    width: "100%",
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
-    color: '#000',
-    backgroundColor: '#f9f9f9',
+    color: "#000",
+    backgroundColor: "#f9f9f9",
   },
   button: {
     borderRadius: 10,
     padding: 12,
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     marginTop: 10,
   },
   buttonClose: {
-    backgroundColor: "orange", 
+    backgroundColor: "orange",
   },
   textStyle: {
     color: "white",

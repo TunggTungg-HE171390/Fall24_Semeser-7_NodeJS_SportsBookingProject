@@ -1,35 +1,69 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Platform } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import { PieChart } from "react-native-chart-kit";
+import { PieChart, LineChart } from "react-native-chart-kit";
+import { Picker } from "@react-native-picker/picker";
 
 const Dashboard = () => {
+  const [selectedYear, setSelectedYear] = useState("2024");
+
+  const years = ["2022", "2023", "2024", "2025"];
+
+  // Dữ liệu cho PieChart
   const pieData = [
     {
-      name: "Desktop",
-      population: 63,
+      name: "Recuring",
+      population: 1800,
       color: "#6a5acd",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     },
     {
-      name: "Tablet",
-      population: 15,
-      color: "#f39c12",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15,
-    },
-    {
-      name: "Phone",
-      population: 22,
+      name: "Transact",
+      population: 2900,
       color: "#2ecc71",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     },
   ];
 
+  // Dữ liệu cho LineChart (doanh thu hàng tháng)
+  const monthlyRevenueData = {
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
+    datasets: [
+      {
+        data: [
+          3000, 4500, 5000, 7000, 8000, 11000, 13000, 12000, 10000, 9000, 8000,
+        ],
+      },
+    ],
+  };
+
+  // Dữ liệu cho danh sách field owner có doanh thu cao nhất
+  const topFieldOwners = [
+    { name: "Owner 1", revenue: 15000 },
+    { name: "Owner 2", revenue: 12000 },
+    { name: "Owner 3", revenue: 11000 },
+    { name: "Owner 4", revenue: 10000 },
+    { name: "Owner 5", revenue: 9000 },
+  ];
+
   return (
     <ScrollView style={styles.container}>
+      {/* Card cho Monthly Recurring Revenue */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>MONTHLY RECURING REVENUE</Text>
@@ -38,6 +72,8 @@ const Dashboard = () => {
         <Text style={styles.cardValue}>$15k</Text>
         <Text style={styles.cardChangePositive}>↑ 12% Since last month</Text>
       </View>
+
+      {/* Card cho Total Profit */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>TOTAL PROFIT</Text>
@@ -46,6 +82,8 @@ const Dashboard = () => {
         <Text style={styles.cardValue}>$24k</Text>
         <Text style={styles.cardChangeNegative}>↓ 16% Since last month</Text>
       </View>
+
+      {/* Card cho Total Field Owners */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>TOTAL FIELD OWNERS</Text>
@@ -53,6 +91,8 @@ const Dashboard = () => {
         </View>
         <Text style={styles.cardValue}>30</Text>
       </View>
+
+      {/* Card cho Total Customers */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>TOTAL CUSTOMERS</Text>
@@ -61,24 +101,68 @@ const Dashboard = () => {
         <Text style={styles.cardValue}>1.6K</Text>
       </View>
 
+      {/* Biểu đồ Pie cho Traffic Source */}
       <View style={styles.chartCard}>
-        <Text style={styles.sectionTitle}>Traffic source</Text>
-        <View style={styles.pieChartContainer}>
-          <PieChart
-            data={pieData}
-            width={300}
-            height={220}
-            chartConfig={{
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              strokeWidth: 2,
-              barPercentage: 0.5,
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-          />
+        <Text style={styles.sectionTitle}>Traffic Source</Text>
+        <PieChart
+          data={pieData}
+          width={340}
+          height={220}
+          chartConfig={{
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            strokeWidth: 2,
+            barPercentage: 0.5,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+        />
+      </View>
+
+      {/* Biểu đồ Line cho Monthly Revenue */}
+      <View style={styles.chartCard}>
+        <View style={styles.monthlyRevenueContainer}>
+          <Text style={styles.sectionTitle}>Monthly Revenue</Text>
+          {/* Wrapped Picker in a View for the border */}
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedYear}
+              style={styles.picker}
+              onValueChange={(itemValue) => setSelectedYear(itemValue)}
+            >
+              {years.map((year) => (
+                <Picker.Item key={year} label={year} value={year} />
+              ))}
+            </Picker>
+          </View>
         </View>
+        <LineChart
+          data={monthlyRevenueData}
+          width={340} // Hoặc thay đổi theo ý muốn
+          height={220}
+          chartConfig={{
+            backgroundColor: "#fff",
+            backgroundGradientFrom: "#fff",
+            backgroundGradientTo: "#fff",
+            color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            strokeWidth: 2,
+            barPercentage: 0.5,
+          }}
+          bezier
+        />
+      </View>
+
+      {/* Bảng hiển thị 5 field owner có doanh thu cao nhất */}
+      <View style={styles.chartCard}>
+        <Text style={styles.sectionTitle}>Top 5 Field Owners by Revenue</Text>
+        {topFieldOwners.map((owner) => (
+          <View style={styles.row} key={owner.name}>
+            <Text style={styles.rowText}>{owner.name}</Text>
+            <Text style={styles.rowText}>${owner.revenue}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
@@ -151,23 +235,34 @@ const styles = StyleSheet.create({
     }),
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20,
   },
-  pieChartContainer: {},
-  pieLabels: {
-    marginTop: 20,
-  },
-  pieRow: {
+  monthlyRevenueContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 20,
   },
-  pieLabelItem: {
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#7f8c8d",
+    borderRadius: 5,
+    overflow: "hidden",
+    marginLeft: 20,
+  },
+  picker: {
+    height: 20,
+    width: 120,
+  },
+  row: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
+  rowText: {
+    fontSize: 14,
   },
 });
 
