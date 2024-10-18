@@ -13,7 +13,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import AccountModal from "../components/AccountModal";
 import Pagination from "../components/Pagination";
 import { useNavigation } from "@react-navigation/native";
-import { ROUTER } from "../utils/contant";
+import { ROUTER, ROLE_NAME } from "../utils/constant";
 import { AccountsData } from "../db/db";
 
 const ManageAccount = () => {
@@ -26,11 +26,8 @@ const ManageAccount = () => {
   const accountsPerPage = 6;
   const [selectedRoles, setSelectedRoles] = useState([]);
 
-  // Available roles for selection
-  const allRoles = [...new Set(accounts.map((account) => account.role))];
-
   const filteredAccounts = accounts.filter((account) => {
-    const matchesSearchQuery = account.username
+    const matchesSearchQuery = account.profile.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesRole =
@@ -104,8 +101,10 @@ const ManageAccount = () => {
       </Text>
       <Image source={item.profile.avatar} style={styles.avatar} />
       <View style={styles.cardContent}>
-        <Text style={styles.nameText}>{item.username}</Text>
-        <Text style={styles.infoText}>Role: {item.role}</Text>
+        <Text style={styles.nameText}>{item.profile.name}</Text>
+        <Text style={styles.infoText}>
+          Role: {ROLE_NAME[item.role] || "Unknown Role"}
+        </Text>
       </View>
       <View style={styles.actionCell}>
         <TouchableOpacity
@@ -160,7 +159,7 @@ const ManageAccount = () => {
           setSelectedAccount(null);
         }}
         onSubmit={handleAddOrEditAccount}
-        account={selectedAccount}
+        data={selectedAccount}
       />
 
       <View style={styles.header}>
@@ -199,22 +198,24 @@ const ManageAccount = () => {
       <View style={styles.roleSelectionContainer}>
         <Text style={styles.roleSelectionTitle}>Select Roles:</Text>
         <View style={styles.rolesContainer}>
-          {allRoles.map((role) => (
+          {Object.keys(ROLE_NAME).map((key) => (
             <TouchableOpacity
-              key={role}
-              onPress={() => toggleRoleSelection(role)}
+              key={key}
+              onPress={() => toggleRoleSelection(parseInt(key))}
               style={[
                 styles.roleButton,
-                selectedRoles.includes(role) && styles.selectedRoleButton,
+                selectedRoles.includes(parseInt(key)) &&
+                  styles.selectedRoleButton,
               ]}
             >
               <Text
                 style={[
                   styles.roleButtonText,
-                  selectedRoles.includes(role) && styles.selectedRoleButtonText,
+                  selectedRoles.includes(parseInt(key)) &&
+                    styles.selectedRoleButtonText,
                 ]}
               >
-                {role}
+                {ROLE_NAME[key]}
               </Text>
             </TouchableOpacity>
           ))}

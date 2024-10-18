@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Profile from './Manage_History_Booking/Profile';
-import History from './Manage_History_Booking/History';
-import Report from './Manage_History_Booking/Report';
-import Setting from './Manage_History_Booking/Setting';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
+import Profile from "../Account_Profile/Profile";
+import History from "../Account_Profile/History";
+import Report from "../Account_Profile/Report";
+import Setting from "../Account_Profile/Setting";
 
-export default function CustomTabScreen() {
-  const [selectedTab, setSelectedTab] = useState('Profile');
+export default function CustomTabScreen({ navigation }) {
+  const [selectedTab, setSelectedTab] = useState("Profile");
 
   const renderContent = () => {
     switch (selectedTab) {
-      case 'Profile':
+      case "Profile":
         return <Profile />;
-      case 'History':
+      case "History":
         return <History />;
-      case 'Report':
+      case "Report":
         return <Report />;
-      case 'Setting':
-        return <Setting />;
+      case "Setting":
+        return <Setting navigation={navigation} />;
       default:
         return <Profile />;
     }
@@ -26,14 +26,14 @@ export default function CustomTabScreen() {
 
   return (
     <View style={styles.container}>
-        <View style={styles.profileContainer}>
-    <Image
-      source={{
-        uri: 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL',
-      }}
-      style={styles.profileImage}
-    />
-  </View>
+      <View style={styles.profileContainer}>
+        <Image
+          source={{
+            uri: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL",
+          }}
+          style={styles.profileImage}
+        />
+      </View>
       <TouchableOpacity style={styles.touchableContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.profileName}>Ronaldo</Text>
@@ -42,18 +42,20 @@ export default function CustomTabScreen() {
       </TouchableOpacity>
 
       <View style={styles.tabBarContainer}>
-        {['Profile', 'History', 'Report', 'Setting'].map((tab) => (
+        {["Profile", "History", "Report", "Setting"].map((tab) => (
           <TouchableOpacity
             key={tab}
             style={[
               styles.tabButton,
               selectedTab === tab && styles.activeTabButton,
             ]}
-            onPress={() => setSelectedTab(tab)}>
+            onPress={() => setSelectedTab(tab)}
+          >
             <Text
               style={
                 selectedTab === tab ? styles.activeTabText : styles.tabText
-              }>
+              }
+            >
               {tab}
             </Text>
           </TouchableOpacity>
@@ -67,53 +69,54 @@ export default function CustomTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  container:{
-    flex: '1',
+  container: {
+    flex: 1,
   },
   tabBarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#f8f9fa',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#f8f9fa",
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   tabButton: {
     padding: 10,
   },
   activeTabButton: {
     borderBottomWidth: 2,
-    borderBottomColor: '#2F95DC',
+    borderBottomColor: "#2F95DC",
   },
   tabText: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
   activeTabText: {
     fontSize: 14,
-    color: '#2F95DC',
-    fontWeight: '600',
+    color: "#2F95DC",
+    fontWeight: "600",
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     borderWidth: 3,
-    borderColor: '#ff6b01',
+    borderColor: "#ff6b01",
     marginBottom: 15,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   profileContainer: {
-  alignItems: 'center',
-},
+    marginTop: 40,
+    alignItems: "center",
+  },
   touchableContainer: {
-    alignItems: 'center',
-    backgroundColor: '#ff6b01',
+    alignItems: "center",
+    backgroundColor: "#ff6b01",
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 15,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -123,14 +126,14 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   textContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   profileName: {
     fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#333",
   },
 });

@@ -1,10 +1,21 @@
+/**
+ * Role:
+ * 1-Customer
+ * 2-Staff
+ * 3-Field Owner
+ * 4-Admin
+ */
+
 export const AccountsData = [
   {
     id: "1",
-    username: "VinaySingh",
-    role: "Customer",
-    email: "john@example.com",
+    account: {
+      email: "vinay@example.com",
+      password: "1",
+    },
+    role: 1,
     profile: {
+      name: "Vinay Singh",
       phone: "0963101234",
       avatar: require("../assets/images/avatar/avatar.png"),
     },
@@ -12,10 +23,13 @@ export const AccountsData = [
   },
   {
     id: "2",
-    username: "JohnSmith",
-    role: "Admin",
-    email: "john@example.com",
+    account: {
+      email: "john@example.com",
+      password: "1",
+    },
+    role: 4,
     profile: {
+      name: "John Smith",
       phone: "0945678901",
       avatar: require("../assets/images/avatar/avatar-1.png"),
     },
@@ -23,10 +37,13 @@ export const AccountsData = [
   },
   {
     id: "3",
-    username: "BruceWayne",
-    role: "Field Owner",
-    email: "bruce@example.com",
+    account: {
+      email: "bruce@example.com",
+      password: "1",
+    },
+    role: 3,
     profile: {
+      name: "Bruce Wayne",
       phone: "0334567890",
       avatar: require("../assets/images/avatar/avatar-2.png"),
     },
@@ -34,10 +51,13 @@ export const AccountsData = [
   },
   {
     id: "4",
-    username: "BobBrown",
-    role: "Staff",
-    email: "bob@example.com",
+    account: {
+      email: "bob@example.com",
+      password: "1",
+    },
+    role: 2,
     profile: {
+      name: "Bob Brown",
       phone: "0445678901",
       avatar: require("../assets/images/avatar/avatar-3.png"),
     },
@@ -45,10 +65,13 @@ export const AccountsData = [
   },
   {
     id: "5",
-    username: "MaryJane",
-    role: "Customer",
-    email: "mary@example.com",
+    account: {
+      email: "mary@example.com",
+      password: "1",
+    },
+    role: 1,
     profile: {
+      name: "Mary Jane",
       phone: "0987654321",
       avatar: require("../assets/images/avatar/avatar-4.png"),
     },
@@ -56,21 +79,27 @@ export const AccountsData = [
   },
   {
     id: "6",
-    username: "SamailKhan",
-    role: "Admin",
-    email: "Samail@example.com",
+    account: {
+      email: "samail@example.com",
+      password: "1",
+    },
+    role: 4,
     profile: {
       phone: "0998765432",
       avatar: require("../assets/images/avatar/avatar-5.png"),
+      name: "Samail Khan",
     },
     status: 1,
   },
   {
     id: "7",
-    username: "IgorIvanov",
-    role: "Field Owner",
-    email: "zjT3b@example.com",
+    account: {
+      email: "lucy@example.com",
+      password: "1",
+    },
+    role: 3,
     profile: {
+      name: "Lucy White",
       phone: "0112345678",
       avatar: require("../assets/images/avatar/avatar-6.png"),
     },
@@ -78,10 +107,13 @@ export const AccountsData = [
   },
   {
     id: "8",
-    username: "OliviaJohnson",
-    role: "Staff",
-    email: "olivia@example.com",
+    account: {
+      email: "olivia@example.com",
+      password: "1",
+    },
+    role: 2,
     profile: {
+      name: "Olivia Johnson",
       phone: "0223456789",
       avatar: require("../assets/images/avatar/avatar-7.png"),
     },
