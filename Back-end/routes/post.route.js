@@ -4,12 +4,12 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 router.use(bodyParser.json());
 
-const postController = require("../controllers/post.controller");
+const { PostController } = require("../controllers");
 
-router.get("/", postController.getAllPosts);
-router.get("/:id", postController.getPostById);
-router.post("/", postController.createPost);
-router.put("/:id", postController.updatePost);
-router.post("/upload", postController.uploadImage);
+router.get("/", PostController.getAllPosts);
+router.get("/:id", PostController.getPostById);
+router.post("/", PostController.createPost);
+router.put("/:id", PostController.updatePost);
+router.post("/upload", PostController.uploadImage);
 
 module.exports = router;
