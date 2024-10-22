@@ -26,80 +26,22 @@ const Explore_screen = () => {
     useState(false);
 
   const [posts, setPosts] = useState([]);
-  const [ipAddress, setIpAddress] = useState("");
+
+  async function fetchPosts() {
+    axios
+      .get(`http://10.33.49.103:3000/post/`)
+      .then((res) => {
+        console.log(res.data);
+        setPosts(res.data.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   useEffect(() => {
-    const fetchIpAddress = async () => {
-      const ip = await getIpAddress();
-      if (ip) {
-        console.log(ip);
-        setIpAddress(ip);
-      }
-    };
-
-    fetchIpAddress();
+    fetchPosts();
   }, []);
-
-  const fetchPosts = async () => {
-    if (!ipAddress) return;
-
-    try {
-      const response = await axios.get(`http://${ipAddress}:3000/post/`);
-      console.log(response.data);
-      setPosts(response.data.result);
-    } catch (error) {
-      console.log("Error fetching posts:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (ipAddress) {
-      fetchPosts();
-    }
-  }, [ipAddress]);
-
-  // const posts = [
-  //   {
-  //     id: 1,
-  //     title: "Saturday Morning Tennis",
-  //     genre: "Tennis",
-  //     date: "7AM - 6PM",
-  //     image: require("../assets/images/san-tennis.jpg"),
-  //     location: "Hoa Lac",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Saturday Morning Football",
-  //     genre: "Football",
-  //     date: "7AM - 6PM",
-  //     image: require("../assets/images/san-nhan-tao.jpg"),
-  //     location: "Hoa Lac",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "Saturday Morning Badminton",
-  //     genre: "Badminton",
-  //     date: "7AM - 6PM",
-  //     image: require("../assets/images/san-cau-long.jpg"),
-  //     location: "Hoa Lac",
-  //   },
-  // ];
-
-  // const [posts, setPosts] = useState([]);
-
-  // Fetch notes from the backend
-  // useEffect(() => {
-  //   fetchPosts();
-  // }, []);
-
-  // const fetchPosts = async () => {
-  //   try {
-  //     const response = await axios.get('http://192.168.1.13:3000/posts/list');
-  //     setPosts(response.data);
-  //   } catch (error) {
-  //     console.error('Error fetching posts:', error);
-  //   }
-  // };
 
   const genres = [
     {
@@ -148,6 +90,10 @@ const Explore_screen = () => {
   };
 
   const EventCard = ({ post }) => {
+    if (!post) {
+      return null;
+    }
+
     const renderRightActions = () => (
       <TouchableOpacity
         style={styles.deleteButton}
@@ -181,16 +127,16 @@ const Explore_screen = () => {
           }}
         >
           {/* sửa chỗ này */}
-          <Image source={{ uri: post.image[0] }} style={styles.eventImage} />
+          <Image source={{ uri: post?.image?.[0] }} style={styles.eventImage} />
           <View style={styles.eventInfo}>
-            <Text style={styles.eventTitle}>{post.title}</Text>
+            <Text style={styles.eventTitle}>{post?.title}</Text>
             <Text style={styles.eventDetails}>
-              {new Date(post.date).toLocaleDateString()}
+              {new Date(post?.date).toLocaleDateString()}
             </Text>
             <View style={styles.eventLocation}>
               <MapPin color="#888" size={16} />
               <Text style={styles.eventLocationText}>
-                {post.location.address}
+                {post?.location?.address}
               </Text>
             </View>
           </View>
