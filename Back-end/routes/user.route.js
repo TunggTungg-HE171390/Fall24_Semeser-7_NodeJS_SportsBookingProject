@@ -4,9 +4,9 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 router.use(bodyParser.json());
 
-const userController = require("../controllers/user.controller");
+const { UserController } = require("../controllers");
 
-router.get("/", userController.getAllUsers);
-router.post("/", userController.createUser);
+router.get("/", UserController.getAllUsers);
+router.post("/", UserController.createUser);
 
 module.exports = router;
