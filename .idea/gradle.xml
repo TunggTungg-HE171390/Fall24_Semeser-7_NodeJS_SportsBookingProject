@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -10,6 +11,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native-community/cli-platform-android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/@react-native-community/datetimepicker/android" />
@@ -19,15 +21,17 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native-community/datetimepicker/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/@react-native-community/slider/android" />
-        <option name="gradleJvm" value="21" />
+        <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native-community/slider/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/@react-native-picker/picker/android" />
@@ -37,9 +41,11 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native-picker/picker/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/@react-native/gradle-plugin" />
+        <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native/gradle-plugin" />
@@ -47,6 +53,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/@react-native/gradle-plugin/settings-plugin" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-asset/android" />
@@ -56,6 +63,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-asset/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-blur/android" />
@@ -65,6 +73,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-blur/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-constants/android" />
@@ -74,6 +83,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-constants/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-constants/scripts" />
@@ -83,6 +93,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-constants/scripts" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-file-system/android" />
@@ -92,6 +103,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-file-system/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-font/android" />
@@ -101,6 +113,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-font/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-keep-awake/android" />
@@ -110,6 +123,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-keep-awake/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-modules-autolinking/scripts/android" />
@@ -119,6 +133,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-modules-autolinking/scripts/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo-modules-core/android" />
@@ -128,6 +143,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo-modules-core/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo/android" />
@@ -137,6 +153,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/expo/scripts" />
@@ -146,6 +163,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/expo/scripts" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native" />
@@ -155,6 +173,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-gesture-handler/android" />
@@ -164,6 +183,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-gesture-handler/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-image-crop-picker/android" />
@@ -173,6 +193,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-image-crop-picker/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-reanimated/android" />
@@ -182,6 +203,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-reanimated/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-safe-area-context/android" />
@@ -190,6 +212,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-safe-area-context/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-screens/android" />
@@ -199,15 +222,17 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-screens/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-svg/android" />
-        <option name="gradleJvm" value="21" />
+        <option name="gradleJvm" value="jbr-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-svg/android" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/Front-end/node_modules/react-native-vector-icons" />
@@ -217,6 +242,7 @@
             <option value="$PROJECT_DIR$/Front-end/node_modules/react-native-vector-icons" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
