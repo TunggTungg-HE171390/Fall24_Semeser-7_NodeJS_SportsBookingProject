@@ -21,7 +21,8 @@ db.equipmentOrder = equipmentOrder;
 
 db.connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Connect to MongoDB successfully!'));
   } catch (error) {
     console.log(error);
     process.exit(1);
