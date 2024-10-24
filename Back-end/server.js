@@ -9,6 +9,8 @@ const getLocalIP = require("./utils/ipconfig");
 
 const app = express();
 
+const { FieldRouter, PostRouter, UserRouter } = require("./routes");
+
 const db = require("./models/index");
 
 // Middleware
@@ -29,9 +31,9 @@ app.get("/get-ip", (req, res) => {
 
 //Routes
 
-app.use("/post", require("./routes/post.route"));
-app.use("/user", require("./routes/user.route"));
-app.use("/field", require("./routes/field.route"));
+app.use("/post", PostRouter);
+app.use("/user", UserRouter);
+app.use("/field", FieldRouter);
 
 app.use(async (err, req, res, next) => {
   res.status(err.status || 500).send({

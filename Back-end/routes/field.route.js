@@ -4,9 +4,9 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 router.use(bodyParser.json());
 
-const fieldController = require("../controllers/field.controller");
+const { FieldController } = require("../controllers");
 
-router.get("/", fieldController.getAllFields);
-router.post("/", fieldController.createField);
+router.get("/", FieldController.getAllFields);
+router.post("/", FieldController.createField);
 
 module.exports = router;

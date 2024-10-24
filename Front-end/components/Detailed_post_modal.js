@@ -13,7 +13,7 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
 
   if (!event) return null;
 
-  const truncateDescription = (text, maxLength) => {
+  const truncateDescription = (text = "", maxLength) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + "...";
   };
@@ -26,8 +26,7 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Image source={{ uri: event.image[0] }} style={styles.eventImage} />
-          <Text style={styles.eventDescription}>{event.description}</Text>
+          <Image source={{ uri: event.image?.[0] }} style={styles.eventImage} />
           <TouchableOpacity onPress={toggleDescription}>
             <Text style={styles.eventDescription}>
               {isDescriptionExpanded
@@ -39,7 +38,7 @@ const DetailedPostModal = ({ visible, event, onClose }) => {
             Date: {new Date(event.date).toLocaleDateString()}
           </Text>
           <Text style={styles.eventLocation}>
-            Location: {event.location.address}
+            Location: {event.location?.address}
           </Text>
 
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>

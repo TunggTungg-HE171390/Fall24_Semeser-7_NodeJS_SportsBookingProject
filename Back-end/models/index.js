@@ -23,8 +23,8 @@ db.connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
   } catch (error) {
-    next(error);
-    process.exit();
+    console.log(error);
+    process.exit(1);
   }
 };
 
