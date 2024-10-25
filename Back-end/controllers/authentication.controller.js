@@ -55,21 +55,21 @@ async function signIn(req, res, next) {
         if (!req.body.name && !req.body.email) {
             throw new createHttpError(400, "Username or email is required");
         }
-        
+
         if (!req.body.password) {
             throw new createHttpError(400, "Password is required");
-        }    
+        }
 
         console.log(req.body.name);
         console.log(req.body.email);
         console.log(req.body.password);
 
         const existUser = await db.user.findOne({
-            $or:[
+            $or: [
                 { "profile.name": req.body.name },
                 { "account.email": req.body.email }
             ]
-            });
+        });
 
         if (!existUser) {
             throw new createHttpError(404, "User not found");
@@ -100,9 +100,19 @@ async function signIn(req, res, next) {
     }
 }
 
+async function signOut(req, res, next) {
+    try {
+        res.status(200).json({ message: 'Sign out successful' });
+        console.log('Sign out successful');
+    } catch (error) {
+        next(error);
+    }
+}
+
 const AuthController = {
     signUp,
-    signIn
+    signIn,
+    signOut
 };
 
 module.exports = AuthController;
