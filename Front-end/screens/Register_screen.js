@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,17 +6,57 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Modal,
+  Button
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-
+import axios from "axios";
 export default function RegisterScreen({ navigation }) {
-  const handleRegister = () => {
-    alert("Đăng ký thành công");
-    navigation.navigate("Login");
+
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false); // State để điều khiển modal
+
+  useEffect(() => {
+    setName(`${lastName} ${firstName}`);
+  }, [lastName, firstName]);
+
+  const handleRegister = (e) => {
+    axios.post("http://192.168.1.7:3000/auth/sign-up", {
+      account: {
+        email: email,
+        password: password,
+      },
+      profile: {
+        name: name,
+        phone: phone,
+        avatar: "",
+      },
+      role: 3,  // Đặt giá trị mặc định là 3 nếu người dùng tự đăng ký
+      status: 1 // Trạng thái mặc định là 1
+    })
+      .then(res => {
+        console.log(res);
+        alert("Đăng ký thành công");
+        navigation.navigate("Login");
+      })
+      .catch(error => {
+        const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
+        console.error("Lỗi:", errorMessage);
+        setErrorMessage(errorMessage); // Lưu lỗi vào state để hiển thị
+        setModalVisible(true); // Hiển thị modal lỗi
+      });
   };
+
   const backtoLogin = () => {
     navigation.navigate("Login");
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register your account </Text>
@@ -35,38 +75,38 @@ export default function RegisterScreen({ navigation }) {
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>First Name</Text>
-          <TextInput style={styles.input} value="Oscar" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setFirstName(text)} />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Last Name</Text>
-          <TextInput style={styles.input} value="Sun" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setLastName(text)} />
         </View>
       </View>
 
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Phone Number</Text>
-          <TextInput style={styles.input} value="Oscar" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setPhone(text)} />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Gmaill</Text>
-          <TextInput style={styles.input} value="Sun" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setEmail(text)} />
         </View>
       </View>
 
       <View style={styles.inputRow}>
         <View style={styles.inputContainerFull}>
           <Text style={styles.label}>Enter your password </Text>
-          <TextInput style={styles.input} value="09/10/1998" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
         </View>
       </View>
 
-      <View style={styles.inputRow}>
+      {/* <View style={styles.inputRow}>
         <View style={styles.inputContainerFull}>
           <Text style={styles.label}>Enter your password again </Text>
-          <TextInput style={styles.input} value="09/10/1998" editable={false} />
+          <TextInput style={styles.input} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
         </View>
-      </View>
+      </View> */}
 
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
@@ -75,6 +115,25 @@ export default function RegisterScreen({ navigation }) {
       <TouchableOpacity style={styles.buttonBlack} onPress={backtoLogin}>
         <Text style={styles.buttonText}>Back to Login</Text>
       </TouchableOpacity>
+
+      {/* Modal thông báo */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Lỗi</Text>
+            <Text style={styles.modalMessage}>{errorMessage}</Text>
+            <Button
+              title="Close"
+              onPress={() => setModalVisible(false)}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -154,5 +213,28 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginTop: 20,
     alignItems: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 20,
   },
 });

@@ -13,7 +13,7 @@ const { FieldRouter, PostRouter, UserRouter, AuthenticationRouter } = require(".
 
 const db = require("./models");
 
-// Middleware
+// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,10 +40,8 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT, process.env.HOST_NAME, () => {
-  console.log(
-    `Server running at http://${process.env.HOST_NAME}:${process.env.PORT}`
-  );
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://192.168.1.7:${process.env.PORT}`);
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
   db.connectDB();

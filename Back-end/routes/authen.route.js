@@ -8,5 +8,6 @@ authRouter.use(bodyParser.json())
 authRouter.post("/sign-up", AuthenticationController.signUp);
 authRouter.post("/sign-in", AuthenticationController.signIn);
 authRouter.post("/sign-out", AuthenticationController.signOut);
+authRouter.post("/google-signin", AuthenticationController.signInWithGoogle);
 
 module.exports = authRouter;
