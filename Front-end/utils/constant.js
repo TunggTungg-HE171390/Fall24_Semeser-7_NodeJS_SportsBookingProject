@@ -10,3 +10,5 @@ export const ROLE_NAME = {
   3: "Field Owner",
   4: "Admin",
 };
+
+export const API_ROOT = "http://192.168.1.3:3000";
