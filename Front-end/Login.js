@@ -12,8 +12,6 @@ export default function Login({ navigation }) {
     const user = useSelector((state) => state?.auth?.user);
     const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
 
-   
-
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     // const [errorMessage, setErrorMessage] = useState('');
@@ -27,12 +25,8 @@ export default function Login({ navigation }) {
                 console.log(res.data.userInfo);
                 console.log("Login successful");
                 dispatch(login(res.data.userInfo)); 
-                // navigation.navigate("Main"); 
             })
             .catch(error => {
-                // const errorMessage = error.response?.data?.message || "Đăng nhập thất bại";
-                // console.error("Lỗi:", errorMessage);
-                // setErrorMessage(errorMessage); 
                 console.log("Login failed");
                 console.log(error.response);
             });
