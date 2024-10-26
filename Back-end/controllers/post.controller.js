@@ -1,4 +1,5 @@
 const postModel = require("../models/post.model");
+const httpErrors = require("http-errors");
 
 const getAllPosts = async (req, res) => {
   try {
@@ -30,7 +31,31 @@ const getPostById = async (req, res) => {
   }
 };
 
+const getPostsByOwner = async (req, res) => {
+  try {
+    const posts = await postModel.find({ ownerId: req.params.id });
+    if (!posts) {
+      throw httpErrors.NotFound("Posts not found");
+    }
+    res.status(200).json({
+      message: "List of posts",
+      result: posts,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: err.status || 500,
+      message: err.message,
+    });
+  }
+};
+
 const createPost = async (req, res) => {
+/**
+ * Create a new post
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Promise<void>}
+ */
   try {
     const post = await postModel.create(req.body);
     res.status(201).json({
