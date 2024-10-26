@@ -2,10 +2,7 @@ const db = require("../models");
 const bcrypt = require("bcrypt");
 const createHttpError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { OAuth2Client } = require("google-auth-library");
 require("dotenv").config();
-
-const client = new OAuth2Client(process.env.REACT_APP_CLIENT_ID);
 
 async function signUp(req, res, next) {
     try {
@@ -108,65 +105,65 @@ async function signIn(req, res, next) {
     }
 }
 
-async function signInWithGoogle(req, res, next) {
-    const { idToken } = req.body;
+// async function signInWithGoogle(req, res, next) {
+//     const { idToken } = req.body;
 
-    try {
-        // Xác thực token ID với Google
-        const ticket = await client.verifyIdToken({
-            idToken: idToken,
-            audience: process.env.REACT_APP_CLIENT_ID,
-        });
+//     try {
+//         // Xác thực token ID với Google
+//         const ticket = await client.verifyIdToken({
+//             idToken: idToken,
+//             audience: process.env.REACT_APP_CLIENT_ID,
+//         });
 
-        const payload = ticket.getPayload();
-        const { sub, email, name, picture } = payload;
+//         const payload = ticket.getPayload();
+//         const { sub, email, name, picture } = payload;
 
-        // Kiểm tra nếu người dùng đã tồn tại bằng email
-        let user = await db.user.findOne({ "account.email": email });
-        if (!user) {
-            // Tạo người dùng mới nếu chưa tồn tại
-            user = new db.user({
-                account: {
-                    email: email,
-                    password: "", // Để trống vì Google Sign-In không cần mật khẩu
-                },
-                role: 2, // Có thể thiết lập vai trò mặc định (ví dụ: 2 cho người dùng bình thường)
-                profile: {
-                    name: name || "Anonymous", // Tên từ Google hoặc tên mặc định
-                    phone: "", // Để trống, có thể yêu cầu bổ sung sau
-                    avatar: picture, // Ảnh đại diện từ Google
-                },
-                status: 1, // Trạng thái mặc định
-            });
+//         // Kiểm tra nếu người dùng đã tồn tại bằng email
+//         let user = await db.user.findOne({ "account.email": email });
+//         if (!user) {
+//             // Tạo người dùng mới nếu chưa tồn tại
+//             user = new db.user({
+//                 account: {
+//                     email: email,
+//                     password: "", // Để trống vì Google Sign-In không cần mật khẩu
+//                 },
+//                 role: 2, // Có thể thiết lập vai trò mặc định (ví dụ: 2 cho người dùng bình thường)
+//                 profile: {
+//                     name: name || "Anonymous", // Tên từ Google hoặc tên mặc định
+//                     phone: "", // Để trống, có thể yêu cầu bổ sung sau
+//                     avatar: picture, // Ảnh đại diện từ Google
+//                 },
+//                 status: 1, // Trạng thái mặc định
+//             });
 
-            // Lưu người dùng mới vào cơ sở dữ liệu
-            await user.save();
-        }
+//             // Lưu người dùng mới vào cơ sở dữ liệu
+//             await user.save();
+//         }
 
-        // Tạo JWT cho người dùng
-        const token = jwt.sign(
-            { userId: user._id, email: user.account.email },
-            process.env.SECRET_KEY,{
-                algorithm: process.env.ALGORITHM,
-                expiresIn: parseInt(process.env.ExpIn, 10) // Chuyển đổi thành số nguyên
-            });
+//         // Tạo JWT cho người dùng
+//         const token = jwt.sign(
+//             { userId: user._id, email: user.account.email },
+//             process.env.SECRET_KEY,{
+//                 algorithm: process.env.ALGORITHM,
+//                 expiresIn: parseInt(process.env.ExpIn, 10) // Chuyển đổi thành số nguyên
+//             });
 
-        // Trả về token và thông tin người dùng
-        res.status(200).json({
-            token,
-            userInfo: {
-                id: user._id,
-                name: user.profile.name,
-                email: user.account.email,
-                role: user.role,
-                avatar: user.profile.avatar,
-            },
-        });
-    } catch (error) {
-        console.error("Error verifying Google ID Token:", error);
-        res.status(401).json({ message: "Invalid ID token" });
-    }
-}
+//         // Trả về token và thông tin người dùng
+//         res.status(200).json({
+//             token,
+//             userInfo: {
+//                 id: user._id,
+//                 name: user.profile.name,
+//                 email: user.account.email,
+//                 role: user.role,
+//                 avatar: user.profile.avatar,
+//             },
+//         });
+//     } catch (error) {
+//         console.error("Error verifying Google ID Token:", error);
+//         res.status(401).json({ message: "Invalid ID token" });
+//     }
+// }
 
 async function signOut(req, res, next) {
     try {
