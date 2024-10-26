@@ -97,7 +97,7 @@ async function signIn(req, res, next) {
                 id: existUser._id,
                 name: existUser.profile.name,
                 email: existUser.account.email,
-                roles: existUser.role,
+                role: existUser.role,
             },
         });
     } catch (error) {
@@ -177,7 +177,6 @@ async function signOut(req, res, next) {
 const AuthController = {
     signUp,
     signIn,
-    signInWithGoogle,
     signOut
 };
 

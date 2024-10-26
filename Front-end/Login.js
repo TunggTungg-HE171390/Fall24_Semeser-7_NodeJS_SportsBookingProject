@@ -4,22 +4,30 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from "react-redux";
 import { login } from "./redux/authSlice";
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useNavigation } from "@react-navigation/native";
 
 export default function Login({ navigation }) {
+    // const navigation = useNavigation();
+    const user = useSelector((state) => state?.auth?.user);
+    const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+
+   
+
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
+    // const [errorMessage, setErrorMessage] = useState('');
     const dispatch = useDispatch();
     const handleLogin = () => {
-        axios.post("http://192.168.1.7:3000/auth/sign-in", {
+        axios.post("http://192.168.102.19:3000/auth/sign-in", {
             identifier: identifier,
             password: password,
         })
             .then(res => {
                 console.log(res.data.userInfo);
                 console.log("Login successful");
-                dispatch(login(res.data.userInfo));
-                // navigation.navigate("./Explore");
+                dispatch(login(res.data.userInfo)); 
+                // navigation.navigate("Main"); 
             })
             .catch(error => {
                 // const errorMessage = error.response?.data?.message || "Đăng nhập thất bại";
@@ -73,8 +81,11 @@ export default function Login({ navigation }) {
                 <Text style={styles.socialButtonText}>Continue with Facebook</Text>
             </TouchableOpacity>
 
-            <Text style={styles.termsText}>
-                By continuing, you agree to our Terms and Conditions
+            <Text
+                style={styles.termsText}
+                onPress={() => navigation.navigate("Register")}
+            >
+                Create your account?
             </Text>
         </View>
     );

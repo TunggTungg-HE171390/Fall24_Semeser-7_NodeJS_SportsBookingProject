@@ -112,7 +112,7 @@ function AdminRole() {
 }
 
 function Main() {
-  const role = useSelector((state) => state.auth.user?.roles);
+  const role = useSelector((state) => state.auth.user?.role);
   // role 1 là Customer
   // 2 là Fied Owner
   // 3 là Admin
