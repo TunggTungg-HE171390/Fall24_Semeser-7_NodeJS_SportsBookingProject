@@ -7,7 +7,8 @@ function generateSubFields(
   totalFields,
   openingTime,
   closingTime,
-  slotDuration
+  slotDuration,
+  price
 ) {
   const subFields = [];
   const openingDate = new Date(`1970-01-01T${openingTime}:00`);
@@ -30,7 +31,7 @@ function generateSubFields(
       subField.fieldTime.push({
         start: new Date(startTime),
         end: new Date(endTime),
-        price: 0,
+        price: price || 0,
         status: 1,
       });
 
@@ -47,8 +48,14 @@ function generateSubFields(
 const addField = async (req, res, next) => {
   try {
     const data = req.body;
-    const { totalFields, openingTime, closingTime, slotDuration, ownerId } =
-      data;
+    const {
+      totalFields,
+      openingTime,
+      closingTime,
+      slotDuration,
+      ownerId,
+      price,
+    } = data;
     const ownerExists = await User.findById(ownerId);
 
     if (!ownerExists) {
@@ -61,7 +68,8 @@ const addField = async (req, res, next) => {
       totalFields,
       openingTime,
       closingTime,
-      slotDuration
+      slotDuration,
+      price
     );
     const field = new Field({ ...data, subFields });
 
@@ -80,8 +88,14 @@ const updateField = async (req, res, next) => {
   try {
     const fieldId = req.params.id;
     const updateData = req.body;
-    const { ownerId, totalFields, openingTime, closingTime, slotDuration } =
-      updateData;
+    const {
+      ownerId,
+      totalFields,
+      openingTime,
+      closingTime,
+      slotDuration,
+      price,
+    } = updateData;
 
     if (ownerId) {
       const ownerExists = await User.findById(ownerId);
@@ -97,7 +111,8 @@ const updateField = async (req, res, next) => {
         totalFields,
         openingTime,
         closingTime,
-        slotDuration
+        slotDuration,
+        price
       );
     }
 

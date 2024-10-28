@@ -6,23 +6,19 @@ const FieldOrdersSchema = new mongoose.Schema({
     ref: "Users",
     required: [true, "Customer ID is required."],
   },
-  fieldTime: [
-    {
-      fieldId: {
-        type: mongoose.Types.ObjectId,
-        ref: "Fields",
-        required: [true, "Field ID is required."],
-      },
-      start: {
-        type: Date,
-        required: [true, "Start time is required."],
-      },
-      end: {
-        type: Date,
-        required: [true, "End time is required."],
-      },
-    },
-  ],
+  fieldId: {
+    type: mongoose.Types.ObjectId,
+    ref: "Fields",
+    required: [true, "Field ID is required."],
+  },
+  subFieldId: {
+    type: mongoose.Types.ObjectId,
+    required: [true, "SubField ID is required."],
+  },
+  slotId: {
+    type: mongoose.Types.ObjectId,
+    required: [true, "Slot ID is required."],
+  },
   orderDate: {
     type: Date,
     default: Date.now,
@@ -31,16 +27,18 @@ const FieldOrdersSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: {
-      values: ["Completed", "Cancelled"],
-      message: "Status must be either 'Completed' or 'Cancelled'.",
+      values: ["Completed", "Cancelled", "Pending"],
+      message: "Status must be either 'Completed', 'Cancelled', or 'Pending'.",
     },
-    default: "Completed",
+    default: "Pending",
     required: [true, "Status is required."],
   },
-  equipmentOrderId: {
-    type: mongoose.Types.ObjectId,
-    ref: "EquipmentOrders",
-  },
+  equipmentOrderId: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: "EquipmentOrders",
+    },
+  ],
 });
 
 module.exports = mongoose.model(
