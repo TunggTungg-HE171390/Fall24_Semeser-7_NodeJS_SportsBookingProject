@@ -3,6 +3,7 @@ const PostController = require("./post.controller");
 const UserController = require("./user.controller");
 const AuthenticationController = require("./authentication.controller");
 const MailServiceController = require("./mailService.controller");
+const FieldOrderController = require("./field-order.controller");
 
 module.exports = {
   AuthenticationController,
@@ -10,4 +11,5 @@ module.exports = {
   FieldController,
   PostController,
   UserController,
+  FieldOrderController,
 };
