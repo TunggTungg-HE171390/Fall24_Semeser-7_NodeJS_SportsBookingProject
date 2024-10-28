@@ -18,7 +18,7 @@ export default function CustomTabScreen() {
       case "Report":
         return <Report />;
       case "Setting":
-        return <Setting navigation={navigation} />;
+        return <Setting/>;
       default:
         return <Profile />;
     }

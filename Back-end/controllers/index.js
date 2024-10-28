@@ -4,6 +4,7 @@ const UserController = require("./user.controller");
 const AuthenticationController = require("./authentication.controller");
 const MailServiceController = require("./mailService.controller");
 const FieldOrderController = require("./field-order.controller");
+const FeedbackController = require("./feedback.controller");
 
 module.exports = {
   AuthenticationController,
@@ -12,4 +13,5 @@ module.exports = {
   PostController,
   UserController,
   FieldOrderController,
+  FeedbackController,
 };

@@ -1,19 +1,35 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, FlatList } from 'react-native';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { logout } from "../redux/authSlice";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Setting() {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ name: '', password: '', newPassword: '', confirmPassword: '' });
 
-  const handleLogout = () => {
-    // Logic for logout
-    alert('Logged out');
-  };
-
+  const dispatch = useDispatch();
   const handleChangePassword = () => {
     // Logic for changing password
     alert('Password changed successfully');
     setShowModal(false);
+  };
+
+  const handleLogout = async () => {
+    axios.post("http://192.168.20.29:3000/auth/sign-out")
+      .then(async (res) => {
+        console.log(res.data.message); 
+        // Xóa token từ AsyncStorage
+        await AsyncStorage.removeItem('authToken');
+        dispatch(logout());
+
+        alert("You have been logged out.");
+      })
+      .catch(error => {
+        console.log("Logout Error:", error.response);
+        alert("An error occurred during logout.");
+      });
   };
 
   return (

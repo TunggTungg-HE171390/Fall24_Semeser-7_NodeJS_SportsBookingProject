@@ -169,7 +169,7 @@ const updateUser = async (req, res, next) => {
 const forgotPassword = async (req, res, next) => {
   try {
     const user = await userModel.findOne({ "account.email": req.body.email });
-
+    console.log(user);
     if (!user) {
       return res.status(404).json({ message: 'Email không tồn tại.' });
     }

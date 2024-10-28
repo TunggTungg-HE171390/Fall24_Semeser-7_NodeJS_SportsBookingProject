@@ -95,8 +95,6 @@ async function signIn(req, res, next) {
             token: token,
             userInfo: {
                 id: existUser._id,
-                name: existUser.profile.name,
-                email: existUser.account.email,
                 role: existUser.role,
             },
         });
@@ -173,6 +171,24 @@ async function signOut(req, res, next) {
         next(error);
     }
 }
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Lấy token từ header
+
+  if (!token) return res.status(401).json({ message: "Access token is missing" });
+
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+    
+    // `user` là thông tin đã giải mã từ token, bao gồm `userId`, `email`, `role`, etc.
+    req.user = user; // Lưu thông tin người dùng vào req để sử dụng trong các route tiếp theo
+    next();
+  });
+};
+
+module.exports = authenticateToken;
+
 
 const AuthController = {
     signUp,

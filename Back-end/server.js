@@ -15,6 +15,8 @@ const {
   UserRouter,
   AuthenticationRouter,
   FieldOrderRouter,
+  FeedbackRouter,
+  EquipmentRouter,
 } = require("./routes");
 
 const db = require("./models");
@@ -37,6 +39,8 @@ app.use("/user", UserRouter);
 app.use("/field", FieldRouter);
 app.use("/auth", AuthenticationRouter);
 app.use("/field-order", FieldOrderRouter);
+app.use("/feedback", FeedbackRouter);
+app.use("/equipment", EquipmentRouter);
 
 app.use(async (err, req, res, next) => {
   res.status(err.status || 500).send({
@@ -47,8 +51,16 @@ app.use(async (err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on http://192.168.1.70:${process.env.PORT}`);
+
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message || "An unexpected error occurred.",
+    status: err.status || 500,
+  });
+});
+
+app.listen(process.env.PORT, process.env.HOST_NAME, () => {
+  console.log(`Server running at http://172.23.16.1:${process.env.PORT}`);
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
   db.connectDB();
