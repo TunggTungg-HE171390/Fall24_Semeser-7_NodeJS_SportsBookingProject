@@ -1,55 +1,94 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useDispatch } from "react-redux";
+import { login } from "./redux/authSlice";
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { useNavigation } from "@react-navigation/native";
 
-export default function Login() {
+export default function Login({ navigation }) {
+    // const navigation = useNavigation();
+    const user = useSelector((state) => state?.auth?.user);
+    const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
+
+    const [identifier, setIdentifier] = useState('');
+    const [password, setPassword] = useState('');
+    // const [errorMessage, setErrorMessage] = useState('');
+    const dispatch = useDispatch();
+    const handleLogin = () => {
+        axios.post("http://192.168.102.19:3000/auth/sign-in", {
+            identifier: identifier,
+            password: password,
+        })
+            .then(res => {
+                console.log(res.data.userInfo);
+                console.log("Login successful");
+                dispatch(login(res.data.userInfo)); 
+            })
+            .catch(error => {
+                console.log("Login failed");
+                console.log(error.response);
+            });
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity style={styles.backButton}>
                 <Icon name="arrow-left" size={24} color="#000" />
             </TouchableOpacity>
-            
+
             <Text style={styles.title}>Get Started with Sports Booking</Text>
-            
+
             <TextInput
                 style={styles.input}
                 placeholder="EMAIL"
-                placeholderTextColor="#aaa"
                 keyboardType="email-address"
+                onChangeText={(text) => setIdentifier(text)}
             />
-            
-            <TouchableOpacity style={styles.continueButton} accessibilityLabel="Continue with email">
+
+            <TextInput
+                style={styles.input}
+                placeholder="PASSWORD"
+                onChangeText={(text) => setPassword(text)} secureTextEntry={true}
+            />
+
+            <TouchableOpacity style={styles.continueButton} onPress={handleLogin}>
                 <Text style={styles.continueButtonText}>Continue</Text>
             </TouchableOpacity>
-            
+
             <Text style={styles.orText}>----------------OR----------------</Text>
-            
+
             <TouchableOpacity style={styles.socialButton} accessibilityLabel="Continue with Google">
                 <Icon name="google" size={24} color="#DB4437" style={styles.icon} />
                 <Text style={styles.socialButtonText}>Continue with Google</Text>
             </TouchableOpacity>
-            
+
+
             <TouchableOpacity style={styles.socialButton} accessibilityLabel="Continue with Apple">
                 <Icon name="apple" size={24} color="#000" style={styles.icon} />
                 <Text style={styles.socialButtonText}>Continue with Apple</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.socialButton} accessibilityLabel="Continue with Facebook">
                 <Icon name="facebook" size={24} color="#4267B2" style={styles.icon} />
                 <Text style={styles.socialButtonText}>Continue with Facebook</Text>
             </TouchableOpacity>
-            
-            <Text style={styles.termsText}>
-                By continuing, you agree to our Terms and Conditions
+
+            <Text
+                style={styles.termsText}
+                onPress={() => navigation.navigate("Register")}
+            >
+                Create your account?
             </Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-        container: {
+    container: {
         flex: 1,
-        justifyContent: 'center', 
+        justifyContent: 'center',
         backgroundColor: '#ffffff',
         padding: 20,
     },
@@ -67,11 +106,11 @@ const styles = StyleSheet.create({
         height: 50,
         borderColor: '#ccc',
         borderWidth: 1,
-        borderRadius: 25, 
+        borderRadius: 25,
         paddingHorizontal: 15,
         marginBottom: 20,
-        fontSize: 16, 
-        color: '#333', 
+        fontSize: 16,
+        color: '#333',
     },
     continueButton: {
         height: 50,

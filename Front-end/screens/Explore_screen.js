@@ -14,6 +14,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 import { getIpAddress } from "../utils/ipUtil";
+import authorizedAxiosInstance from "../utils/authorizedAxios";
+import { API_ROOT } from "../utils/constant";
 
 import CreatePostModal from "../components/Create_post_modal";
 import DetailedPostModal from "../components/Detailed_post_modal";
@@ -37,6 +39,14 @@ const Explore_screen = () => {
       .catch((err) => {
         console.log(err);
       });
+
+    try {
+      const res = await authorizedAxiosInstance.get(`${API_ROOT}/post/`);
+      console.log(res.data);
+      setPosts(res.data.result);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {

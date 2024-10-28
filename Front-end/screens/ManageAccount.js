@@ -194,9 +194,9 @@ const ManageAccount = () => {
         />
       </View>
 
-      {/* Multi-select Roles */}
+      {/* Multi-select role */}
       <View style={styles.roleSelectionContainer}>
-        <Text style={styles.roleSelectionTitle}>Select Roles:</Text>
+        <Text style={styles.roleSelectionTitle}>Select role:</Text>
         <View style={styles.rolesContainer}>
           {Object.keys(ROLE_NAME).map((key) => (
             <TouchableOpacity

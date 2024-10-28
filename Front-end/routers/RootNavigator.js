@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Tab_bar from "../components/Tab_bar";
 import Booking_screen from "../screens/Booking_screen";
 import Explore_screen from "../screens/Explore_screen";
+import SigninScreen from "../Login";
 import LoginScreen from "../screens/Login_screen";
 import FieldDetailScreen from "../screens/FieldDetailScreen";
 import FieldListScreen from "../screens/FieldListScreen";
@@ -142,7 +143,7 @@ function RootNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!isLoggedIn ? (
         <>
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Login" component={SigninScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
         </>
       ) : (
