@@ -45,9 +45,7 @@ app.use(async (err, req, res, next) => {
 });
 
 app.listen(process.env.PORT, process.env.HOST_NAME, () => {
-  console.log(
-    `Server running at http://${process.env.HOST_NAME}:${process.env.PORT}`
-  );
+  console.log(`Server running at http://172.23.16.1:${process.env.PORT}`);
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
   // Connect DB

@@ -5,18 +5,20 @@ const FieldsSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    maxLength: [50, "Field name must not exceed 50 characters"],
-    minLength: [5, "Field name must be at least 5 characters"],
+    maxLength: [100, "Field name must not exceed 100 characters"],
+    minLength: [3, "Field name must be at least 3 characters"],
   },
   sportName: {
     type: String,
     enum: ["Football", "Volleyball", "Badminton", "Tennis", "Table Tennis"],
     required: true,
   },
-  location: {
-    longitude: String,
-    latitude: String,
-    address: String,
+  address: {
+    type: String,
+    required: true,
+    trim: true,
+    maxLength: [100, "Address must not exceed 100 characters"],
+    minLength: [3, "Address must be at least 3 characters"],
   },
   ownerId: {
     type: mongoose.Types.ObjectId,
@@ -29,25 +31,41 @@ const FieldsSchema = new mongoose.Schema({
       ref: "Feedbacks",
     },
   ],
-  fieldTime: [
+  totalFields: {
+    type: Number,
+    required: true,
+    min: [1, "There must be at least 1 field"],
+  },
+  subFields: [
     {
-      start: {
-        type: Date,
+      name: {
+        type: String,
         required: true,
+        trim: true,
+        maxLength: [100, "Sub field name must not exceed 100 characters"],
+        minLength: [3, "Sub field name must be at least 3 characters"],
       },
-      end: {
-        type: Date,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-      status: {
-        type: Number,
-        required: true,
-        enum: [1, 2, 3, 4, 5],
-      },
+      fieldTime: [
+        {
+          start: {
+            type: Date,
+            required: true,
+          },
+          end: {
+            type: Date,
+            required: true,
+          },
+          price: {
+            type: Number,
+            required: true,
+          },
+          status: {
+            type: Number,
+            required: true,
+            enum: [1, 2, 3, 4, 5],
+          },
+        },
+      ],
     },
   ],
   image: [
@@ -58,8 +76,8 @@ const FieldsSchema = new mongoose.Schema({
   ],
   status: {
     type: Number,
-    default: 1,
-    enum: [1, 2, 3, 4, 5],
+    default: "ACTIVE",
+    enum: ["ACTIVE", "INACTIVE"],
     required: true,
   },
 });
