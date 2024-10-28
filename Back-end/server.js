@@ -49,9 +49,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT, process.env.IP_Address, () => {
-  console.log(
-    `Server is running on http://${process.env.IP_Address}:${process.env.PORT}`
-  );
+app.listen(process.env.PORT, process.env.HOST_NAME, () => {
+  console.log(`Server running at http://172.23.16.1:${process.env.PORT}`);
+  const ip = getLocalIP();
+  console.log(`IP Address: ${ip}`);
   db.connectDB();
 });
