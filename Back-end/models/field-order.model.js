@@ -4,33 +4,38 @@ const FieldOrdersSchema = new mongoose.Schema({
   customerId: {
     type: mongoose.Types.ObjectId,
     ref: "Users",
-    required: true,
+    required: [true, "Customer ID is required."],
   },
   fieldTime: [
     {
       fieldId: {
         type: mongoose.Types.ObjectId,
         ref: "Fields",
-        required: true,
+        required: [true, "Field ID is required."],
       },
       start: {
         type: Date,
-        required: true,
+        required: [true, "Start time is required."],
       },
       end: {
         type: Date,
-        required: true,
+        required: [true, "End time is required."],
       },
     },
   ],
   orderDate: {
     type: Date,
+    default: Date.now,
+    required: [true, "Order date is required."],
   },
   status: {
-    type: Number,
-    default: 1,
-    enum: [1, 2, 3, 4, 5],
-    required: true,
+    type: String,
+    enum: {
+      values: ["Completed", "Cancelled"],
+      message: "Status must be either 'Completed' or 'Cancelled'.",
+    },
+    default: "Completed",
+    required: [true, "Status is required."],
   },
   equipmentOrderId: {
     type: mongoose.Types.ObjectId,
