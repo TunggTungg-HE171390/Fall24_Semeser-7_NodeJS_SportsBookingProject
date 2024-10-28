@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Field = require("../models/field.model");
+const User = require("../models/user.model");
 
 // Hàm tạo các subFields dựa trên tổng số sân, giờ mở/đóng cửa và thời gian mỗi ca
 function generateSubFields(
@@ -29,8 +30,8 @@ function generateSubFields(
       subField.fieldTime.push({
         start: new Date(startTime),
         end: new Date(endTime),
-        price: 0, // Giá mặc định, có thể cập nhật sau
-        status: 1, // Trạng thái mặc định
+        price: 0,
+        status: 1,
       });
 
       startTime = new Date(endTime);
@@ -43,9 +44,19 @@ function generateSubFields(
 }
 
 // Hàm thêm Field mới
-async function addField(data) {
+const addField = async (req, res, next) => {
   try {
-    const { totalFields, openingTime, closingTime, slotDuration } = data;
+    const data = req.body;
+    const { totalFields, openingTime, closingTime, slotDuration, ownerId } =
+      data;
+    const ownerExists = await User.findById(ownerId);
+
+    if (!ownerExists) {
+      return res
+        .status(400)
+        .json({ message: "Invalid ownerId: User does not exist" });
+    }
+
     const subFields = generateSubFields(
       totalFields,
       openingTime,
@@ -53,17 +64,34 @@ async function addField(data) {
       slotDuration
     );
     const field = new Field({ ...data, subFields });
-    await field.save();
-    console.log("Field added successfully!");
+
+    const savedField = await field.save();
+    res.status(201).json({
+      message: "Field added successfully!",
+      data: savedField,
+    });
   } catch (error) {
-    console.error("Error adding field:", error);
+    next(error);
   }
-}
+};
 
 // Hàm cập nhật Field
-async function updateField(fieldId, updateData) {
+const updateField = async (req, res, next) => {
   try {
-    const { totalFields, openingTime, closingTime, slotDuration } = updateData;
+    const fieldId = req.params.id;
+    const updateData = req.body;
+    const { ownerId, totalFields, openingTime, closingTime, slotDuration } =
+      updateData;
+
+    if (ownerId) {
+      const ownerExists = await User.findById(ownerId);
+      if (!ownerExists) {
+        return res
+          .status(400)
+          .json({ message: "Invalid ownerId: User does not exist" });
+      }
+    }
+
     if (totalFields && openingTime && closingTime && slotDuration) {
       updateData.subFields = generateSubFields(
         totalFields,
@@ -72,71 +100,77 @@ async function updateField(fieldId, updateData) {
         slotDuration
       );
     }
+
     const updatedField = await Field.findByIdAndUpdate(fieldId, updateData, {
       new: true,
     });
-    if (updatedField) {
-      console.log("Field updated successfully!");
-    } else {
-      console.log("Field not found.");
+    if (!updatedField) {
+      return res.status(404).json({ message: "Field not found." });
     }
+    res.status(200).json(updatedField);
   } catch (error) {
-    console.error("Error updating field:", error);
+    next(error);
   }
-}
+};
 
 // Hàm xóa Field
-async function deleteField(fieldId) {
+const deleteField = async (req, res, next) => {
   try {
+    const fieldId = req.params.id;
     const deletedField = await Field.findByIdAndDelete(fieldId);
-    if (deletedField) {
-      console.log("Field deleted successfully!");
-    } else {
-      console.log("Field not found.");
+    if (!deletedField) {
+      return res.status(404).json({ message: "Field not found." });
     }
+    res.status(200).json({ message: "Field deleted successfully!" });
   } catch (error) {
-    console.error("Error deleting field:", error);
+    next(error);
   }
-}
+};
 
-// Hàm lấy danh sách các Field với phân trang
-async function getFields(page = 1, limit = 10) {
+// Hàm lấy danh sách các Field với phân trang và tìm kiếm theo tên
+const getFields = async (req, res, next) => {
   try {
-    const skip = (page - 1) * limit; // Bỏ qua số lượng bản ghi dựa trên trang hiện tại
-    const fields = await Field.find().skip(skip).limit(limit);
+    const { page = 1, limit = 10, searchQuery = "" } = req.query;
+    const skip = (page - 1) * limit;
 
-    const totalFields = await Field.countDocuments(); // Tổng số lượng Field
+    const query = searchQuery
+      ? { name: { $regex: searchQuery, $options: "i" } }
+      : {};
+
+    const fields = await Field.find(query).skip(skip).limit(parseInt(limit));
+
+    const totalFields = await Field.countDocuments(query);
     const totalPages = Math.ceil(totalFields / limit);
 
-    return {
+    res.status(200).json({
       data: fields,
       currentPage: page,
       totalPages,
       totalFields,
-    };
+    });
   } catch (error) {
-    console.error("Error fetching fields list:", error);
-    throw error;
+    next(error);
   }
-}
+};
 
 // Hàm lấy chi tiết Field theo fieldId
-async function getFieldById(fieldId) {
+const getFieldById = async (req, res, next) => {
   try {
+    const fieldId = req.params.id;
+
     const field = await Field.findById(fieldId)
-      .populate("ownerId", "name") // Lấy thông tin tên của người sở hữu sân từ Users
-      .populate("feedBackId"); // Lấy thông tin phản hồi từ Feedbacks
+      .populate("ownerId", "name")
+      .populate("feedBackId");
 
     if (!field) {
-      console.log("Field not found.");
-      return null;
+      return res.status(404).json({ message: "Field not found." });
     }
-    return field;
+
+    res.status(200).json(field);
   } catch (error) {
-    console.error("Error fetching field details:", error);
-    throw error;
+    next(error);
   }
-}
+};
 
 // Export các hàm để sử dụng trong các phần khác của ứng dụng
 module.exports = {

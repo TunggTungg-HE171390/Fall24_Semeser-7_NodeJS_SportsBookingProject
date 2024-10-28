@@ -75,7 +75,7 @@ const FieldsSchema = new mongoose.Schema({
     },
   ],
   status: {
-    type: Number,
+    type: String,
     default: "ACTIVE",
     enum: ["ACTIVE", "INACTIVE"],
     required: true,
