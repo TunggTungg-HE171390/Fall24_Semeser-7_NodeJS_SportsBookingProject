@@ -15,19 +15,26 @@ export default function RegisterScreen({ navigation }) {
 
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [modalVisible, setModalVisible] = useState(false); // State để điều khiển modal
+  const [modalVisible, setModalVisible] = useState(false); 
 
   useEffect(() => {
     setName(`${lastName} ${firstName}`);
   }, [lastName, firstName]);
 
   const handleRegister = (e) => {
-    axios.post("http://192.168.1.7:3000/auth/sign-up", {
+    if (password !== confirmPassword) {
+      setErrorMessage("Mật khẩu không khớp");
+      setModalVisible(true);
+      return;
+    }
+
+    axios.post("http://192.168.20.29:3000/auth/sign-up", {
       account: {
         email: email,
         password: password,
@@ -37,8 +44,8 @@ export default function RegisterScreen({ navigation }) {
         phone: phone,
         avatar: "",
       },
-      role: 3,  // Đặt giá trị mặc định là 3 nếu người dùng tự đăng ký
-      status: 1 // Trạng thái mặc định là 1
+      role: 3,  
+      status: 1 
     })
       .then(res => {
         console.log(res);
@@ -101,12 +108,12 @@ export default function RegisterScreen({ navigation }) {
         </View>
       </View>
 
-      {/* <View style={styles.inputRow}>
+      <View style={styles.inputRow}>
         <View style={styles.inputContainerFull}>
           <Text style={styles.label}>Enter your password again </Text>
-          <TextInput style={styles.input} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
+          <TextInput style={styles.input} onChangeText={(text) => setConfirmPassword(text)} secureTextEntry={true} />
         </View>
-      </View> */}
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
