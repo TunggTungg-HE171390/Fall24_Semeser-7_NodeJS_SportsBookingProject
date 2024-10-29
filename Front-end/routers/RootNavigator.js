@@ -21,6 +21,7 @@ import TabScreen from "../components/Tab_Navigator";
 import SportSelected from "../screens/SportSelected";
 import RegisterScreen from "../screens/Register_screen";
 import { useSelector } from "react-redux";
+import EquipmentListScreen from "../screens/EquipmentList";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -65,6 +66,18 @@ function FieldStack() {
         name="FieldAdminDetail"
         component={FieldAdminDetailScreen}
         options={{ title: "Chi tiết sân" }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function EquipmentAdminStack() {
+  return (
+    <Stack.Navigator initialRouteName="EquipmentList">
+      <Stack.Screen
+        name="EquipmentList"
+        component={EquipmentListScreen}
+        options={{ title: "Quản lý sân thể thao" }}
       />
     </Stack.Navigator>
   );
@@ -129,10 +142,15 @@ function Main() {
           <Tab.Screen name="Equipment" component={Equipment_Rental_Stack} />
         </>
       )}
-      {role === 2 && <Tab.Screen name="Field" component={FieldStack} />}
+      {role === 2 && (
+        <>
+          <Tab.Screen name="Field" component={FieldStack} />
+          <Tab.Screen name="Profile" component={EquipmentAdminStack} />
+        </>
+      )}
       {role === 3 && <Stack.Screen name="Admin" component={AdminRole} />}
 
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      {/* <Tab.Screen name="Profile" component={ProfileStack} /> */}
     </Tab.Navigator>
   );
 }

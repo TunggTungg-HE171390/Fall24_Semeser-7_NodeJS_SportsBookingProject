@@ -1,17 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, TextInput, Button, Alert } from 'react-native';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Button,
+  Alert,
+} from "react-native";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function Report() {
   const [reviews, setReviews] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [updatedRating, setUpdatedRating] = useState('');
-  const [updatedDetail, setUpdatedDetail] = useState('');
+  const [updatedRating, setUpdatedRating] = useState("");
+  const [updatedDetail, setUpdatedDetail] = useState("");
 
-  const userId = useSelector(state => state.auth.user?.id);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
     if (userId) {
@@ -23,7 +34,9 @@ export default function Report() {
     try {
       if (!userId) return;
       // console.log(userId);
-      const res = await axios.get(`http://192.168.20.29:3000/feedback/${userId}`);
+      const res = await axios.get(
+        `http://172.22.240.1:3000/feedback/${userId}`
+      );
       setReviews(res.data.feedbacks);
     } catch (error) {
       console.log("Error fetching feedback:", error);
@@ -46,10 +59,19 @@ export default function Report() {
         detail: updatedDetail,
       };
 
-      await axios.put(`http://192.168.20.29:3000/feedback/update/${selectedReview._id}`, updatedReview);
+      await axios.put(
+        `http://172.22.240.1:3000/feedback/update/${selectedReview._id}`,
+        updatedReview
+      );
       Alert.alert("Success", "Feedback has been updated successfully");
 
-      setReviews(reviews.map((review) => review._id === selectedReview._id ? { ...review, ...updatedReview } : review));
+      setReviews(
+        reviews.map((review) =>
+          review._id === selectedReview._id
+            ? { ...review, ...updatedReview }
+            : review
+        )
+      );
       setEditModalVisible(false);
       setSelectedReview(null);
     } catch (error) {
@@ -66,8 +88,10 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(`http://192.168.20.29:3000/feedback/delete/${selectedReview._id}`);
-      setReviews(reviews.filter(review => review._id !== selectedReview._id));
+      await axios.delete(
+        `http://172.22.240.1:3000/feedback/delete/${selectedReview._id}`
+      );
+      setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
 
@@ -79,20 +103,36 @@ export default function Report() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.reviewContainer} contentContainerStyle={styles.scrollContentContainer}>
+      <ScrollView
+        style={styles.reviewContainer}
+        contentContainerStyle={styles.scrollContentContainer}
+      >
         <Text style={styles.label}>Đánh giá trước đó về các sân:</Text>
         {Array.isArray(reviews) && reviews.length > 0 ? (
           reviews.slice(0, 10).map((review, index) => (
             <View key={index} style={styles.reviewItem}>
-              <Image source={{ uri: review.image || 'https://via.placeholder.com/80' }} style={styles.reviewImage} />
+              <Image
+                source={{
+                  uri: review.image || "https://via.placeholder.com/80",
+                }}
+                style={styles.reviewImage}
+              />
               <View style={styles.reviewTextContainer}>
-                <Text style={styles.reviewRating}>Đánh giá: {review.starNumber} ⭐</Text>
+                <Text style={styles.reviewRating}>
+                  Đánh giá: {review.starNumber} ⭐
+                </Text>
                 <Text style={styles.reviewFeedback}>{review.detail}</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity style={styles.editButton} onPress={() => handleEditPress(review)}>
+                <View style={{ flexDirection: "row" }}>
+                  <TouchableOpacity
+                    style={styles.editButton}
+                    onPress={() => handleEditPress(review)}
+                  >
                     <Text style={styles.editButtonText}>Edit</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.editButtonDelete} onPress={() => handleDeletePress(review)}>
+                  <TouchableOpacity
+                    style={styles.editButtonDelete}
+                    onPress={() => handleDeletePress(review)}
+                  >
                     <Text style={styles.editButtonText}>Delete</Text>
                   </TouchableOpacity>
                 </View>
@@ -133,7 +173,11 @@ export default function Report() {
 
               <View style={styles.modalButtonContainer}>
                 <Button title="Lưu" onPress={handleSaveEdit} />
-                <Button title="Hủy" color="red" onPress={() => setEditModalVisible(false)} />
+                <Button
+                  title="Hủy"
+                  color="red"
+                  onPress={() => setEditModalVisible(false)}
+                />
               </View>
             </View>
           </View>
@@ -154,7 +198,11 @@ export default function Report() {
               <Text>Bạn có chắc chắn muốn xóa đánh giá này không?</Text>
               <View style={styles.modalButtonContainer}>
                 <Button title="Có" onPress={handleConfirmDelete} />
-                <Button title="Không" color="red" onPress={() => setDeleteModalVisible(false)} />
+                <Button
+                  title="Không"
+                  color="red"
+                  onPress={() => setDeleteModalVisible(false)}
+                />
               </View>
             </View>
           </View>
@@ -167,7 +215,7 @@ export default function Report() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 120,
     paddingHorizontal: 20,
     paddingTop: 40,
@@ -177,18 +225,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   reviewContainer: {
-    width: '100%',
+    width: "100%",
     marginTop: 20,
   },
   scrollContentContainer: {
     paddingBottom: 20,
   },
   reviewItem: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 15,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
   },
   reviewImage: {
@@ -202,7 +250,7 @@ const styles = StyleSheet.create({
   },
   reviewRating: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   reviewFeedback: {
     fontSize: 16,
@@ -211,53 +259,53 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     borderRadius: 5,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   editButtonDelete: {
     marginTop: 10,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     borderRadius: 5,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginLeft: 10,
   },
   editButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   input: {
-    width: '100%',
-    borderColor: '#ccc',
+    width: "100%",
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     padding: 10,
     marginVertical: 5,
   },
   modalButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '50%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "50%",
     marginTop: 20,
   },
 });
