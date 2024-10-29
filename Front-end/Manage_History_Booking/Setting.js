@@ -1,41 +1,61 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, Alert } from 'react-native';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { logout } from "../redux/authSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from 'react-redux';
 
-export default function Setting() {
+export default function Setting({ navigation }) {
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', password: '', newPassword: '', confirmPassword: '' });
+  const userName = useSelector(state => state.auth.user?.name);
 
+  const [formData, setFormData] = useState({ name: userName, password: '', newPassword: '', confirmPassword: '' });
+  const [modalVisible, setModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const dispatch = useDispatch();
+
   const handleChangePassword = () => {
-    // Logic for changing password
-    alert('Password changed successfully');
-    setShowModal(false);
+    const { name, password, newPassword, confirmPassword } = formData;
+
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("Mật khẩu không khớp");
+      setModalVisible(true);
+      return;
+    }
+
+    axios.post("http://172.20.10.2:3000/auth/change-password", formData)
+      .then(res => {
+        console.log(res);
+        Alert.alert("Success", "Password changed successfully");
+        setModalVisible(false);
+        setShowModal(false);
+        navigation.navigate("Login");
+      })
+      .catch(error => {
+        const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
+        console.error("Lỗi:", errorMessage);
+        setErrorMessage(errorMessage);
+        setModalVisible(true);
+      });
   };
 
   const handleLogout = async () => {
-    axios.post("http://192.168.20.29:3000/auth/sign-out")
+    axios.post("http://172.20.10.2:3000/auth/sign-out")
       .then(async (res) => {
-        console.log(res.data.message); 
-        // Xóa token từ AsyncStorage
+        console.log(res.data.message);
         await AsyncStorage.removeItem('authToken');
         dispatch(logout());
-
-        alert("You have been logged out.");
+        Alert.alert("Logged out", "You have been logged out.");
       })
       .catch(error => {
         console.log("Logout Error:", error.response);
-        alert("An error occurred during logout.");
+        Alert.alert("Error", "An error occurred during logout.");
       });
   };
 
   return (
     <View style={styles.container}>
-
-      {/* Setting Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => setShowModal(true)}>
           <Text style={styles.buttonText}>Change Password</Text>
@@ -45,17 +65,10 @@ export default function Setting() {
         </TouchableOpacity>
       </View>
 
-      {/* Change Password Modal */}
       <Modal visible={showModal} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Change Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Name"
-              value={formData.name}
-              onChangeText={(text) => setFormData({ ...formData, name: text })}
-            />
             <TextInput
               style={styles.input}
               placeholder="Current Password"
@@ -86,7 +99,6 @@ export default function Setting() {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -138,26 +150,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   modalButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: 'orange',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
-  },
-  reportContainer: {
-    width: '100%',
-    padding: 20,
-  },
-  reportTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  reportItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  reportText: {
-    fontSize: 16,
   },
 });

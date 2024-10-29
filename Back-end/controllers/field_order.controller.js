@@ -5,8 +5,14 @@ async function getFieldOrdersByCustomerId(req, res, next) {
     console.log(req.params.id);
     const field_orders = await db.fieldOrder.find({ customerId: req.params.id })
       .populate("customerId", "profile.name")
-      .populate("equipmentOrderId")
-      .populate("equipmentOrderId.equipments.equipment_id", "equipmentName")
+      .populate({
+        path: "equipmentOrderId",
+        populate: {
+          path: "equipments.equipmentId",
+          model: "Equipments",
+          select: "equipmentName"
+        }
+      })
       .populate({
         path: "fieldTime.fieldId",
         model: "Fields",
@@ -21,8 +27,11 @@ async function getFieldOrdersByCustomerId(req, res, next) {
         start: time.start,
         end: time.end
       })),
-      equipmentOrder: order.equipmentOrderId
-
+      equipmentOrder: order.equipmentOrderId.equipments.map(e => ({
+        equipmentName: e.equipmentId?.equipmentName,
+        quantity: e.quantity,
+        totalPrice: e.price * e.quantity
+      }))
     }));
 
     console.log(formattedFieldOrders);

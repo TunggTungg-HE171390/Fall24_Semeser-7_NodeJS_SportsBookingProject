@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const EquipmentOrderSchema = new mongoose.Schema({
   equipments: [
     {
-      equipment_id: {
+      equipmentId: {
         type: mongoose.Types.ObjectId,
-        ref: "Equipments",
+        ref: "Equipments", // Đúng với tên model "Equipments"
         required: true,
       },
       price: {
@@ -20,8 +20,4 @@ const EquipmentOrderSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model(
-  "EquipmentOrders",
-  EquipmentOrderSchema,
-  "equipment_orders"
-);
+module.exports = mongoose.model("EquipmentOrders", EquipmentOrderSchema, "equipment_orders");

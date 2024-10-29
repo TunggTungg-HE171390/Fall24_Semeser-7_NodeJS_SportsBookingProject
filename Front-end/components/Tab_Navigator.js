@@ -5,9 +5,13 @@ import Profile from '../Manage_History_Booking/Profile';
 import History from '../Manage_History_Booking/History';
 import Report from '../Manage_History_Booking/Report';
 import Setting from '../Manage_History_Booking/Setting';
+import { useSelector } from 'react-redux';
+
 
 export default function CustomTabScreen() {
   const [selectedTab, setSelectedTab] = useState('History');
+  const userName = useSelector(state => state.auth.user?.name);
+  // const userId = useSelector(state => state.auth.user?.id);
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -36,7 +40,7 @@ export default function CustomTabScreen() {
       </View>
       <TouchableOpacity style={styles.touchableContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.profileName}>Ronaldo</Text>
+          <Text style={styles.profileName}>{userName}</Text>
           <Icon name="wrench" size={20} color="#000" />
         </View>
       </TouchableOpacity>

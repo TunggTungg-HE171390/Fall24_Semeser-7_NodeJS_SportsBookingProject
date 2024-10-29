@@ -4,6 +4,7 @@ const UserRouter = require("./user.route");
 const AuthenticationRouter = require("./authen.route");
 const FeedbackRouter = require("./feedback.route");
 const Field_OrderRouter = require("./field_order.route");
+const Equipment_OrderRouter = require("./equipment_order.route");
 
 module.exports = {
   AuthenticationRouter,
@@ -11,5 +12,6 @@ module.exports = {
   PostRouter,
   UserRouter,
   FeedbackRouter,
-  Field_OrderRouter
+  Field_OrderRouter,
+  Equipment_OrderRouter
 };

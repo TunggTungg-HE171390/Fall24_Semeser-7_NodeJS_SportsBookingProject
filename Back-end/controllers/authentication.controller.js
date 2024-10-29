@@ -94,6 +94,7 @@ async function signIn(req, res, next) {
         res.status(200).json({
             token: token,
             userInfo: {
+                name: existUser.profile.name,
                 id: existUser._id,
                 role: existUser.role,
             },

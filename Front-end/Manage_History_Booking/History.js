@@ -21,7 +21,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.20.29:3000/field_order/${userId}`);
+      const res = await axios.get(`http://172.20.10.2:3000/field_order/${userId}`);
       const fetchedOrders = res.data.data;
       setOrders(fetchedOrders);
 
@@ -38,7 +38,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.20.29:3000/field_order/getDetail/${fieldOrderId}`);
+      const res = await axios.get(`http://172.20.10.2:3000/field_order/getDetail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       console.log(res.data.data);
       setModalVisible(true);
