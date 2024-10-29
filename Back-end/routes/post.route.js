@@ -6,10 +6,8 @@ router.use(bodyParser.json());
 
 const { PostController } = require("../controllers");
 
-router.get("/", PostController.getAllPosts);
-router.get("/:id", PostController.getPostById);
-router.post("/", PostController.createPost);
-router.put("/:id", PostController.updatePost);
+const upload = require("../utils/multer.config");
+
 // Get all posts
 router.get("/", PostController.getAllPosts);
 
@@ -17,12 +15,17 @@ router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getPostById);
 
 // Create post
-router.post("/", PostController.createPost);
+//router.post("/:id", upload.array("images", 5), PostController.createPost);
+router.post("/:id", upload.array("images", 5), PostController.createPost);
 
 // Update post
-router.put("/:id", PostController.updatePost);
+router.put(
+  "/:id/:postId",
+  upload.array("images", 5),
+  PostController.updatePost
+);
 
-// Upload image
-router.post("/upload", PostController.uploadImage);
+// Delete post
+router.delete("/:id", PostController.deletePost);
 
 module.exports = router;
