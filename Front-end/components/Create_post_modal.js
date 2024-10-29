@@ -7,36 +7,96 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
+  Image,
+  ScrollView,
 } from "react-native";
 import { X } from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker"; // Import image picker
 
 const CreatePostModal = ({ visible, onClose, onAdd }) => {
-  const [newEvent, setNewEvent] = React.useState({
+  const [newPost, setNewPost] = React.useState({
     title: "",
-    date: "",
-    location: "",
-    genre: "",
-    image: require("../assets/images/san-nhan-tao.jpg"),
+    address: "",
+    description: "",
+    images: [],
   });
 
-  const handleAddPost = () => {
+  // Function to pick images
+  const pickImages = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setNewPost((prevState) => ({
+        ...prevState,
+        images: [
+          ...prevState.images,
+          ...result.assets.map((asset) => asset.uri),
+        ],
+      }));
+    }
+  };
+
+  // Function to confirm removal of an image
+  const confirmRemoveImage = (index) => {
+    Alert.alert(
+      "Remove Image",
+      "Are you sure you want to remove this image?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => removeImage(index),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Function to remove an image by its index
+  const removeImage = (index) => {
+    setNewPost((prevState) => ({
+      ...prevState,
+      images: prevState.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddPost = async () => {
     if (
-      !newEvent.title ||
-      !newEvent.date ||
-      !newEvent.location ||
-      !newEvent.genre
+      !newPost.title ||
+      !newPost.address ||
+      !newPost.description ||
+      newPost.images.length === 0
     ) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
-    onAdd(newEvent);
-    setNewEvent({
-      title: "",
-      genre: "",
-      location: "",
-      genre: "",
-      image: require("../assets/images/san-nhan-tao.jpg"),
+
+    // Create form data
+    const formData = new FormData();
+    formData.append("title", newPost.title);
+    formData.append("address", newPost.address);
+    formData.append("description", newPost.description);
+
+    newPost.images.forEach((imageUri, index) => {
+      const uniqueName = () => {
+        return `${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+      };
+      formData.append("images", {
+        uri: imageUri,
+        type: "image/jpeg",
+        name: uniqueName(),
+      });
     });
+    await onAdd(formData);
+    // Reset state after adding
+    setNewPost({ title: "", address: "", description: "", images: [] });
   };
 
   return (
@@ -54,46 +114,52 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
           <Text style={styles.modalTitle}>Add New Event</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Event Title</Text>
+            <Text style={styles.label}>Title</Text>
             <TextInput
               style={styles.input}
-              placeholder="Event Title"
-              value={newEvent.title}
-              onChangeText={(text) => setNewEvent({ ...newEvent, title: text })}
+              placeholder="Title"
+              value={newPost.title}
+              onChangeText={(text) => setNewPost({ ...newPost, title: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Date</Text>
+            <Text style={styles.label}>Address</Text>
             <TextInput
               style={styles.input}
-              placeholder="Date"
-              value={newEvent.date}
-              onChangeText={(text) => setNewEvent({ ...newEvent, date: text })}
+              placeholder="Address"
+              value={newPost.address}
+              onChangeText={(text) => setNewPost({ ...newPost, address: text })}
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Location</Text>
+            <Text style={styles.label}>Description</Text>
             <TextInput
               style={styles.input}
-              placeholder="Location"
-              value={newEvent.location}
+              placeholder="Description"
+              value={newPost.description}
               onChangeText={(text) =>
-                setNewEvent({ ...newEvent, location: text })
+                setNewPost({ ...newPost, description: text })
               }
             />
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Genre</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Genre"
-              value={newEvent.genre}
-              onChangeText={(text) => setNewEvent({ ...newEvent, genre: text })}
-            />
-          </View>
+          <TouchableOpacity style={styles.button} onPress={pickImages}>
+            <Text style={styles.textStyle}>Select Images</Text>
+          </TouchableOpacity>
+
+          {/* Preview Selected Images */}
+          <ScrollView horizontal={true} style={styles.imagePreviewContainer}>
+            {newPost.images.map((imageUri, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => confirmRemoveImage(index)} // Show confirmation alert
+              >
+                <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
           <TouchableOpacity
             style={[styles.button, styles.buttonClose]}
@@ -167,6 +233,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     marginTop: 10,
+    backgroundColor: "#007BFF",
   },
   buttonClose: {
     backgroundColor: "orange",
@@ -175,6 +242,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  imagePreviewContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 10,
   },
 });
 

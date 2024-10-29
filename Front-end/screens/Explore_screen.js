@@ -7,14 +7,13 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Search, MapPin, Share2, Plus } from "lucide-react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-
-import authorizedAxiosInstance from "../utils/authorizedAxios";
-import { API_ROOT } from "../utils/constant";
+import PostAPI from "../api/post.service";
 
 import CreatePostModal from "../components/Create_post_modal";
 import DetailedPostModal from "../components/Detailed_post_modal";
@@ -29,13 +28,8 @@ const Explore_screen = () => {
   const [posts, setPosts] = useState([]);
 
   async function fetchPosts() {
-    try {
-      const res = await authorizedAxiosInstance.get(`${API_ROOT}/post/`);
-      console.log(res.data);
-      setPosts(res.data.result);
-    } catch (err) {
-      console.log(err);
-    }
+    const res = await PostAPI.getAllPosts();
+    setPosts(res);
   }
 
   useEffect(() => {
@@ -62,30 +56,48 @@ const Explore_screen = () => {
   ];
   const timeFilters = ["Tomorrow", "Next week", "Next Month", "All upcoming"];
 
-  const handleAddEvent = (newEvent) => {
-    if (
-      !newEvent.title ||
-      !newEvent.date ||
-      !newEvent.location ||
-      !newEvent.genre
-    ) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
+  const handleAddEvent = async (formData) => {
+    console.log("formData:", formData);
+    try {
+      await PostAPI.createPost(formData);
+      await fetchPosts();
+      setCreatePostModalVisible(false);
+    } catch (error) {
+      console.log("Error creating post:", error);
+      Alert.alert(
+        "Error",
+        `Failed to create post: ${error || "Unknown error"}`
+      );
     }
-
-    setPosts([...posts, { ...newEvent, id: posts.length + 1 }]);
-    setCreatePostModalVisible(false);
   };
 
-  const handleDeleteEvent = (eventId) => {
-    setPosts(posts.filter((post) => post.id !== eventId));
+  const handleDeleteEvent = async (postId) => {
+    try {
+      await PostAPI.deletePost(postId);
+      Alert.alert("Success", "Post deleted successfully");
+      await fetchPosts();
+    } catch (error) {
+      console.log("Error deleting post:", error);
+      Alert.alert(
+        "Error",
+        `Failed to delete post: ${error || "Unknown error"}`
+      );
+    }
   };
 
-  const handleEditEvent = (updatedEvent) => {
-    setPosts(
-      posts.map((post) => (post.id === updatedEvent.id ? updatedEvent : post))
-    );
-    setEditPostModalVisible(false);
+  const handleEditEvent = async (formData, postId) => {
+    console.log("Main screen");
+    console.log("formData: ", formData);
+    console.log("postId: ", postId);
+    console.log("-------------------");
+    try {
+      await PostAPI.editPost(formData, postId);
+      await fetchPosts();
+      setEditPostModalVisible(false);
+    } catch (error) {
+      console.log("Error editing post:", error);
+      Alert.alert("Error", `Failed to edit post: ${error || "Unknown error"}`);
+    }
   };
 
   const EventCard = ({ post }) => {
@@ -96,7 +108,7 @@ const Explore_screen = () => {
     const renderRightActions = () => (
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => handleDeleteEvent(post.id)}
+        onPress={() => handleDeleteEvent(post._id)}
       >
         <FontAwesome name="trash" size={24} color="#fff" />
       </TouchableOpacity>
@@ -197,6 +209,7 @@ const Explore_screen = () => {
           <Plus color="#fff" size={24} />
         </TouchableOpacity>
 
+        {/* Modal here */}
         <CreatePostModal
           visible={createPostModalVisible}
           onClose={() => setCreatePostModalVisible(false)}
@@ -205,7 +218,7 @@ const Explore_screen = () => {
 
         <DetailedPostModal
           visible={detailedPostModalVisible}
-          event={selectedEvent}
+          event={selectedEvent || {}}
           onClose={() => setDetailedPostModalVisible(false)}
         />
 
