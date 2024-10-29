@@ -9,19 +9,23 @@ const getLocalIP = require("./utils/ipconfig");
 
 const app = express();
 
-const { FieldRouter, PostRouter, UserRouter } = require("./routes");
+const {
+  FieldRouter,
+  PostRouter,
+  UserRouter,
+  AuthenticationRouter,
+  FieldOrderRouter,
+  FeedbackRouter,
+  EquipmentRouter,
+} = require("./routes");
 
-const db = require("./models/index");
+const db = require("./models");
 
-// Middleware
+// Middlewares
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-
-app.get("/", async (req, res, next) => {
-  res.status(200).json({ message: "Hello World" });
-});
 
 // get local ip
 app.get("/get-ip", (req, res) => {
@@ -30,10 +34,13 @@ app.get("/get-ip", (req, res) => {
 });
 
 //Routes
-
 app.use("/post", PostRouter);
 app.use("/user", UserRouter);
 app.use("/field", FieldRouter);
+app.use("/auth", AuthenticationRouter);
+app.use("/field-order", FieldOrderRouter);
+app.use("/feedback", FeedbackRouter);
+app.use("/equipment", EquipmentRouter);
 
 app.use(async (err, req, res, next) => {
   res.status(err.status || 500).send({
@@ -44,12 +51,18 @@ app.use(async (err, req, res, next) => {
   });
 });
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    message: err.message || "An unexpected error occurred.",
+    status: err.status || 500,
+  });
+});
+
 app.listen(process.env.PORT, () => {
   console.log(
     `Server running at http://${process.env.HOST_NAME}:${process.env.PORT}`
   );
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
-  // Connect DB
   db.connectDB();
 });

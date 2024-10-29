@@ -8,6 +8,8 @@ module.exports = function (api) {
         {
           moduleName: "@env",
           path: ".env",
+          safe: true,
+          allowUndefined: true,
         },
       ],
     ],

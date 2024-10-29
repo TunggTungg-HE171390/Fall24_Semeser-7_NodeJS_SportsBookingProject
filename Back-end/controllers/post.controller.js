@@ -59,6 +59,12 @@ const getPostsByOwner = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
+/**
+ * Create a new post
+ * @param {Object} req - Request object
+ * @param {Object} res - Response object
+ * @returns {Promise<void>}
+ */
   try {
     const ownerId = req.params.id;
 

@@ -1,24 +1,24 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
-import Profile from "../Account_Profile/Profile";
-import History from "../Account_Profile/History";
-import Report from "../Account_Profile/Report";
-import Setting from "../Account_Profile/Setting";
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Profile from '../Manage_History_Booking/Profile';
+import History from '../Manage_History_Booking/History';
+import Report from '../Manage_History_Booking/Report';
+import Setting from '../Manage_History_Booking/Setting';
 
-export default function CustomTabScreen({ navigation }) {
-  const [selectedTab, setSelectedTab] = useState("Profile");
+export default function CustomTabScreen() {
+  const [selectedTab, setSelectedTab] = useState('History');
 
   const renderContent = () => {
     switch (selectedTab) {
-      case "Profile":
-        return <Profile />;
-      case "History":
+       case 'Profile':
+         return <Profile />;
+      case 'History':
         return <History />;
       case "Report":
         return <Report />;
       case "Setting":
-        return <Setting navigation={navigation} />;
+        return <Setting/>;
       default:
         return <Profile />;
     }
@@ -69,7 +69,7 @@ export default function CustomTabScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container:{
     flex: 1,
   },
   tabBarContainer: {

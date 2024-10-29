@@ -6,11 +6,33 @@ const UsersSchema = new mongoose.Schema({
       type: String,
       unique: true,
       required: true,
+      match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email format"], // Biểu thức chính quy cho email
     },
     password: {
       type: String,
       required: true,
-    },
+      minlength: [6, 'Password must be at least 6 characters long'],
+      validate: [
+        {
+          validator: function (value) {
+            return /[a-zA-Z]/.test(value);
+          },
+          message: 'Password must contain at least one letter.',
+        },
+        {
+          validator: function (value) {
+            return /\d/.test(value);
+          },
+          message: 'Password must contain at least one number.',
+        },
+        {
+          validator: function (value) {
+            return /[@$!%*?&]/.test(value);
+          },
+          message: 'Password must contain at least one special character (@, $, !, %, *, ?, &).',
+        }
+      ]
+    }
   },
   role: {
     type: Number,
@@ -35,7 +57,7 @@ const UsersSchema = new mongoose.Schema({
     default: 1,
     enum: [1, 2, 3, 4, 5],
     required: true,
-  },
+  }
 });
 
 module.exports = mongoose.model("Users", UsersSchema, "users");
