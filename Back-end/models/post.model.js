@@ -26,7 +26,6 @@ const PostSchema = new mongoose.Schema({
   image: [
     {
       type: String,
-      required: true,
     },
   ],
   location: {
@@ -37,7 +36,7 @@ const PostSchema = new mongoose.Schema({
   status: {
     type: Number,
     default: 1,
-    enum: [1, 2, 3, 4, 5],
+    enum: [1, 2, 3],
     required: true,
   },
   ownerId: {
@@ -48,21 +47,22 @@ const PostSchema = new mongoose.Schema({
   fieldId: {
     type: mongoose.Types.ObjectId,
     ref: "Fields",
-    required: true,
   },
 });
 
 // Kiểm tra người dùng và sân có tồn tại trong database không
+
 PostSchema.pre("save", async function (next) {
   try {
     const userExists = await User.findById(this.ownerId);
     if (!userExists) {
       throw httpErrors.NotFound("User not found");
     }
-    const fieldExists = await Field.findById(this.fieldId);
-    if (!fieldExists) {
-      throw httpErrors.NotFound("Field not found");
-    }
+
+    // const fieldExists = await Field.findById(this.fieldId);
+    // if (!fieldExists) {
+    //   throw httpErrors.NotFound("Field not found");
+    // }
     next();
   } catch (error) {
     next(error);
