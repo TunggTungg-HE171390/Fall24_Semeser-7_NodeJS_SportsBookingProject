@@ -1,12 +1,38 @@
 const equipmentModel = require("../models/equipment.model");
 
-// Get all equipments
+// Get all equipments with pagination
 const getAllEquipments = async (req, res) => {
   try {
-    const equipments = await equipmentModel.find();
-    res.status(200).json(equipments);
+    const page = parseInt(req.query.page) || 1; // Current page number, default is 1
+    const limit = parseInt(req.query.limit) || 10; // Number of items per page, default is 10
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip
+    const search = req.query.search || ""; // Search term, default is empty
+
+    // Define the search filter, if search term is provided, use regex for case-insensitive search
+    const searchQuery = search
+      ? { equipmentName: { $regex: search, $options: "i" } }
+      : {};
+
+    // Fetch the equipments matching the search criteria, with pagination
+    const equipments = await equipmentModel
+      .find(searchQuery)
+      .skip(skip)
+      .limit(limit);
+
+    // Count total equipments matching the search criteria
+    const totalEquipments = await equipmentModel.countDocuments(searchQuery);
+
+    res.status(200).json({
+      page,
+      limit,
+      totalEquipments,
+      totalPages: Math.ceil(totalEquipments / limit),
+      equipments,
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
