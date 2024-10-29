@@ -14,8 +14,8 @@ const {
   PostRouter,
   UserRouter,
   AuthenticationRouter,
+  FieldOrderRouter,
   FeedbackRouter,
-  Field_OrderRouter,
   EquipmentRouter,
 } = require("./routes");
 
@@ -38,9 +38,18 @@ app.use("/post", PostRouter);
 app.use("/user", UserRouter);
 app.use("/field", FieldRouter);
 app.use("/auth", AuthenticationRouter);
+app.use("/field-order", FieldOrderRouter);
 app.use("/feedback", FeedbackRouter);
-app.use("/field_order", Field_OrderRouter);
 app.use("/equipment", EquipmentRouter);
+
+app.use(async (err, req, res, next) => {
+  res.status(err.status || 500).send({
+    error: {
+      status: err.status || 500,
+      message: err.message,
+    },
+  });
+});
 
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
@@ -49,9 +58,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(process.env.PORT, process.env.IP_Address, () => {
+app.listen(process.env.PORT, () => {
   console.log(
-    `Server is running on http://${process.env.IP_Address}:${process.env.PORT}`
+    `Server running at http://${process.env.HOST_NAME}:${process.env.PORT}`
   );
+  const ip = getLocalIP();
+  console.log(`IP Address: ${ip}`);
   db.connectDB();
 });
