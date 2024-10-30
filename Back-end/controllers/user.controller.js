@@ -143,6 +143,7 @@ const changePassword = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
+    
     const userInfo = await userModel.findById(req.params.id);
     res.status(200).json(userInfo);
   } catch (error) {

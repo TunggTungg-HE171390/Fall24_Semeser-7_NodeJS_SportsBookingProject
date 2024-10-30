@@ -1,13 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export default function Profile() {
   const [viewType, setViewType] = useState('monthly');
 
+  const userName = useSelector(state => state.auth.user?.name);
+  const dispatch = useDispatch();
+
+  const userInfoDetail = async () => {
+    try {
+      const userInfo = await axios.get(`http://192.168.20.44:3000/user/${userId}`);
+      
+    } catch (error) {
+      console.log("Error fetching field orders:", error);
+    }
+  }
+
   return (
     <View style={styles.container}>
-    
+
       {/* Khu vực để lựa chọn Monthly/Weekly View */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -53,7 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-     marginTop: 20,
+    marginTop: 20,
     width: '100%', // Đảm bảo header chiếm toàn bộ chiều ngang
   },
   calendar: {
@@ -72,6 +86,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: '#000',
-    textAlign:'center'
+    textAlign: 'center'
   },
 });
