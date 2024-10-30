@@ -17,7 +17,7 @@ class PostAPI {
       const ownerId = "670b420e1a81fd665035b288";
 
       const res = await authorizedAxiosInstance.post(
-        `${REACT_APP_IP_Address}/post/${ownerId}`,
+        `/post/${ownerId}`,
         postData
       );
 
@@ -66,7 +66,7 @@ class PostAPI {
       const ownerId = "670b420e1a81fd665035b288";
 
       const res = await authorizedAxiosInstance.put(
-        `${REACT_APP_IP_Address}/post/${ownerId}/${postId}`,
+        `/post/${ownerId}/${postId}`,
         postData
       );
 
@@ -84,9 +84,7 @@ class PostAPI {
 
   static async deletePost(postId) {
     try {
-      const res = await authorizedAxiosInstance.delete(
-        `${REACT_APP_IP_Address}/post/${postId}`
-      );
+      const res = await authorizedAxiosInstance.delete(`/post/${postId}`);
       if (res.status === 200) {
         console.log("Post successfully marked as deleted:", res.data.result);
         return res.data.result;
