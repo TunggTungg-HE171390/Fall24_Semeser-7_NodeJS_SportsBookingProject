@@ -7,79 +7,26 @@ const ms = require("ms");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await userModel.find();
+    const users = await userModel.find({ status: 1 });
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const createUser = async (req, res) => {
+const changUserStatus = async (req, res, next) => {
   try {
-    const user = await userModel.create(req.body);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-const login = async (req, res) => {
-  try {
-    if (!req.body.email || !req.body.password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
-
-    const user = await userModel.findOne({
-      account: { email: req.body.email, password: req.body.password },
-    });
-
-    if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-
-    // Muốn bổ sung gì vào token thì thêm ở đây
-    const userInfo = {
-      _id: user._id,
-      email: user.account.email,
-      role: user.role,
-    };
-
-    //Tạo ra 2 loại token: access token và refresh token
-    //Cả 2 cái đều dùng SECRET_KEY
-    const accessToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      process.env.ExpIn
+    const { id, status } = req.body;
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      { status },
+      {
+        new: true,
+      }
     );
-    const refreshToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      "7d"
-    );
-
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.status(200).json({
-      ...userInfo,
-      accessToken,
-      refreshToken,
-    });
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
@@ -157,19 +104,17 @@ const getUserById = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
-    const newPhone = req.body.phone;
-    const newAvatar = req.body.avatar;
+    const { id, name, phone, role } = req.body;
 
     const updateInfo = {
-      "profile.phone": newPhone,
-      "profile.avatar": newAvatar,
+      "profile.phone": phone,
+      "profile.name": name,
+      role: role,
     };
 
-    const updatedUser = await userModel.findByIdAndUpdate(
-      req.params.id,
-      updateInfo,
-      { new: true }
-    );
+    const updatedUser = await userModel.findByIdAndUpdate(id, updateInfo, {
+      new: true,
+    });
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
@@ -208,10 +153,8 @@ const forgotPassword = async (req, res, next) => {
 
 module.exports = {
   getAllUsers,
-  createUser,
   changePassword,
   getUserById,
   updateUser,
   forgotPassword,
-  login,
 };

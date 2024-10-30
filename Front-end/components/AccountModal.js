@@ -29,7 +29,6 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       setPhone(data.profile.phone);
       setRole(data.role);
     } else {
-      // Reset fields khi ở chế độ thêm mới
       setName("");
       setEmail("");
       setPhone("");
@@ -73,14 +72,14 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
     };
 
     if (isEditMode) {
-      // Chế độ chỉnh sửa
       const editedAccount = {
-        ...account,
-        ...accountData,
+        id: data._id,
+        name: name,
+        phone: phone,
+        role: role,
       };
       onSubmit(editedAccount);
     } else {
-      // Chế độ thêm mới
       const newAccount = {
         id: Date.now().toString(),
         ...accountData,
@@ -125,22 +124,24 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
                 />
               </View>
 
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>
-                  Email <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                />
-                {errors.email && (
-                  <Text style={styles.errorText}>{errors.email}</Text>
-                )}
-              </View>
+              {!isEditMode && (
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>
+                    Email <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                  />
+                  {errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+                </View>
+              )}
 
               <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Phone:</Text>

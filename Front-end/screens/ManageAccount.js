@@ -57,18 +57,26 @@ const ManageAccount = () => {
 
   const handleAddOrEditAccount = (accountData) => {
     if (selectedAccount) {
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((account) =>
-          account._id === accountData._id ? accountData : account
-        )
-      );
+      fetchAccountsData();
+      axios
+        .put(`http://${api}:3000/user/updateInfo`, accountData)
+        .then((res) => {
+          Alert.alert("Success", "Edit user successfully!");
+          fetchAccountsData();
+          setIsModalVisible(false);
+          setSelectedAccount(null);
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message || "Edit user failed";
+
+          Alert.alert("Error", errorMessage);
+        });
     } else {
-      // setAccounts((prevAccounts) => [accountData, ...prevAccounts]);
       axios
         .post(`http://${api}:3000/auth/sign-up`, accountData)
         .then((res) => {
-          // console.log(res);
-          // alert("Đăng ký thành công");
           Alert.alert(
             "Success",
             "Account added successfully. Password will send to email!"
@@ -82,7 +90,6 @@ const ManageAccount = () => {
           const errorMessage =
             error.response?.data?.message ||
             "Add new account failed, Email exists";
-          // console.error("Lỗi:", errorMessage);
 
           Alert.alert("Error", errorMessage);
         });
