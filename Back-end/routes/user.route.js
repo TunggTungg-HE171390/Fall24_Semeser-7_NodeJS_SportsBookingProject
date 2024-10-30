@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 router.use(bodyParser.json());
 
-const { UserController } = require("../controllers");
+const { UserController, FieldOrderController } = require("../controllers");
 
 router.get("/list", UserController.getAllUsers);
 router.get("/list-from-admin", UserController.getAllUsersFromAdmin);
@@ -14,5 +14,8 @@ router.post("/updateInfo/:id", UserController.updateUser);
 router.put("/edit-user-from-admin", UserController.editUserFromAdmin);
 router.post("/forgetPassword", UserController.forgotPassword);
 router.put("/change-status", UserController.changeUserStatus);
+
+router.get("/:id", FieldOrderController.getFieldOrdersByCustomerId);
+router.get("/getDetail/:id", FieldOrderController.getDetailByFieldOrdersId);
 
 module.exports = router;
