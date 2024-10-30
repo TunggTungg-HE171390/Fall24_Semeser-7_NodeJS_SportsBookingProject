@@ -2,10 +2,17 @@ const userModel = require("../models/user.model");
 const { sendEmail, generateAuthCode } = require("./mailService.controller");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-const JwtProvider = require("../providers/JwtProvider");
-const ms = require("ms");
 
 const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getAllUsersFromAdmin = async (req, res) => {
   try {
     const users = await userModel.find({ status: 1 });
     res.status(200).json(users);
@@ -14,16 +21,30 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const changUserStatus = async (req, res, next) => {
+const changeUserStatus = async (req, res, next) => {
   try {
     const { id, status } = req.body;
+
+    // Tìm người dùng theo id để lấy role
+    const user = await userModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Kiểm tra role của người dùng
+    if (user.role === 3) {
+      return res
+        .status(403)
+        .json({ message: "Cannot change status for users with role 3" });
+    }
+
+    // Cập nhật status nếu role khác 3
     const updatedUser = await userModel.findByIdAndUpdate(
       id,
       { status },
-      {
-        new: true,
-      }
+      { new: true }
     );
+
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
@@ -104,6 +125,26 @@ const getUserById = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
+    const newPhone = req.body.phone;
+    const newAvatar = req.body.avatar;
+
+    const updateInfo = {
+      "profile.phone": newPhone,
+      "profile.avatar": newAvatar,
+    };
+
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.params.id,
+      updateInfo,
+      { new: true }
+    );
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+const editUserFromAdmin = async (req, res, next) => {
+  try {
     const { id, name, phone, role } = req.body;
 
     const updateInfo = {
@@ -157,4 +198,7 @@ module.exports = {
   getUserById,
   updateUser,
   forgotPassword,
+  changeUserStatus,
+  getAllUsersFromAdmin,
+  editUserFromAdmin,
 };

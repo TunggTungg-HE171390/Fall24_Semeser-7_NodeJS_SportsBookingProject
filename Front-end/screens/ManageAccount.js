@@ -15,8 +15,10 @@ import Pagination from "../components/Pagination";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTER, ROLE_NAME } from "../utils/constant";
 import axios from "axios";
+import { useSelector } from "react-redux";
 const ManageAccount = () => {
   const navigation = useNavigation();
+  const userId = useSelector((state) => state.auth.user?.id);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accounts, setAccounts] = useState([]);
@@ -27,8 +29,9 @@ const ManageAccount = () => {
   const api = process.env.REACT_APP_IP_Address;
   const fetchAccountsData = async () => {
     try {
-      const response = await axios.get(`http://${api}:3000/user/list`);
-      // console.log(response.data);
+      const response = await axios.get(
+        `http://${api}:3000/user/list-from-admin`
+      );
       const accounts = response.data.reverse();
       setAccounts(accounts);
     } catch (error) {
@@ -57,9 +60,8 @@ const ManageAccount = () => {
 
   const handleAddOrEditAccount = (accountData) => {
     if (selectedAccount) {
-      fetchAccountsData();
       axios
-        .put(`http://${api}:3000/user/updateInfo`, accountData)
+        .put(`http://${api}:3000/user/edit-user-from-admin`, accountData)
         .then((res) => {
           Alert.alert("Success", "Edit user successfully!");
           fetchAccountsData();
@@ -97,43 +99,44 @@ const ManageAccount = () => {
     }
   };
 
-  const handleDeleteAccountConfirm = (prevAccounts, accountId) => {
-    const updatedAccounts = prevAccounts.filter(
-      (account) => account.id !== accountId
-    );
-    return updatedAccounts;
+  const handleDeleteAccountConfirm = (accountId) => {
+    console.log(`Account ID: ${accountId}`);
+    console.log(`User ID: ${userId}`);
+    if (accountId === userId) {
+      Alert.alert("Warning", "You can't delete yourself!");
+    } else {
+      axios
+        .put(`http://${api}:3000/user/change-status`, {
+          id: accountId,
+          status: 2,
+        })
+        .then((res) => {
+          fetchAccountsData();
+          Alert.alert("Success", "Delete user successfully!");
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message || "Delete user failed";
+
+          Alert.alert("Error", errorMessage);
+        });
+    }
   };
 
   const handleDeleteAccount = (accountId) => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Do you want to delete this account?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
+    Alert.alert("Confirm Deletion", "Do you want to delete this account?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => {
+          handleDeleteAccountConfirm(accountId);
         },
-        {
-          text: "Delete",
-          onPress: () => {
-            setAccounts((prevAccounts) => {
-              const updatedAccounts = handleDeleteAccountConfirm(
-                prevAccounts,
-                accountId
-              );
-              const newTotalPages = Math.ceil(
-                updatedAccounts.length / accountsPerPage
-              );
-              if (currentPage > newTotalPages && newTotalPages > 0) {
-                setCurrentPage(newTotalPages);
-              }
-              return updatedAccounts;
-            });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+      },
+    ]);
   };
 
   const renderItem = (item, index) => (

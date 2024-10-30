@@ -80,11 +80,7 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       };
       onSubmit(editedAccount);
     } else {
-      const newAccount = {
-        id: Date.now().toString(),
-        ...accountData,
-        status: 0,
-      };
+      const newAccount = accountData;
       onSubmit(newAccount);
     }
   };
