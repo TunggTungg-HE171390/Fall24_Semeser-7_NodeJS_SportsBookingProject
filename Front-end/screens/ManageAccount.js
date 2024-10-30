@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,17 +14,29 @@ import AccountModal from "../components/AccountModal";
 import Pagination from "../components/Pagination";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTER, ROLE_NAME } from "../utils/constant";
-import { AccountsData } from "../db/db";
-
+import axios from "axios";
 const ManageAccount = () => {
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [accounts, setAccounts] = useState(AccountsData);
+  const [accounts, setAccounts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const accountsPerPage = 6;
   const [selectedRoles, setSelectedRoles] = useState([]);
+
+  const fetchAccountsData = async () => {
+    try {
+      const response = await axios.get("http://192.168.0.104:3000/user/list");
+      // console.log(response.data);
+      setAccounts(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchAccountsData();
+  }, []);
 
   const filteredAccounts = accounts.filter((account) => {
     const matchesSearchQuery = account.profile.name
@@ -46,7 +58,7 @@ const ManageAccount = () => {
     if (selectedAccount) {
       setAccounts((prevAccounts) =>
         prevAccounts.map((account) =>
-          account.id === accountData.id ? accountData : account
+          account._id === accountData._id ? accountData : account
         )
       );
     } else {
@@ -95,11 +107,11 @@ const ManageAccount = () => {
   };
 
   const renderItem = (item, index) => (
-    <View style={styles.card} key={item.id}>
+    <View style={styles.card} key={item._id}>
       <Text style={styles.orderText}>
         {index + 1 + (currentPage - 1) * accountsPerPage}
       </Text>
-      <Image source={item.profile.avatar} style={styles.avatar} />
+      <Image source={{ uri: item.profile.avatar }} style={styles.avatar} />
       <View style={styles.cardContent}>
         <Text style={styles.nameText}>{item.profile.name}</Text>
         <Text style={styles.infoText}>
@@ -126,7 +138,7 @@ const ManageAccount = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => handleDeleteAccount(item.id)}
+          onPress={() => handleDeleteAccount(item._id)}
         >
           <AntDesign name="delete" size={20} color="#ff8000" />
         </TouchableOpacity>

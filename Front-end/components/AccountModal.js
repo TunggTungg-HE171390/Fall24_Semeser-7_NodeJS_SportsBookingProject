@@ -68,7 +68,8 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       profile: {
         name,
         phone,
-        avatar: require("../assets/images/avatar/avatar.png"),
+        avatar:
+          "https://firebasestorage.googleapis.com/v0/b/sdn302-42d07.appspot.com/o/files%2Favatar.png%202024-10-29%200%3A28%3A22?alt=media&token=ba83b026-e17d-46ed-8682-f5fd0973747a",
       },
     };
 
