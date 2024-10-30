@@ -29,9 +29,7 @@ const ManageAccount = () => {
   const api = process.env.REACT_APP_IP_Address;
   const fetchAccountsData = async () => {
     try {
-      const response = await axios.get(
-        `http://${api}:3000/user/list-from-admin`
-      );
+      const response = await axios.get(`${api}/user/list-from-admin`);
       const accounts = response.data.reverse();
       setAccounts(accounts);
     } catch (error) {
@@ -61,7 +59,7 @@ const ManageAccount = () => {
   const handleAddOrEditAccount = (accountData) => {
     if (selectedAccount) {
       axios
-        .put(`http://${api}:3000/user/edit-user-from-admin`, accountData)
+        .put(`${api}/user/edit-user-from-admin`, accountData)
         .then((res) => {
           Alert.alert("Success", "Edit user successfully!");
           fetchAccountsData();
@@ -77,7 +75,7 @@ const ManageAccount = () => {
         });
     } else {
       axios
-        .post(`http://${api}:3000/auth/sign-up`, accountData)
+        .post(`${api}/auth/sign-up`, accountData)
         .then((res) => {
           Alert.alert(
             "Success",
@@ -106,7 +104,7 @@ const ManageAccount = () => {
       Alert.alert("Warning", "You can't delete yourself!");
     } else {
       axios
-        .put(`http://${api}:3000/user/change-status`, {
+        .put(`${api}/user/change-status`, {
           id: accountId,
           status: 2,
         })

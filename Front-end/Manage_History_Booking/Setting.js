@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Modal,
   TextInput,
-  FlatList,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -22,27 +22,29 @@ export default function Setting() {
     confirmPassword: "",
   });
   const api = process.env.REACT_APP_IP_Address;
+
   const dispatch = useDispatch();
   const handleChangePassword = () => {
     // Logic for changing password
-    alert("Password changed successfully");
+    Alert("Password changed successfully");
     setShowModal(false);
   };
 
   const handleLogout = async () => {
     axios
-      .post(`http://${api}:3000/auth/sign-out`)
+      .post(`${api}/auth/sign-out`)
+
       .then(async (res) => {
         console.log(res.data.message);
         // Xóa token từ AsyncStorage
         await AsyncStorage.removeItem("authToken");
         dispatch(logout());
 
-        // alert("You have been logged out.");
+        // Alert("You have been logged out.");
       })
       .catch((error) => {
         console.log("Logout Error:", error.response);
-        alert("An error occurred during logout.");
+        Alert("An error occurred during logout.");
       });
   };
 

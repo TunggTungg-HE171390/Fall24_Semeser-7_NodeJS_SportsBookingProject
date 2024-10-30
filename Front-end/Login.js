@@ -20,11 +20,12 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
   const api = process.env.REACT_APP_IP_Address;
   const dispatch = useDispatch();
   const handleLogin = async () => {
     try {
-      const res = await axios.post(`http://${api}:3000/auth/sign-in`, {
+      const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,
         password: password,
       });
@@ -52,7 +53,7 @@ export default function Login({ navigation }) {
 
   const handleForgotPassword = async () => {
     try {
-      const res = await axios.post(`http://${api}:3000/user/forgetPassword`, {
+      const res = await axios.post(`${api}/user/forgetPassword`, {
         email: email,
       });
       console.log(res.data.message);

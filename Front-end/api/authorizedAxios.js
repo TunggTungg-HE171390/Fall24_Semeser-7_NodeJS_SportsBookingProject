@@ -1,6 +1,8 @@
 import axios from "axios";
 
-let authorizedAxiosInstance = axios.create();
+let authorizedAxiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_IP_Address,
+});
 
 // Thời gian chờ tối đa của 1 request: 5 phút
 authorizedAxiosInstance.defaults.timeout = 1000 * 60 * 5;
