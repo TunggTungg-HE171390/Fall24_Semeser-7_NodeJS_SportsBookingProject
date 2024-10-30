@@ -50,6 +50,14 @@ async function getDetailByFieldOrdersId(req, res, next) {
     const detail_field_orders = await db.fieldOrder.findOne({ _id: req.params.id })
       .populate("customerId", "profile.name")
       .populate({
+        path: "equipmentOrderId",
+        populate: {
+          path: "equipments.equipmentId",
+          model: "Equipments",
+          select: "equipmentName"
+        }
+      })
+      .populate({
         path: "fieldTime.fieldId",
         model: "Fields",
         select: "name"
@@ -82,7 +90,11 @@ async function getDetailByFieldOrdersId(req, res, next) {
           minute: '2-digit'
         })
       })),
-      equipmentOrder: detail_field_orders.equipmentOrderId
+      equipmentOrder: detail_field_orders.equipmentOrderId?.equipments.map(e => ({
+        equipmentName: e.equipmentId?.equipmentName,
+        quantity: e.quantity,
+        totalPrice: e.price * e.quantity
+      })) || []
     };
 
     res.status(200).json({
@@ -94,7 +106,6 @@ async function getDetailByFieldOrdersId(req, res, next) {
     next(error);
   }
 }
-
 
 const Field_OrderController = {
   getFieldOrdersByCustomerId,

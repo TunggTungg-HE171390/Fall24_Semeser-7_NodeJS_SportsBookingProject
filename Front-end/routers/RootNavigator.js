@@ -13,7 +13,7 @@ import FieldAdminDetailScreen from "../screens/FieldAdminsDetail";
 import Header from "../layout/Header";
 import ManageAccount from "../screens/ManageAccount";
 import AccountDetail from "../screens/AccountDetail";
-import Dashboard from "../screens/Dashbord";
+import Dashboard from "../screens/Dashboard";
 import { ROUTER } from "../utils/constant";
 import RentalEquipmentScreen from "../screens/RentalEquipmentScreen";
 import EquipmentDetailScreen from "../screens/EquipmentDetailsScreen";

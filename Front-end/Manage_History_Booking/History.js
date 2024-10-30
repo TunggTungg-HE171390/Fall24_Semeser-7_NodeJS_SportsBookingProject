@@ -21,7 +21,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://172.20.10.2:3000/field_order/${userId}`);
+      const res = await axios.get(`http://192.168.20.44:3000/field_order/${userId}`);
       const fetchedOrders = res.data.data;
       setOrders(fetchedOrders);
 
@@ -38,7 +38,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://172.20.10.2:3000/field_order/getDetail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.20.44:3000/field_order/getDetail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       console.log(res.data.data);
       setModalVisible(true);
@@ -84,17 +84,25 @@ export default function History() {
             <Text style={styles.modalTitle}>Chi tiết đơn đặt hàng</Text>
             <Text>Khách hàng: {selectedOrder?.customerName}</Text>
             {selectedOrder?.fieldTime.map((time, index) => (
-              <Text key={index}>Sân: {time.fieldName}</Text>
+              <Text key={index}>
+                <Text>Thời gian: {time.start} - {time.end}</Text>
+                <Text>Sân: {time.fieldName}</Text>
+              </Text>
             ))}
-            {selectedOrder?.fieldTime.map((time, index) => (
-              <Text key={index}>Thời gian: {time.start} - {time.end}</Text>
-            ))} 
+            {selectedOrder?.equipmentOrder.map((equipment, index) => (
+              <Text key={index}>
+                <Text>Thiết bị: {equipment.equipmentName}</Text>
+                <Text>Số lượng: {equipment.quantity}</Text>
+                <Text>Tổng giá: {equipment.totalPrice}</Text>
+              </Text>
+            ))}
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButton}>Đóng</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
     </View>
   );
 }
