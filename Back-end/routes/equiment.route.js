@@ -5,6 +5,7 @@ const {
   updateEquipment,
   getEquipmentById,
   deleteEquipment,
+  rentalEquipment,
 } = require("../controllers/equipment.controller");
 
 const router = express.Router();
@@ -23,5 +24,7 @@ router.put("/update/:id", updateEquipment);
 
 // "Soft delete" an equipment by updating its status
 router.put("/delete/:id", deleteEquipment);
+
+router.post("/rental", rentalEquipment);
 
 module.exports = router;
