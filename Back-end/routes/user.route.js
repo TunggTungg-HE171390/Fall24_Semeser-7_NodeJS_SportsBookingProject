@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 router.use(bodyParser.json());
 
-const { UserController } = require("../controllers");
+const { UserController, FieldOrderController } = require("../controllers");
 
 router.get("/list", UserController.getAllUsers);
 router.get("/userInfo/:id", UserController.getUserById);
@@ -17,5 +17,8 @@ router.get("/", UserController.getAllUsers);
 router.post("/", UserController.createUser);
 
 router.post("/login", UserController.login);
+
+router.get("/:id", FieldOrderController.getFieldOrdersByCustomerId);
+router.get("/getDetail/:id", FieldOrderController.getDetailByFieldOrdersId);
 
 module.exports = router;
