@@ -24,12 +24,13 @@ const ManageAccount = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const accountsPerPage = 6;
   const [selectedRoles, setSelectedRoles] = useState([]);
-
+  const api = process.env.REACT_APP_IP_Address;
   const fetchAccountsData = async () => {
     try {
-      const response = await axios.get("http://192.168.0.104:3000/user/list");
+      const response = await axios.get(`http://${api}:3000/user/list`);
       // console.log(response.data);
-      setAccounts(response.data);
+      const accounts = response.data.reverse();
+      setAccounts(accounts);
     } catch (error) {
       console.error(error);
     }
@@ -62,7 +63,29 @@ const ManageAccount = () => {
         )
       );
     } else {
-      setAccounts((prevAccounts) => [accountData, ...prevAccounts]);
+      // setAccounts((prevAccounts) => [accountData, ...prevAccounts]);
+      axios
+        .post(`http://${api}:3000/auth/sign-up`, accountData)
+        .then((res) => {
+          // console.log(res);
+          // alert("Đăng ký thành công");
+          Alert.alert(
+            "Success",
+            "Account added successfully. Password will send to email!"
+          );
+          fetchAccountsData();
+          setIsModalVisible(false);
+          setSelectedAccount(null);
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message ||
+            "Add new account failed, Email exists";
+          // console.error("Lỗi:", errorMessage);
+
+          Alert.alert("Error", errorMessage);
+        });
       setCurrentPage(1);
     }
   };
@@ -121,9 +144,9 @@ const ManageAccount = () => {
       <View style={styles.actionCell}>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() =>
-            navigation.navigate(ROUTER.ACCOUNT_DETAIL, { account: item })
-          }
+          // onPress={() =>
+          //   navigation.navigate(ROUTER.ACCOUNT_DETAIL, { account: item })
+          // }
         >
           <AntDesign name="eye" size={20} color="#6a5acd" />
         </TouchableOpacity>

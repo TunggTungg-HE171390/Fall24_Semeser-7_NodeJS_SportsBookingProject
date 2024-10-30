@@ -8,7 +8,6 @@ import {
   TextInput,
   ScrollView,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { isValidEmail, isValidPhone, isValidField } from "../utils/validation";
@@ -89,15 +88,6 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       };
       onSubmit(newAccount);
     }
-    Alert.alert(
-      "Success",
-      isEditMode
-        ? "Account edited successfully!"
-        : "Account added successfully!",
-      [{ text: "OK", onPress: onClose }]
-    );
-
-    onClose();
   };
 
   return (
@@ -175,9 +165,8 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
                     onValueChange={(itemValue) => setRole(itemValue)}
                   >
                     <Picker.Item label="Customer" value={1} />
-                    <Picker.Item label="Staff" value={2} />
-                    <Picker.Item label="Field Owner" value={3} />
-                    <Picker.Item label="Admin" value={4} />
+                    <Picker.Item label="Field Owner" value={2} />
+                    <Picker.Item label="Admin" value={3} />
                   </Picker>
                 </View>
               </View>
