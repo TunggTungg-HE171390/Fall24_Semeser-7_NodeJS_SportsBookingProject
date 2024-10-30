@@ -12,23 +12,20 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { useDispatch } from "react-redux";
 import { login } from "./redux/authSlice";
 import axios from "axios";
-import { useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const user = useSelector((state) => state?.auth?.user);
-  const isLoggedIn = useSelector((state) => state?.auth?.isLoggedIn);
   const [email, setEmail] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const api = process.env.REACT_APP_IP_Address;
   const dispatch = useDispatch();
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://172.22.240.1:3000/auth/sign-in", {
+      const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,
         password: password,
       });
@@ -56,12 +53,9 @@ export default function Login({ navigation }) {
 
   const handleForgotPassword = async () => {
     try {
-      const res = await axios.post(
-        "http://172.22.240.1:3000/user/forgetPassword",
-        {
-          email: email,
-        }
-      );
+      const res = await axios.post(`${api}/user/forgetPassword`, {
+        email: email,
+      });
       console.log(res.data.message);
       setCodeSent(true);
       Alert.alert("Mã xác thực", "Mã xác thực đã được gửi đến email của bạn.");

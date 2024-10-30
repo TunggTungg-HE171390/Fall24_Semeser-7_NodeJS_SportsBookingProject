@@ -1,8 +1,7 @@
 import axios from "axios";
-import { REACT_APP_IP_Address } from "@env";
 
 let authorizedAxiosInstance = axios.create({
-  baseURL: `${REACT_APP_IP_Address}`,
+  baseURL: process.env.REACT_APP_IP_Address,
 });
 
 // Thời gian chờ tối đa của 1 request: 5 phút

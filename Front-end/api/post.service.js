@@ -1,5 +1,4 @@
 import authorizedAxiosInstance from "./authorizedAxios";
-import { REACT_APP_IP_Address } from "@env";
 
 class PostAPI {
   // Create post
@@ -36,9 +35,7 @@ class PostAPI {
   // Get all posts
   static async getAllPosts() {
     try {
-      const res = await authorizedAxiosInstance.get(
-        `${REACT_APP_IP_Address}/post/`
-      );
+      const res = await authorizedAxiosInstance.get(`/post/`);
       return res.data.result;
     } catch (err) {
       if (err.response) {

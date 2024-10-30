@@ -6,7 +6,6 @@ import Tab_bar from "../components/Tab_bar";
 import Booking_screen from "../screens/Booking_screen";
 import Explore_screen from "../screens/Explore_screen";
 import SigninScreen from "../Login";
-import LoginScreen from "../screens/Login_screen";
 import FieldDetailScreen from "../screens/FieldDetailScreen";
 import FieldListScreen from "../screens/FieldListScreen";
 import FieldAdminDetailScreen from "../screens/FieldAdminsDetail";
@@ -150,7 +149,7 @@ function Main() {
       )}
       {role === 3 && <Stack.Screen name="Admin" component={AdminRole} />}
 
-      {/* <Tab.Screen name="Profile" component={ProfileStack} /> */}
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }

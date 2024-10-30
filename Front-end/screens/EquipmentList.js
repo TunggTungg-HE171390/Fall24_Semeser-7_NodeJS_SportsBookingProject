@@ -32,7 +32,7 @@ const EquipmentListScreen = () => {
   const [quantity, setQuantity] = useState("");
   const [status, setStatus] = useState(1);
   const [images, setImages] = useState([]);
-
+  const api = process.env.REACT_APP_IP_Address;
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
@@ -47,7 +47,7 @@ const EquipmentListScreen = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://172.22.240.1:3000/equipment?page=${page}&limit=10&search=${searchTerm}`
+        `${api}/equipment?page=${page}&limit=10&search=${searchTerm}`
       );
       const { equipments, totalPages } = response.data;
       setEquipment(equipments);
@@ -76,7 +76,7 @@ const EquipmentListScreen = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.put(`http://172.22.240.1:3000/equipment/delete/${id}`);
+      await axios.put(`${api}/equipment/delete/${id}`);
       fetchEquipment(page, search);
     } catch (error) {
       console.error("Error deleting equipment:", error);
@@ -152,11 +152,11 @@ const EquipmentListScreen = () => {
     try {
       if (editingEquipment) {
         await axios.put(
-          `http://172.22.240.1:3000/equipment/update/${editingEquipment._id}`,
+          `${api}/equipment/update/${editingEquipment._id}`,
           payload
         );
       } else {
-        await axios.post("http://172.22.240.1:3000/equipment", payload);
+        await axios.post(`${api}/equipment`, payload);
       }
       fetchEquipment(page, search);
       closeModal();

@@ -22,6 +22,8 @@ export default function RegisterScreen({ navigation }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
+  const api = process.env.REACT_APP_IP_Address;
+
   useEffect(() => {
     setName(`${lastName} ${firstName}`);
   }, [lastName, firstName]);
@@ -34,7 +36,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
     axios
-      .post("http://172.22.240.1:3000/auth/sign-up", {
+      .post(`${api}/auth/sign-up`, {
         account: {
           email: email,
           password: password,
