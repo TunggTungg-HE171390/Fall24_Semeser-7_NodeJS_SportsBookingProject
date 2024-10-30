@@ -1,32 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, TextInput, FlatList } from 'react-native';
-import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  TextInput,
+  FlatList,
+} from "react-native";
+import axios from "axios";
+import { useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Setting() {
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: '', password: '', newPassword: '', confirmPassword: '' });
+  const [formData, setFormData] = useState({
+    name: "",
+    password: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const dispatch = useDispatch();
   const handleChangePassword = () => {
     // Logic for changing password
-    alert('Password changed successfully');
+    alert("Password changed successfully");
     setShowModal(false);
   };
 
   const handleLogout = async () => {
-    axios.post("http://192.168.20.29:3000/auth/sign-out")
+    axios
+      .post("http://172.22.240.1:3000/auth/sign-out")
       .then(async (res) => {
-        console.log(res.data.message); 
+        console.log(res.data.message);
         // Xóa token từ AsyncStorage
-        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem("authToken");
         dispatch(logout());
 
         alert("You have been logged out.");
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("Logout Error:", error.response);
         alert("An error occurred during logout.");
       });
@@ -34,10 +48,12 @@ export default function Setting() {
 
   return (
     <View style={styles.container}>
-
       {/* Setting Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => setShowModal(true)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setShowModal(true)}
+        >
           <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
@@ -61,32 +77,43 @@ export default function Setting() {
               placeholder="Current Password"
               secureTextEntry
               value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, password: text })
+              }
             />
             <TextInput
               style={styles.input}
               placeholder="New Password"
               secureTextEntry
               value={formData.newPassword}
-              onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, newPassword: text })
+              }
             />
             <TextInput
               style={styles.input}
               placeholder="Confirm New Password"
               secureTextEntry
               value={formData.confirmPassword}
-              onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, confirmPassword: text })
+              }
             />
-            <TouchableOpacity style={styles.modalButton} onPress={handleChangePassword}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleChangePassword}
+            >
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setShowModal(false)}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowModal(false)}
+            >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -94,68 +121,68 @@ export default function Setting() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 120,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 20,
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 15,
   },
   modalButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
   },
   reportContainer: {
-    width: '100%',
+    width: "100%",
     padding: 20,
   },
   reportTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   reportItem: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   reportText: {
     fontSize: 16,
