@@ -11,6 +11,7 @@ const {
 } = require("firebase/storage");
 
 const getAllPosts = async (req, res) => {
+  console.log(`getAllPosts`);
   try {
     const posts = await postModel.find({ status: POST_STATUS.PUBLISHED });
     res.status(200).json({
@@ -59,12 +60,12 @@ const getPostsByOwner = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-/**
- * Create a new post
- * @param {Object} req - Request object
- * @param {Object} res - Response object
- * @returns {Promise<void>}
- */
+  /**
+   * Create a new post
+   * @param {Object} req - Request object
+   * @param {Object} res - Response object
+   * @returns {Promise<void>}
+   */
   try {
     const ownerId = req.params.id;
 

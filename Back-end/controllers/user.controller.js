@@ -2,8 +2,6 @@ const userModel = require("../models/user.model");
 const { sendEmail, generateAuthCode } = require("./mailService.controller");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
-const JwtProvider = require("../providers/JwtProvider");
-const ms = require("ms");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -14,72 +12,42 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+const getAllUsersFromAdmin = async (req, res) => {
   try {
-    const user = await userModel.create(req.body);
-    res.status(201).json(user);
+    const users = await userModel.find({ status: 1 });
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const login = async (req, res) => {
+const changeUserStatus = async (req, res, next) => {
   try {
-    if (!req.body.email || !req.body.password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
+    const { id, status } = req.body;
 
-    const user = await userModel.findOne({
-      account: { email: req.body.email, password: req.body.password },
-    });
-
+    // Tìm người dùng theo id để lấy role
+    const user = await userModel.findById(id);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Muốn bổ sung gì vào token thì thêm ở đây
-    const userInfo = {
-      _id: user._id,
-      email: user.account.email,
-      role: user.role,
-    };
+    // Kiểm tra role của người dùng
+    if (user.role === 3) {
+      return res
+        .status(403)
+        .json({ message: "Cannot change status for users with role 3" });
+    }
 
-    //Tạo ra 2 loại token: access token và refresh token
-    //Cả 2 cái đều dùng SECRET_KEY
-    const accessToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      process.env.ExpIn
-    );
-    const refreshToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      "7d"
+    // Cập nhật status nếu role khác 3
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
     );
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.status(200).json({
-      ...userInfo,
-      accessToken,
-      refreshToken,
-    });
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
@@ -154,6 +122,7 @@ const getUserById = async (req, res, next) => {
     next(error);
   }
 };
+
 const updateUser = async (req, res, next) => {
   try {
     const newPhone = req.body.phone;
@@ -174,11 +143,31 @@ const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+const editUserFromAdmin = async (req, res, next) => {
+  try {
+    const { id, name, phone, role } = req.body;
+
+    const updateInfo = {
+      "profile.phone": phone,
+      "profile.name": name,
+      role: role,
+    };
+
+    const updatedUser = await userModel.findByIdAndUpdate(id, updateInfo, {
+      new: true,
+    });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const forgotPassword = async (req, res, next) => {
   try {
     const user = await userModel.findOne({ "account.email": req.body.email });
-    console.log(user);
+
+    console.log(`Email: ${req.body.email}`);
+    console.log(`User `, user);
     if (!user) {
       return res.status(404).json({ message: "Email không tồn tại." });
     }
@@ -205,10 +194,11 @@ const forgotPassword = async (req, res, next) => {
 
 module.exports = {
   getAllUsers,
-  createUser,
   changePassword,
   getUserById,
   updateUser,
   forgotPassword,
-  login,
+  changeUserStatus,
+  getAllUsersFromAdmin,
+  editUserFromAdmin,
 };

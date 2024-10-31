@@ -22,7 +22,7 @@ export default function History() {
   const getFieldOrderByCustomerId = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/field_order/${userId}`
+        `http://172.22.240.1:3000/field_order/${userId}`
       );
       const fetchedOrders = res.data.data;
       setOrders(fetchedOrders);
@@ -45,7 +45,7 @@ export default function History() {
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/field_order/getDetail/${fieldOrderId}`
+        `http://172.22.240.1:3000/field_order/getDetail/${fieldOrderId}`
       );
       setSelectedOrder(res.data.data);
       console.log(res.data.data);

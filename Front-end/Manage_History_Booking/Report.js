@@ -29,12 +29,12 @@ export default function Report() {
       getFeedbackByCustomerId();
     }
   }, [userId]);
-
+  const api = process.env.REACT_APP_IP_Address;
   const getFeedbackByCustomerId = async () => {
     try {
       if (!userId) return;
       // console.log(userId);
-      const res = await axios.get(`http://localhost:3000/feedback/${userId}`);
+      const res = await axios.get(`${api}/feedback/${userId}`);
       setReviews(res.data.feedbacks);
     } catch (error) {
       console.log("Error fetching feedback:", error);
@@ -58,7 +58,7 @@ export default function Report() {
       };
 
       await axios.put(
-        `http://localhost:3000/feedback/update/${selectedReview._id}`,
+        `${api}/feedback/update/${selectedReview._id}`,
         updatedReview
       );
       Alert.alert("Success", "Feedback has been updated successfully");
@@ -85,10 +85,7 @@ export default function Report() {
   const handleConfirmDelete = async () => {
     try {
       if (!selectedReview) return;
-
-      await axios.delete(
-        `http://localhost:3000/feedback/delete/${selectedReview._id}`
-      );
+      await axios.delete(`${api}/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
