@@ -85,7 +85,6 @@ export default function Report() {
   const handleConfirmDelete = async () => {
     try {
       if (!selectedReview) return;
-
       await axios.delete(`${api}/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
