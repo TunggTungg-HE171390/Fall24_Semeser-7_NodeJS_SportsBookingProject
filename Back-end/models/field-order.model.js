@@ -6,6 +6,10 @@ const FieldOrdersSchema = new mongoose.Schema({
     ref: "Users",
     required: [true, "Customer ID is required."],
   },
+  price: {
+    type: Number,
+    required: [true, "Price is required."],
+  },
   fieldId: {
     type: mongoose.Types.ObjectId,
     ref: "Fields",
