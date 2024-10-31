@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { Calendar } from "react-native-calendars";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 export default function History() {
-  const [viewType, setViewType] = useState('monthly');
+  const [viewType, setViewType] = useState("monthly");
   const [markedDates, setMarkedDates] = useState({});
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  
-
-  const userId = useSelector(state => state.auth.user?.id);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
     if (userId) {
@@ -23,14 +21,20 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.20.44:3000/field_order/${userId}`);
-      const fetchedOrders = res.data.data;
+      const res = await axios.get(`http://192.168.20.92:3000/field_order/${userId}`);
+      const fetchedOrders = res.data.data || [];
       setOrders(fetchedOrders);
 
       const dates = {};
-      fetchedOrders.forEach(order => {
-        const orderDate = order.fieldTime[0].start.split('T')[0];
-        dates[orderDate] = { selected: true, marked: true, selectedColor: 'red' };
+      fetchedOrders.forEach((order) => {
+        const orderDate = order.fieldTime?.[0]?.start?.split("T")[0];
+        if (orderDate) {
+          dates[orderDate] = {
+            selected: true,
+            marked: true,
+            selectedColor: "red",
+          };
+        }
       });
       setMarkedDates(dates);
     } catch (error) {
@@ -40,7 +44,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.20.44:3000/field_order/getDetail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.20.92:3000/field_order/getDetail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       console.log(res.data.data);
       setModalVisible(true);
@@ -50,7 +54,9 @@ export default function History() {
   };
 
   const onDayPress = (day) => {
-    const order = orders.find(o => o.fieldTime[0].start.startsWith(day.dateString));
+    const order = orders.find((o) =>
+      o.fieldTime?.[0]?.start?.startsWith(day.dateString)
+    );
     if (order) {
       getFieldOrderDetail(order._id);
     }
@@ -60,20 +66,22 @@ export default function History() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          style={[styles.button, viewType === 'monthly' && styles.activeButton]}
-          onPress={() => setViewType('monthly')}>
+          style={[styles.button, viewType === "monthly" && styles.activeButton]}
+          onPress={() => setViewType("monthly")}
+        >
           <Text style={styles.buttonText}>Monthly view</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button, viewType === 'weekly' && styles.activeButton]}
-          onPress={() => setViewType('weekly')}>
+          style={[styles.button, viewType === "weekly" && styles.activeButton]}
+          onPress={() => setViewType("weekly")}
+        >
           <Text style={styles.buttonText}>Weekly view</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.calendar}>
         <Calendar
-          markingType={'custom'}
+          markingType={"custom"}
           markedDates={markedDates}
           onDayPress={onDayPress}
         />
@@ -84,19 +92,19 @@ export default function History() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Chi tiết đơn đặt hàng</Text>
-            <Text>Khách hàng: {selectedOrder?.customerName}</Text>
-            {selectedOrder?.fieldTime.map((time, index) => (
-              <Text key={index}>
+            <Text>Khách hàng: {selectedOrder?.customerName || "N/A"}</Text>
+            {selectedOrder?.fieldTime?.map((time, index) => (
+              <View key={index}>
                 <Text>Thời gian: {time.start} - {time.end}</Text>
                 <Text>Sân: {time.fieldName}</Text>
-              </Text>
+              </View>
             ))}
-            {selectedOrder?.equipmentOrder.map((equipment, index) => (
-              <Text key={index}>
+            {selectedOrder?.equipmentOrder?.map((equipment, index) => (
+              <View key={index}>
                 <Text>Thiết bị: {equipment.equipmentName}</Text>
                 <Text>Số lượng: {equipment.quantity}</Text>
                 <Text>Tổng giá: {equipment.totalPrice}</Text>
-              </Text>
+              </View>
             ))}
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButton}>Đóng</Text>
@@ -104,7 +112,6 @@ export default function History() {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -112,53 +119,54 @@ export default function History() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    marginBottom: 120
+    alignItems: "center",
+    marginBottom: 120,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20, marginTop: 20,
-    width: '100%'
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    marginTop: 20,
+    width: "100%",
   },
   calendar: {
-    width: '100%'
+    width: "100%",
   },
   button: {
     padding: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
-    width: '48%'
+    borderColor: "#ddd",
+    width: "48%",
   },
   activeButton: {
-    backgroundColor: '#ff6b01'
+    backgroundColor: "#ff6b01",
   },
   buttonText: {
     fontSize: 16,
-    color: '#000',
-    textAlign: 'center'
+    color: "#000",
+    textAlign: "center",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: '80%',
+    width: "80%",
     padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10
+    backgroundColor: "white",
+    borderRadius: 10,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   closeButton: {
-    color: 'blue',
+    color: "blue",
     marginTop: 15,
-    textAlign: 'center'
-  }
+    textAlign: "center",
+  },
 });

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const EquipmentOrderSchema = new mongoose.Schema({
   equipments: [
     {
-      equipmentId: {
+      equipment_id: {
         type: mongoose.Types.ObjectId,
         ref: "Equipments", // Đúng với tên model "Equipments"
         required: true,

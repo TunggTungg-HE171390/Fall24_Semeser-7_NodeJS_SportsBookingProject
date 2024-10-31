@@ -6,9 +6,8 @@ export const ROUTER = {
 
 export const ROLE_NAME = {
   1: "Customer",
-  2: "Staff",
-  3: "Field Owner",
-  4: "Admin",
+  2: "Field Owner",
+  3: "Admin",
 };
 
-export const API_ROOT = "http://192.168.1.3:3000";
+export const API_ROOT = "http://172.22.240.1:3000";

@@ -7,12 +7,11 @@ import {
   Image,
   StyleSheet,
   Modal,
-  Button
+  Button,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import axios from "axios";
 export default function RegisterScreen({ navigation }) {
-
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [confirmPassword, setConfirmPassword] = useState();
@@ -21,7 +20,9 @@ export default function RegisterScreen({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [modalVisible, setModalVisible] = useState(false); 
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const api = process.env.REACT_APP_IP_Address;
 
   useEffect(() => {
     setName(`${lastName} ${firstName}`);
@@ -34,7 +35,7 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    axios.post("http://192.168.20.44:3000/auth/sign-up", {
+    axios.post("http://192.168.20.92:3000/auth/sign-up", {
       account: {
         email: email,
         password: password,
@@ -52,8 +53,9 @@ export default function RegisterScreen({ navigation }) {
         alert("Đăng ký thành công");
         navigation.navigate("Login");
       })
-      .catch(error => {
-        const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
+      .catch((error) => {
+        const errorMessage =
+          error.response?.data?.message || "Đăng ký thất bại";
         console.error("Lỗi:", errorMessage);
         setErrorMessage(errorMessage); // Lưu lỗi vào state để hiển thị
         setModalVisible(true); // Hiển thị modal lỗi
@@ -82,36 +84,56 @@ export default function RegisterScreen({ navigation }) {
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>First Name</Text>
-          <TextInput style={styles.input} onChangeText={(text) => setFirstName(text)} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setFirstName(text)}
+          />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Last Name</Text>
-          <TextInput style={styles.input} onChangeText={(text) => setLastName(text)} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setLastName(text)}
+          />
         </View>
       </View>
 
       <View style={styles.inputRow}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Phone Number</Text>
-          <TextInput style={styles.input} onChangeText={(text) => setPhone(text)} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setPhone(text)}
+          />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Gmaill</Text>
-          <TextInput style={styles.input} onChangeText={(text) => setEmail(text)} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setEmail(text)}
+          />
         </View>
       </View>
 
       <View style={styles.inputRow}>
         <View style={styles.inputContainerFull}>
           <Text style={styles.label}>Enter your password </Text>
-          <TextInput style={styles.input} onChangeText={(text) => setPassword(text)} secureTextEntry={true} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry={true}
+          />
         </View>
       </View>
 
       <View style={styles.inputRow}>
         <View style={styles.inputContainerFull}>
           <Text style={styles.label}>Enter your password again </Text>
-          <TextInput style={styles.input} onChangeText={(text) => setConfirmPassword(text)} secureTextEntry={true} />
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => setConfirmPassword(text)}
+            secureTextEntry={true}
+          />
         </View>
       </View>
 
@@ -134,10 +156,7 @@ export default function RegisterScreen({ navigation }) {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Lỗi</Text>
             <Text style={styles.modalMessage}>{errorMessage}</Text>
-            <Button
-              title="Close"
-              onPress={() => setModalVisible(false)}
-            />
+            <Button title="Close" onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>

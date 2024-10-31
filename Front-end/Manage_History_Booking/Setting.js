@@ -24,7 +24,7 @@ export default function Setting({ navigation }) {
       return;
     }
 
-    axios.post("http://192.168.20.44:3000/auth/change-password", formData)
+    axios.post("http://192.168.20.92:3000/auth/change-password", formData)
       .then(res => {
         console.log(res);
         Alert.alert("Success", "Password changed successfully");
@@ -41,14 +41,14 @@ export default function Setting({ navigation }) {
   };
 
   const handleLogout = async () => {
-    axios.post("http://192.168.20.44:3000/auth/sign-out")
+    axios.post("http://192.168.20.92:3000/auth/sign-out")
       .then(async (res) => {
         console.log(res.data.message);
         await AsyncStorage.removeItem('authToken');
         dispatch(logout());
         Alert.alert("Logged out", "You have been logged out.");
       })
-      .catch(error => {
+      .catch((error) => {
         console.log("Logout Error:", error.response);
         Alert.alert("Error", "An error occurred during logout.");
       });
@@ -57,7 +57,10 @@ export default function Setting({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => setShowModal(true)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setShowModal(true)}
+        >
           <Text style={styles.buttonText}>Change Password</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
@@ -74,26 +77,38 @@ export default function Setting({ navigation }) {
               placeholder="Current Password"
               secureTextEntry
               value={formData.password}
-              onChangeText={(text) => setFormData({ ...formData, password: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, password: text })
+              }
             />
             <TextInput
               style={styles.input}
               placeholder="New Password"
               secureTextEntry
               value={formData.newPassword}
-              onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, newPassword: text })
+              }
             />
             <TextInput
               style={styles.input}
               placeholder="Confirm New Password"
               secureTextEntry
               value={formData.confirmPassword}
-              onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+              onChangeText={(text) =>
+                setFormData({ ...formData, confirmPassword: text })
+              }
             />
-            <TouchableOpacity style={styles.modalButton} onPress={handleChangePassword}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleChangePassword}
+            >
               <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.modalButton} onPress={() => setShowModal(false)}>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setShowModal(false)}
+            >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
@@ -106,46 +121,46 @@ export default function Setting({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 120,
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginVertical: 20,
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#007bff",
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 15,
   },
@@ -156,3 +171,4 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+

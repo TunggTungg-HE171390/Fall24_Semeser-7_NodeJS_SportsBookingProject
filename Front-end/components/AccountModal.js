@@ -8,7 +8,6 @@ import {
   TextInput,
   ScrollView,
   TouchableWithoutFeedback,
-  Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { isValidEmail, isValidPhone, isValidField } from "../utils/validation";
@@ -30,7 +29,6 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       setPhone(data.profile.phone);
       setRole(data.role);
     } else {
-      // Reset fields khi ở chế độ thêm mới
       setName("");
       setEmail("");
       setPhone("");
@@ -68,35 +66,23 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       profile: {
         name,
         phone,
-        avatar: require("../assets/images/avatar/avatar.png"),
+        avatar:
+          "https://firebasestorage.googleapis.com/v0/b/sdn302-42d07.appspot.com/o/files%2Favatar.png%202024-10-29%200%3A28%3A22?alt=media&token=ba83b026-e17d-46ed-8682-f5fd0973747a",
       },
     };
 
     if (isEditMode) {
-      // Chế độ chỉnh sửa
       const editedAccount = {
-        ...account,
-        ...accountData,
+        id: data._id,
+        name: name,
+        phone: phone,
+        role: role,
       };
       onSubmit(editedAccount);
     } else {
-      // Chế độ thêm mới
-      const newAccount = {
-        id: Date.now().toString(),
-        ...accountData,
-        status: 0,
-      };
+      const newAccount = accountData;
       onSubmit(newAccount);
     }
-    Alert.alert(
-      "Success",
-      isEditMode
-        ? "Account edited successfully!"
-        : "Account added successfully!",
-      [{ text: "OK", onPress: onClose }]
-    );
-
-    onClose();
   };
 
   return (
@@ -134,22 +120,24 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
                 />
               </View>
 
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>
-                  Email <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  keyboardType="email-address"
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                />
-                {errors.email && (
-                  <Text style={styles.errorText}>{errors.email}</Text>
-                )}
-              </View>
+              {!isEditMode && (
+                <View style={styles.fieldContainer}>
+                  <Text style={styles.label}>
+                    Email <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                  />
+                  {errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+                </View>
+              )}
 
               <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Phone:</Text>
@@ -174,9 +162,8 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
                     onValueChange={(itemValue) => setRole(itemValue)}
                   >
                     <Picker.Item label="Customer" value={1} />
-                    <Picker.Item label="Staff" value={2} />
-                    <Picker.Item label="Field Owner" value={3} />
-                    <Picker.Item label="Admin" value={4} />
+                    <Picker.Item label="Field Owner" value={2} />
+                    <Picker.Item label="Admin" value={3} />
                   </Picker>
                 </View>
               </View>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,17 +14,31 @@ import AccountModal from "../components/AccountModal";
 import Pagination from "../components/Pagination";
 import { useNavigation } from "@react-navigation/native";
 import { ROUTER, ROLE_NAME } from "../utils/constant";
-import { AccountsData } from "../db/db";
-
+import axios from "axios";
+import { useSelector } from "react-redux";
 const ManageAccount = () => {
   const navigation = useNavigation();
+  const userId = useSelector((state) => state.auth.user?.id);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
-  const [accounts, setAccounts] = useState(AccountsData);
+  const [accounts, setAccounts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const accountsPerPage = 6;
   const [selectedRoles, setSelectedRoles] = useState([]);
+  const api = process.env.REACT_APP_IP_Address;
+  const fetchAccountsData = async () => {
+    try {
+      const response = await axios.get(`${api}/user/list-from-admin`);
+      const accounts = response.data.reverse();
+      setAccounts(accounts);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    fetchAccountsData();
+  }, []);
 
   const filteredAccounts = accounts.filter((account) => {
     const matchesSearchQuery = account.profile.name
@@ -44,62 +58,91 @@ const ManageAccount = () => {
 
   const handleAddOrEditAccount = (accountData) => {
     if (selectedAccount) {
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((account) =>
-          account.id === accountData.id ? accountData : account
-        )
-      );
+      axios
+        .put(`${api}/user/edit-user-from-admin`, accountData)
+        .then((res) => {
+          Alert.alert("Success", "Edit user successfully!");
+          fetchAccountsData();
+          setIsModalVisible(false);
+          setSelectedAccount(null);
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message || "Edit user failed";
+
+          Alert.alert("Error", errorMessage);
+        });
     } else {
-      setAccounts((prevAccounts) => [accountData, ...prevAccounts]);
+      axios
+        .post(`${api}/auth/sign-up`, accountData)
+        .then((res) => {
+          Alert.alert(
+            "Success",
+            "Account added successfully. Password will send to email!"
+          );
+          fetchAccountsData();
+          setIsModalVisible(false);
+          setSelectedAccount(null);
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message ||
+            "Add new account failed, Email exists";
+
+          Alert.alert("Error", errorMessage);
+        });
       setCurrentPage(1);
     }
   };
 
-  const handleDeleteAccountConfirm = (prevAccounts, accountId) => {
-    const updatedAccounts = prevAccounts.filter(
-      (account) => account.id !== accountId
-    );
-    return updatedAccounts;
+  const handleDeleteAccountConfirm = (accountId) => {
+    console.log(`Account ID: ${accountId}`);
+    console.log(`User ID: ${userId}`);
+    if (accountId === userId) {
+      Alert.alert("Warning", "You can't delete yourself!");
+    } else {
+      axios
+        .put(`${api}/user/change-status`, {
+          id: accountId,
+          status: 2,
+        })
+        .then((res) => {
+          fetchAccountsData();
+          Alert.alert("Success", "Delete user successfully!");
+        })
+        .catch((error) => {
+          console.log(error?.response?.data);
+          const errorMessage =
+            error.response?.data?.message || "Delete user failed";
+
+          Alert.alert("Error", errorMessage);
+        });
+    }
   };
 
   const handleDeleteAccount = (accountId) => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Do you want to delete this account?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
+    Alert.alert("Confirm Deletion", "Do you want to delete this account?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        onPress: () => {
+          handleDeleteAccountConfirm(accountId);
         },
-        {
-          text: "Delete",
-          onPress: () => {
-            setAccounts((prevAccounts) => {
-              const updatedAccounts = handleDeleteAccountConfirm(
-                prevAccounts,
-                accountId
-              );
-              const newTotalPages = Math.ceil(
-                updatedAccounts.length / accountsPerPage
-              );
-              if (currentPage > newTotalPages && newTotalPages > 0) {
-                setCurrentPage(newTotalPages);
-              }
-              return updatedAccounts;
-            });
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+      },
+    ]);
   };
 
   const renderItem = (item, index) => (
-    <View style={styles.card} key={item.id}>
+    <View style={styles.card} key={item._id}>
       <Text style={styles.orderText}>
         {index + 1 + (currentPage - 1) * accountsPerPage}
       </Text>
-      <Image source={item.profile.avatar} style={styles.avatar} />
+      <Image source={{ uri: item.profile.avatar }} style={styles.avatar} />
       <View style={styles.cardContent}>
         <Text style={styles.nameText}>{item.profile.name}</Text>
         <Text style={styles.infoText}>
@@ -109,9 +152,9 @@ const ManageAccount = () => {
       <View style={styles.actionCell}>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() =>
-            navigation.navigate(ROUTER.ACCOUNT_DETAIL, { account: item })
-          }
+          // onPress={() =>
+          //   navigation.navigate(ROUTER.ACCOUNT_DETAIL, { account: item })
+          // }
         >
           <AntDesign name="eye" size={20} color="#6a5acd" />
         </TouchableOpacity>
@@ -126,7 +169,7 @@ const ManageAccount = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => handleDeleteAccount(item.id)}
+          onPress={() => handleDeleteAccount(item._id)}
         >
           <AntDesign name="delete" size={20} color="#ff8000" />
         </TouchableOpacity>

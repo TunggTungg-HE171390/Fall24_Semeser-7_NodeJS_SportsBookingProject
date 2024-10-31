@@ -15,14 +15,14 @@ export default function CustomTabScreen() {
 
   const renderContent = () => {
     switch (selectedTab) {
-       case 'Profile':
-         return <Profile />;
-      case 'History':
+      case "Profile":
+        return <Profile />;
+      case "History":
         return <History />;
       case "Report":
         return <Report />;
       case "Setting":
-        return <Setting/>;
+        return <Setting />;
       default:
         return <Profile />;
     }
@@ -73,7 +73,7 @@ export default function CustomTabScreen() {
 }
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
   },
   tabBarContainer: {

@@ -12,7 +12,7 @@ export default function Profile() {
 
   const userInfoDetail = async () => {
     try {
-      const userInfo = await axios.get(`http://192.168.20.44:3000/user/${userId}`);
+      const userInfo = await axios.get(`http://192.168.20.92:3000/user/${userId}`);
       
     } catch (error) {
       console.log("Error fetching field orders:", error);

@@ -1,9 +1,7 @@
 const userModel = require("../models/user.model");
-const { sendEmail,generateAuthCode } = require('./mailService.controller');
+const { sendEmail, generateAuthCode } = require("./mailService.controller");
 const bcrypt = require("bcrypt");
-require('dotenv').config();
-const JwtProvider = require("../providers/JwtProvider");
-const ms = require("ms");
+require("dotenv").config();
 
 const getAllUsers = async (req, res) => {
   try {
@@ -14,72 +12,42 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
+const getAllUsersFromAdmin = async (req, res) => {
   try {
-    const user = await userModel.create(req.body);
-    res.status(201).json(user);
+    const users = await userModel.find({ status: 1 });
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-const login = async (req, res) => {
+const changeUserStatus = async (req, res, next) => {
   try {
-    if (!req.body.email || !req.body.password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
+    const { id, status } = req.body;
 
-    const user = await userModel.findOne({
-      account: { email: req.body.email, password: req.body.password },
-    });
-
+    // Tìm người dùng theo id để lấy role
+    const user = await userModel.findById(id);
     if (!user) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Muốn bổ sung gì vào token thì thêm ở đây
-    const userInfo = {
-      _id: user._id,
-      email: user.account.email,
-      role: user.role,
-    };
+    // Kiểm tra role của người dùng
+    if (user.role === 3) {
+      return res
+        .status(403)
+        .json({ message: "Cannot change status for users with role 3" });
+    }
 
-    //Tạo ra 2 loại token: access token và refresh token
-    //Cả 2 cái đều dùng SECRET_KEY
-    const accessToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      process.env.ExpIn
-    );
-    const refreshToken = await JwtProvider.generateToken(
-      userInfo,
-      process.env.SECRET_KEY,
-      "7d"
+    // Cập nhật status nếu role khác 3
+    const updatedUser = await userModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
     );
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: ms("7d"),
-    });
-
-    res.status(200).json({
-      ...userInfo,
-      accessToken,
-      refreshToken,
-    });
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 
@@ -89,18 +57,18 @@ const changePassword = async (req, res, next) => {
 
     if (!userId) {
       return res.status(404).json({
-        message: "User not found"
+        message: "User not found",
       });
     }
 
     if (!req.body.oldPassword || !req.body.newPassword) {
       return res.status(400).json({
-        message: "Old password and new password are required"
+        message: "Old password and new password are required",
       });
     }
     if (req.body.oldPassword === req.body.newPassword) {
       return res.status(400).json({
-        message: "New password must be different from old password"
+        message: "New password must be different from old password",
       });
     }
 
@@ -108,7 +76,10 @@ const changePassword = async (req, res, next) => {
     let isMatch = false;
 
     while (attempts > 0) {
-      isMatch = await bcrypt.compare(req.body.oldPassword, userId.account.password);
+      isMatch = await bcrypt.compare(
+        req.body.oldPassword,
+        userId.account.password
+      );
 
       if (isMatch) {
         break;
@@ -117,25 +88,27 @@ const changePassword = async (req, res, next) => {
         if (attempts > 0) {
           return res.status(400).json({
             message: "Wrong password",
-            warning: `You have ${attempts} attempts left.`
+            warning: `You have ${attempts} attempts left.`,
           });
         } else {
           return res.status(400).json({
             message: "Wrong password",
-            warning: "No attempts left. Please try again later."
+            warning: "No attempts left. Please try again later.",
           });
         }
       }
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.newPassword, parseInt(process.env.SECRET_PASSWORD));
+    const hashedPassword = await bcrypt.hash(
+      req.body.newPassword,
+      parseInt(process.env.SECRET_PASSWORD)
+    );
     userId.account.password = hashedPassword;
     await userId.save();
 
     return res.status(200).json({
-      message: "Change password successfully"
+      message: "Change password successfully",
     });
-
   } catch (error) {
     next(error);
   }
@@ -149,7 +122,8 @@ const getUserById = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-}
+};
+
 const updateUser = async (req, res, next) => {
   try {
     const newPhone = req.body.phone;
@@ -157,34 +131,63 @@ const updateUser = async (req, res, next) => {
 
     const updateInfo = {
       "profile.phone": newPhone,
-      "profile.avatar": newAvatar
-    }
+      "profile.avatar": newAvatar,
+    };
 
-    const updatedUser = await userModel.findByIdAndUpdate(req.params.id, updateInfo, { new: true });
+    const updatedUser = await userModel.findByIdAndUpdate(
+      req.params.id,
+      updateInfo,
+      { new: true }
+    );
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }
-}
+};
+const editUserFromAdmin = async (req, res, next) => {
+  try {
+    const { id, name, phone, role } = req.body;
+
+    const updateInfo = {
+      "profile.phone": phone,
+      "profile.name": name,
+      role: role,
+    };
+
+    const updatedUser = await userModel.findByIdAndUpdate(id, updateInfo, {
+      new: true,
+    });
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+};
 
 const forgotPassword = async (req, res, next) => {
   try {
     const user = await userModel.findOne({ "account.email": req.body.email });
-    console.log(user);
+
+    console.log(`Email: ${req.body.email}`);
+    console.log(`User `, user);
     if (!user) {
-      return res.status(404).json({ message: 'Email không tồn tại.' });
+      return res.status(404).json({ message: "Email không tồn tại." });
     }
 
-    const authCode = generateAuthCode()
+    const authCode = generateAuthCode();
     console.log(authCode);
-    const hashedPassword = await bcrypt.hash(authCode, parseInt(process.env.SECRET_PASSWORD));
+    const hashedPassword = await bcrypt.hash(
+      authCode,
+      parseInt(process.env.SECRET_PASSWORD)
+    );
     console.log(hashedPassword);
-    user.set(user.account.password=hashedPassword);
+    user.set((user.account.password = hashedPassword));
     console.log(user.account.password);
-    await user.save();    
+    await user.save();
     console.log(hashedPassword);
     await sendEmail(req.body.email, user.profile.name, authCode);
-    res.status(200).json({ message: 'Mã xác thực đã được gửi đến email của bạn.' });
+    res
+      .status(200)
+      .json({ message: "Mã xác thực đã được gửi đến email của bạn." });
   } catch (error) {
     next(error);
   }
@@ -192,10 +195,11 @@ const forgotPassword = async (req, res, next) => {
 
 module.exports = {
   getAllUsers,
-  createUser,
   changePassword,
   getUserById,
   updateUser,
   forgotPassword,
-  login,
+  changeUserStatus,
+  getAllUsersFromAdmin,
+  editUserFromAdmin,
 };
