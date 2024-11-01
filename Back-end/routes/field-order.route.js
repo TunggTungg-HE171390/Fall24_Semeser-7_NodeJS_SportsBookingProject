@@ -29,4 +29,10 @@ router.get(
   FieldOrderController.getAvailableSlotsForField
 );
 
+// Get field orders by customer ID
+router.get(
+  "/customer/:customerId",
+  FieldOrderController.getFieldOrdersByCustomerId
+);
+
 module.exports = router;

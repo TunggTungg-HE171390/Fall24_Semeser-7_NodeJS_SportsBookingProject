@@ -67,7 +67,7 @@ export default function CustomTabScreen() {
       </View>
 
       {/* Tab Content */}
-      <View style={{ flex: 1 }}>{renderContent()}</View>
+      <View style={styles.component}>{renderContent()}</View>
     </View>
   );
 }
@@ -75,6 +75,12 @@ export default function CustomTabScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 20,
+  },
+  component: {
+    flex: 1,
+    height: "100%",
+    width: "100%",
   },
   tabBarContainer: {
     flexDirection: "row",

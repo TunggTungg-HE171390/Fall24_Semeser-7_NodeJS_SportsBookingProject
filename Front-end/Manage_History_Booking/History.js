@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Button } from "react-native";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar } from "react-native-calendars";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -21,32 +22,38 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.20.92:3000/field_order/${userId}`);
+      const res = await axios.get(`http://192.168.20.35:3000/field-order/customer/${userId}`);
       const fetchedOrders = res.data.data || [];
-      setOrders(fetchedOrders);
+      const updatedOrders = fetchedOrders.map((order) => {
+        const [time, date] = order.orderDate.split(" ");
+        const [day, month, year] = date.split("/");
+        const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+        return { ...order, formattedOrderDate: formattedDate }; // Thêm trường formattedOrderDate với định dạng chuẩn
+      });
+      setOrders(updatedOrders);
 
       const dates = {};
-      fetchedOrders.forEach((order) => {
-        const orderDate = order.fieldTime?.[0]?.start?.split("T")[0];
-        if (orderDate) {
-          dates[orderDate] = {
+      updatedOrders.forEach((order) => {
+        if (order.formattedOrderDate) {
+          dates[order.formattedOrderDate] = {
             selected: true,
             marked: true,
             selectedColor: "red",
           };
         }
       });
+
       setMarkedDates(dates);
     } catch (error) {
       console.log("Error fetching field orders:", error);
     }
   };
 
+
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.20.92:3000/field_order/getDetail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.20.35:3000/field-order/detail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
-      console.log(res.data.data);
       setModalVisible(true);
     } catch (error) {
       console.log("Error fetching field order detail:", error);
@@ -54,28 +61,25 @@ export default function History() {
   };
 
   const onDayPress = (day) => {
+    console.log("Day pressed:", day);
     const order = orders.find((o) =>
-      o.fieldTime?.[0]?.start?.startsWith(day.dateString)
+      o.formattedOrderDate === day.dateString // So sánh với formattedOrderDate
     );
     if (order) {
+      console.log("Order found:", order);
       getFieldOrderDetail(order._id);
+    } else {
+      console.log("No order found for the selected day.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.button, viewType === "monthly" && styles.activeButton]}
-          onPress={() => setViewType("monthly")}
-        >
-          <Text style={styles.buttonText}>Monthly view</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, viewType === "weekly" && styles.activeButton]}
-          onPress={() => setViewType("weekly")}
-        >
-          <Text style={styles.buttonText}>Weekly view</Text>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Lịch đăng kí</Text>
+        <TouchableOpacity style={styles.filterButton}>
+          <Icon name="sliders" size={16} color="#ccc" style={{ marginRight: 5 }} />
+          <Text style={styles.filterText}>Bộ lọc</Text>
         </TouchableOpacity>
       </View>
 
@@ -92,35 +96,60 @@ export default function History() {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Chi tiết đơn đặt hàng</Text>
+            <Text style={{ fontWeight: "bold" }}>
+              Thông tin đặt sân
+            </Text>
             <Text>Khách hàng: {selectedOrder?.customerName || "N/A"}</Text>
-            {selectedOrder?.fieldTime?.map((time, index) => (
-              <View key={index}>
-                <Text>Thời gian: {time.start} - {time.end}</Text>
-                <Text>Sân: {time.fieldName}</Text>
+            <Text>Ngày đặt:{selectedOrder?.orderDate || "N/A"}</Text>
+            {selectedOrder?.fieldTime ? (
+              <View>
+                <Text>Thời gian: {selectedOrder.fieldTime}</Text>
+                <Text>Địa điểm: {selectedOrder.fieldName || "N/A"}</Text>
+                <Text>Tên sân: {selectedOrder.subFieldName || "N/A"}</Text>
               </View>
-            ))}
-            {selectedOrder?.equipmentOrder?.map((equipment, index) => (
-              <View key={index}>
-                <Text>Thiết bị: {equipment.equipmentName}</Text>
-                <Text>Số lượng: {equipment.quantity}</Text>
-                <Text>Tổng giá: {equipment.totalPrice}</Text>
+            ) : (
+              <Text>Thông tin thời gian không có sẵn</Text>
+            )}
+
+            <Text style={{ fontWeight: "bold" }}>Thiết bị đăng kí:</Text>
+            {selectedOrder?.equipmentOrder?.length > 0 ? (
+              <View style={{ marginVertical: 2 }}>
+                {selectedOrder.equipmentOrder.map((equipment, index) => (
+                  <View key={index} style={{ marginLeft: 10, marginVertical: 5 }}>
+                    {equipment.equipmentName.map((name, i) => (
+                      <Text key={i}>- {name} | Số lượng: {equipment.quantity[i]} | Giá: {equipment.price[i]} |
+                        <Text style={{ fontWeight: "bold" }}>
+                          Thành tiền: {equipment.quantity[i] * equipment.price[i]} VND
+                        </Text>
+                      </Text>
+                    ))}
+                  </View>
+                ))}
+                <Text style={{ fontWeight: "bold" }}>
+                  Tổng tiền: {selectedOrder.totalPrice} VND
+                </Text>
               </View>
-            ))}
+            ) : (
+              <Text>Không có thiết bị đặt hàng</Text>
+            )}
+
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButton}>Đóng</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginBottom: 120,
+    marginTop: 25,
   },
   header: {
     flexDirection: "row",
@@ -130,6 +159,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   calendar: {
+    flex: 1,
     width: "100%",
   },
   button: {
@@ -168,5 +198,33 @@ const styles = StyleSheet.create({
     color: "blue",
     marginTop: 15,
     textAlign: "center",
+    fontSize: 18,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333', // Màu nền chính
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 25,
+  },
+  title: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#555', // Màu nền của nút "Bộ lọc"
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  filterText: {
+    color: '#ccc', // Màu chữ của nút "Bộ lọc"
+    fontSize: 14,
   },
 });

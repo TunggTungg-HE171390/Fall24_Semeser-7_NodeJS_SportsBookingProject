@@ -12,6 +12,8 @@ import {
   Alert,
 } from "react-native";
 import { useSelector } from "react-redux";
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import axios from "axios";
 
 export default function Report() {
@@ -34,7 +36,7 @@ export default function Report() {
     try {
       if (!userId) return;
       // console.log(userId);
-      const res = await axios.get(`http://192.168.20.92:3000/feedback/${userId}`);
+      const res = await axios.get(`http://192.168.20.35:3000/feedback/${userId}`);
       setReviews(res.data.feedbacks);
     } catch (error) {
       console.log("Error fetching feedback:", error);
@@ -57,7 +59,7 @@ export default function Report() {
         detail: updatedDetail,
       };
 
-      await axios.put(`http://192.168.20.92:3000/feedback/update/${selectedReview._id}`, updatedReview);
+      await axios.put(`http://192.168.20.35:3000/feedback/update/${selectedReview._id}`, updatedReview);
       Alert.alert("Success", "Feedback has been updated successfully");
 
       setReviews(
@@ -83,7 +85,7 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(`http://192.168.20.92:3000/feedback/delete/${selectedReview._id}`);
+      await axios.delete(`http://192.168.20.35:3000/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter(review => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
@@ -96,11 +98,20 @@ export default function Report() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Đánh giá</Text>
+        <TouchableOpacity style={styles.filterButton} >
+          <Icon name="sliders" size={16} color="#ccc" style={{ marginRight: 5 }} />
+          <Text style={styles.filterText}>Bộ lọc</Text>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.label}>Đánh giá trước đó về các sân:</Text>
+
       <ScrollView
         style={styles.reviewContainer}
         contentContainerStyle={styles.scrollContentContainer}
       >
-        <Text style={styles.label}>Đánh giá trước đó về các sân:</Text>
         {Array.isArray(reviews) && reviews.length > 0 ? (
           reviews.slice(0, 10).map((review, index) => (
             <View key={index} style={styles.reviewItem}>
@@ -209,7 +220,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginBottom: 120,
     paddingHorizontal: 20,
     paddingTop: 40,
   },
@@ -300,5 +310,37 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "50%",
     marginTop: 20,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  title: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#555',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  filterText: {
+    color: '#ccc',
+    fontSize: 14,
+  },
+  filterOptions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
   },
 });

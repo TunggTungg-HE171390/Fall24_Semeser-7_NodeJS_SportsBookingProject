@@ -24,7 +24,7 @@ export default function Login({ navigation }) {
     const dispatch = useDispatch();
     const handleLogin = async () => {
         try {
-            const res = await axios.post("http://192.168.20.92:3000/auth/sign-in", {
+            const res = await axios.post("http://192.168.20.35:3000/auth/sign-in", {
                 identifier: identifier,
                 password: password,
             });
@@ -52,7 +52,7 @@ export default function Login({ navigation }) {
 
     const handleForgotPassword = async () => {
         try {
-            const res = await axios.post("http://192.168.20.92:3000/user/forgetPassword", {
+            const res = await axios.post("http://192.168.20.35:3000/user/forgetPassword", {
                 email: email
             });
             console.log(res.data.message);

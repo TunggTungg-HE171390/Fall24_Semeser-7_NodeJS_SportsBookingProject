@@ -256,39 +256,57 @@ const getAvailableSlotsForField = async (req, res) => {
 
 async function getFieldOrdersByCustomerId(req, res, next) {
   try {
-    console.log(req.params.id);
-    const field_orders = await db.fieldOrder
-      .find({ customerId: req.params.id })
+    console.log(req.params.customerId);
+    const field_orders = await db.fieldOrder.find({ customerId: req.params.customerId })
       .populate("customerId", "profile.name")
       .populate({
         path: "equipmentOrderId",
         populate: {
-          path: "equipments.equipmentId",
-          select: "equipmentName",
-        },
+          path: "equipments.equipment_id",
+          model: "Equipments",
+          select: "equipmentName"
+        }
       })
       .populate({
         path: "fieldId",
-        select: "name subFields.name subFields.fieldTime.start subFields.fieldTime.end",
+        select: "name sportName subFields",
       });
 
-    const formattedFieldOrders = field_orders.map((order) => ({
-      _id: order._id,
-      customerName: order.customerId?.profile?.name,
-      fieldTime: order.fieldId.subFields.flatMap((subField) =>
-        subField.fieldTime.map((time) => ({
-          fieldName: order.fieldId?.name,
-          subFieldName: subField.name,
-          start: time.start,
-          end: time.end,
-        }))
-      ),
-      equipmentOrder: order.equipmentOrderId?.equipments.map((equipment) => ({
-        equipmentName: equipment.equipmentId?.equipmentName,
-        quantity: equipment.quantity,
-        price: equipment.price,
-      })),
-    }));
+    const formattedFieldOrders = field_orders.map((order) => {
+      const selectedSubField = order.fieldId?.subFields?.find(
+        (subField) => subField._id.toString() === order.subFieldId.toString()
+      );
+
+      const selectedSlot = selectedSubField?.fieldTime?.find(
+        (slot) => slot._id.toString() === order.slotId.toString()
+      );
+
+      return {
+        _id: order._id,
+        customerName: order.customerId.profile.name,
+        fieldName: order.fieldId?.name,
+        orderDate: new Date(order.orderDate).toLocaleString("vi-VN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        subFieldName: selectedSubField?.name || null,
+        fieldTime: selectedSlot ? `${selectedSlot.start} - ${selectedSlot.end}` : null,
+
+        equipmentOrder: order.equipmentOrderId.map((e) => ({
+          equipmentName: e.equipments.map((eName) => eName.equipment_id.equipmentName),
+          quantity: e.equipments.map((q) => q.quantity),
+          price: e.equipments.map((p) => p.price),
+        })),
+        totalPrice: order.equipmentOrderId.reduce((total, e) => {
+          return total + e.equipments.reduce((subTotal, equipment) => {
+            return subTotal + (equipment.price * equipment.quantity);
+          }, 0);
+        }, 0),
+      };
+    });
 
     console.log(formattedFieldOrders);
 
@@ -300,6 +318,7 @@ async function getFieldOrdersByCustomerId(req, res, next) {
     next(error);
   }
 }
+
 
 async function getDetailByFieldOrdersId(req, res, next) {
   try {
