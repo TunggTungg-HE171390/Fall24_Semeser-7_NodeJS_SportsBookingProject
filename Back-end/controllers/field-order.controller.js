@@ -65,6 +65,8 @@ const getAllFieldOrders = async (req, res) => {
 // Create a new field order
 const createFieldOrder = async (req, res) => {
   try {
+    console.log(req.body);
+
     const {
       customerId,
       fieldId,
@@ -80,10 +82,19 @@ const createFieldOrder = async (req, res) => {
     await checkExistence(customerId, fieldId, subFieldId, slotId);
 
     // Validate order date
-    if (orderDate && new Date(orderDate) < new Date()) {
-      return res
-        .status(400)
-        .json({ message: "Order date must be in the present or future." });
+    if (orderDate) {
+      const currentDate = new Date();
+      const orderDateOnly = new Date(orderDate);
+
+      // Set the time components to zero for both dates to ignore hours, minutes, and seconds
+      currentDate.setHours(0, 0, 0, 0);
+      orderDateOnly.setHours(0, 0, 0, 0);
+
+      if (orderDateOnly < currentDate) {
+        return res
+          .status(400)
+          .json({ message: "Order date must be in the present or future." });
+      }
     }
 
     // Check if the slot is available for the specific field and subField
@@ -216,16 +227,13 @@ const getAvailableSlotsForField = async (req, res) => {
         .status(400)
         .json({ message: "Date query parameter is required" });
     }
-    console.log(date);
+
+    console.log(`Date: ${date}`);
 
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
-
-    console.log(startOfDay, endOfDay);
-
-    console.log(startOfDay.getDate());
 
     // Check if the selected date is today
     const today = new Date();
@@ -233,7 +241,6 @@ const getAvailableSlotsForField = async (req, res) => {
       startOfDay.getDate() === today.getDate() &&
       startOfDay.getMonth() === today.getMonth() &&
       startOfDay.getFullYear() === today.getFullYear();
-
     console.log(isToday);
 
     // Retrieve all booked slots for the day for the specific field and subFieldId if provided
@@ -263,6 +270,8 @@ const getAvailableSlotsForField = async (req, res) => {
     // Get the current time if the selected date is today
     const currentTime = isToday ? new Date() : null;
 
+    console.log(`Current time: ${currentTime}`);
+
     // Filter for a specific subField or all subFields if no specific subFieldId is provided
     const availableSlots = field.subFields
       .filter((subField) => !subFieldId || subField._id.equals(subFieldId))
@@ -282,11 +291,20 @@ const getAvailableSlotsForField = async (req, res) => {
 
           // If today, only include slots that start after the current time
           if (isToday) {
-            console.log(currentTime);
+            // Log the current date and time
+            console.log("current time", currentTime);
 
-            console.log(slot.start);
+            // Assuming slot.start is a string like "20:00", split it to get hours and minutes
+            const [slotHour, slotMinute] = slot.start.split(":").map(Number);
 
-            const slotStartTime = new Date(slot.start);
+            // Create a Date object for the slot start time on the current day
+            const slotStartTime = new Date(currentTime);
+            slotStartTime.setHours(slotHour, slotMinute, 0, 0); // Set hours, minutes, seconds, and milliseconds
+
+            // Log the slot start time
+            console.log("slot start time", slotStartTime);
+
+            // Return whether the slot start time is after the current time
             return slotStartTime > currentTime;
           }
 
