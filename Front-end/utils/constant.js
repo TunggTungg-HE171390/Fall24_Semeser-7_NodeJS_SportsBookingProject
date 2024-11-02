@@ -10,4 +10,3 @@ export const ROLE_NAME = {
   3: "Admin",
 };
 
-export const API_ROOT = "http://172.22.240.1:3000";
