@@ -149,7 +149,7 @@ function Main() {
       )}
       {role === 3 && <Stack.Screen name="Admin" component={AdminRole} />}
 
-      <Tab.Screen name="Profile" component={ProfileStack} />
+      {/* <Tab.Screen name="Profile" component={ProfileStack} /> */}
     </Tab.Navigator>
   );
 }
