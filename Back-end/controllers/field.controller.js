@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Field = require("../models/field.model");
 const User = require("../models/user.model");
+const Feedback = require("../models/feedback.model");
 
 // Hàm tạo các subFields dựa trên tổng số sân, giờ mở/đóng cửa và thời gian mỗi ca
 function generateSubFields(
@@ -187,6 +188,51 @@ const getFieldById = async (req, res, next) => {
   }
 };
 
+// Xem thông tin chi tiết của sân qua feedbackID
+
+
+const getFieldByFeedbackId = async (req, res, next) => {
+  try {
+    const fieldDetail = await Field.findOne({
+      feedBackId: { $in: [req.params.feedbackId] }
+    }).populate("ownerId", "profile.name");
+
+    console.log(req.params.feedbackId);
+
+    if (!fieldDetail) {
+      return res.status(404).json({ message: "Field not found" });
+    }
+
+    const getField = await Field.findById(fieldDetail._id)
+      .populate({
+        path: "feedBackId",
+        select: "starNumber detail customerId",
+        populate: {
+          path: "customerId",
+          select: "profile.name"
+        }
+      });
+
+    const getAllFeedback = getField.feedBackId.map((f) => ({
+      starNumber: f.starNumber,
+      detail: f.detail,
+      customerName: f.customerId ? f.customerId.profile.name : "N/A", 
+    }));
+
+    res.status(200).json({
+      fieldName: getField.name,
+      sportName: getField.sportName,
+      address: getField.address,
+      ownerName: fieldDetail.ownerId ? fieldDetail.ownerId.profile.name : "N/A",
+      totalFields: getField.totalFields,
+      image: getField.image, 
+      feedback: getAllFeedback, 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Export các hàm để sử dụng trong các phần khác của ứng dụng
 module.exports = {
   addField,
@@ -194,4 +240,5 @@ module.exports = {
   deleteField,
   getFields,
   getFieldById,
+  getFieldByFeedbackId,
 };

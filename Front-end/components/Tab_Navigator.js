@@ -23,7 +23,7 @@ export default function CustomTabScreen() {
   const getCountFieldOrderByCustomerId = async () => {
     try {
       console.log("Fetching count for user:", userId);
-      const res = await axios.get(`http://192.168.0.102:3000/field-order/count-by-customer/${userId}`);
+      const res = await axios.get(`http://192.168.1.38:3000/field-order/count-by-customer/${userId}`);
       const count = res.data.data;
       setCount(count);
       console.log("Count fetched successfully:", count);

@@ -13,16 +13,20 @@ import {
 } from "react-native";
 import { useSelector } from "react-redux";
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import RNPickerSelect from 'react-native-picker-select';
 import axios from "axios";
 
 export default function Report() {
   const [reviews, setReviews] = useState([]);
+  const [filteredReviews, setFilteredReviews] = useState([]);
   const [selectedReview, setSelectedReview] = useState(null);
+  const [fieldDetail, setFieldDetail] = useState(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [updatedRating, setUpdatedRating] = useState("");
+  const [isDetailsModalVisible, setDetailsModalVisible] = useState(false);
+  const [updatedRating, setUpdatedRating] = useState(0);
   const [updatedDetail, setUpdatedDetail] = useState("");
+  const [selectedStarFilter, setSelectedStarFilter] = useState("all");
 
   const userId = useSelector((state) => state.auth.user?.id);
 
@@ -31,20 +35,50 @@ export default function Report() {
       getFeedbackByCustomerId();
     }
   }, [userId]);
-  const api = process.env.REACT_APP_IP_Address;
+
+  useEffect(() => {
+    filterReviews();
+  }, [selectedStarFilter, reviews]);
+
+  const getFieldByFeedbackId = async (feedbackId) => {
+    try {
+      const res = await axios.get(`http://192.168.1.38:3000/field/fieldDetail/${feedbackId}`);
+      setFieldDetail(res.data);
+      setDetailsModalVisible(true);
+    } catch (error) {
+      console.log("Error fetching field detail:", error);
+      Alert.alert("Error", "Không thể tải thông tin chi tiết của sân.");
+    }
+  };
+
+  const handleDetailsPress = (feedbackId) => {
+    getFieldByFeedbackId(feedbackId);
+  };
+
   const getFeedbackByCustomerId = async () => {
     try {
       if (!userId) return;
-      const res = await axios.get(`http://192.168.0.102:3000/feedback/${userId}`);
+      const res = await axios.get(`http://192.168.1.38:3000/feedback/${userId}`);
       setReviews(res.data.feedbacks);
+      setFilteredReviews(res.data.feedbacks);
     } catch (error) {
       console.log("Error fetching feedback:", error);
     }
   };
 
+  const filterReviews = () => {
+    if (selectedStarFilter === "all") {
+      setFilteredReviews(reviews);
+    } else {
+      setFilteredReviews(
+        reviews.filter((review) => review.starNumber === parseInt(selectedStarFilter))
+      );
+    }
+  };
+
   const handleEditPress = (review) => {
     setSelectedReview(review);
-    setUpdatedRating(String(review.starNumber));
+    setUpdatedRating(review.starNumber);
     setUpdatedDetail(review.detail);
     setEditModalVisible(true);
   };
@@ -54,15 +88,22 @@ export default function Report() {
       if (!selectedReview) return;
 
       const updatedReview = {
-        starNumber: Number(updatedRating),
+        starNumber: updatedRating,
         detail: updatedDetail,
       };
 
-      await axios.put(`http://192.168.0.102:3000/feedback/update/${selectedReview._id}`, updatedReview);
+      await axios.put(`http://192.168.1.38:3000/feedback/update/${selectedReview._id}`, updatedReview);
       Alert.alert("Success", "Feedback has been updated successfully");
 
       setReviews(
         reviews.map((review) =>
+          review._id === selectedReview._id
+            ? { ...review, ...updatedReview }
+            : review
+        )
+      );
+      setFilteredReviews(
+        filteredReviews.map((review) =>
           review._id === selectedReview._id
             ? { ...review, ...updatedReview }
             : review
@@ -84,7 +125,7 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(`http://192.168.0.102:3000/feedback/delete/${selectedReview._id}`);
+      await axios.delete(`http://192.168.1.38:3000/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter(review => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
@@ -99,21 +140,30 @@ export default function Report() {
     <View style={styles.container}>
       <Text style={styles.label}>Đánh giá về các sân</Text>
 
-      <View style={styles.titleContainer}>
+      <View style={styles.filterOptions}>
         <Text style={styles.title}>Lọc số sao</Text>
-        <TouchableOpacity style={styles.filterButton} >
-          <Icon name="sliders" size={16} color="#ccc" style={{ marginRight: 5 }} />
-          <Text style={styles.filterText}>Bộ lọc</Text>
-        </TouchableOpacity>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedStarFilter(value)}
+          items={[
+            { label: "Tất cả", value: "all" },
+            { label: "1 sao", value: "1" },
+            { label: "2 sao", value: "2" },
+            { label: "3 sao", value: "3" },
+            { label: "4 sao", value: "4" },
+            { label: "5 sao", value: "5" },
+          ]}
+          value={selectedStarFilter}
+          placeholder={{ label: "Lọc số sao", value: "all" }}
+          style={pickerSelectStyles}
+        />
       </View>
-
 
       <ScrollView
         style={styles.reviewContainer}
         contentContainerStyle={styles.scrollContentContainer}
       >
-        {Array.isArray(reviews) && reviews.length > 0 ? (
-          reviews.slice(0, 10).map((review, index) => (
+        {Array.isArray(filteredReviews) && filteredReviews.length > 0 ? (
+          filteredReviews.slice(0, 10).map((review, index) => (
             <View key={index} style={styles.reviewItem}>
               <Image
                 source={{
@@ -127,9 +177,9 @@ export default function Report() {
                 </Text>
                 <Text style={styles.reviewFeedback}>{review.detail}</Text>
                 <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity
+                  <TouchableOpacity
                     style={styles.editButtonDetail}
-                    onPress={() => handleEditPress(review)}
+                    onPress={() => handleDetailsPress(review._id)}
                   >
                     <Text style={styles.editButtonText}>Chi tiết</Text>
                   </TouchableOpacity>
@@ -166,13 +216,21 @@ export default function Report() {
             <View style={styles.modalContainer}>
               <Text style={styles.modalTitle}>Chỉnh sửa đánh giá</Text>
 
-              <TextInput
-                style={styles.input}
-                value={updatedRating}
-                onChangeText={setUpdatedRating}
-                keyboardType="numeric"
-                placeholder="Nhập số sao (1-5)"
-              />
+              <View style={styles.starContainerHorizontal}>
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => setUpdatedRating(index + 1)}
+                  >
+                    <Icon
+                      name="star"
+                      size={30}
+                      color={index < updatedRating ? "#FFD700" : "#ccc"}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               <TextInput
                 style={[styles.input, { height: 80 }]}
                 value={updatedDetail}
@@ -189,6 +247,55 @@ export default function Report() {
                   onPress={() => setEditModalVisible(false)}
                 />
               </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {/* Modal for Viewing Field Details */}
+      {isDetailsModalVisible && fieldDetail && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isDetailsModalVisible}
+          onRequestClose={() => setDetailsModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Thông tin chi tiết sân</Text>
+              <Text>Tên sân: {fieldDetail.fieldName}</Text>
+              <Text>Địa chỉ: {fieldDetail.address}</Text>
+              <Text>Tên chủ sân: {fieldDetail.ownerName || "N/A"}</Text>
+              <Text>Số lượng sân: {fieldDetail.totalFields}</Text>
+              <ScrollView horizontal={true} style={{ marginVertical: 10 }}>
+                {fieldDetail.image && fieldDetail.image.map((img, index) => (
+                  <Image key={index} source={{ uri: img }} style={styles.reviewImage} />
+                ))}
+              </ScrollView>
+              <Text>Các đánh giá:</Text>
+              <ScrollView style={{ maxHeight: 200 }}>
+                <View>
+                  {fieldDetail.feedback && fieldDetail.feedback.length > 0 ? (
+                    fieldDetail.feedback.map((feedback, index) => (
+                      <View key={index} style={[styles.feedbackContainer, { marginBottom: 15 }]}>
+                        <Text style={{ fontWeight: "bold" }}>{feedback.customerName}</Text>
+                        <Text>
+                          {Array.from({ length: feedback.starNumber }).map((_, i) => (
+                            <Text key={i}>⭐</Text>
+                          ))}
+                        </Text>
+                        <Text>Đánh giá: {feedback.detail}</Text>
+                      </View>
+                    ))
+                  ) : (
+                    <Text>Không có đánh giá nào</Text>
+                  )}
+                </View>
+              </ScrollView>
+              <Button
+                title="Đóng"
+                onPress={() => setDetailsModalVisible(false)}
+              />
             </View>
           </View>
         </Modal>
@@ -243,7 +350,7 @@ const styles = StyleSheet.create({
   },
   reviewItem: {
     flexDirection: "row",
-    marginBottom: 15,
+    marginBottom: 5,
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
@@ -266,7 +373,7 @@ const styles = StyleSheet.create({
   reviewFeedback: {
     fontSize: 16,
   },
-  editButtonDetail:{
+  editButtonDetail: {
     marginTop: 10,
     paddingVertical: 5,
     paddingHorizontal: 10,
@@ -286,7 +393,8 @@ const styles = StyleSheet.create({
   editButtonDelete: {
     marginTop: 10,
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal:
+      10,
     backgroundColor: "red",
     borderRadius: 5,
     alignSelf: "flex-start",
@@ -322,6 +430,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
   },
+  starContainerHorizontal: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
   modalButtonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -338,9 +451,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    flex: 1,
-    color: '#fff',
     fontSize: 16,
+    color: '#000',
     fontWeight: 'bold',
   },
   filterButton: {
@@ -357,7 +469,40 @@ const styles = StyleSheet.create({
   },
   filterOptions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    backgroundColor: 'white',
+    paddingHorizontal: 5,
+    marginBottom: 10,
+  },
+  feedbackContainer: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 19,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30,
+    backgroundColor: "#fff",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 23,
+    borderWidth: 0.5,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    color: "black",
+    backgroundColor: "#fff",
   },
 });

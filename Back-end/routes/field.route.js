@@ -11,5 +11,6 @@ router.post("/", FieldController.addField);
 router.put("/:id", FieldController.updateField);
 router.delete("/:id", FieldController.deleteField);
 router.get("/:id", FieldController.getFieldById);
+router.get("/fieldDetail/:feedbackId", FieldController.getFieldByFeedbackId);
 
 module.exports = router;
