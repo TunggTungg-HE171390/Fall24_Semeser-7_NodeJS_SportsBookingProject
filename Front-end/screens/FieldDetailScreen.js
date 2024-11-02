@@ -13,6 +13,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
 import axios from "axios";
 import { useSelector } from "react-redux"; // Import useSelector
+import { useNavigation } from "@react-navigation/native";
 
 const PRIMARY_COLOR = "#1E90FF"; // Blue color for selected slot
 const SECONDARY_COLOR = "#f0f0f0"; // Light grey for unselected slot
@@ -27,6 +28,8 @@ const formatTime = (dateString) => {
 };
 
 const FieldDetailScreen = ({ route }) => {
+  console.log(route.params);
+
   const { field } = route.params;
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -38,6 +41,8 @@ const FieldDetailScreen = ({ route }) => {
 
   // Get customerId from Redux store
   const customerId = useSelector((state) => state.auth.user.id);
+
+  const navigation = useNavigation();
 
   // Format date to 'YYYY-MM-DD' for the API
   const formatDate = (date) => {
@@ -56,11 +61,9 @@ const FieldDetailScreen = ({ route }) => {
 
   const fetchAvailableSlots = async () => {
     setLoading(true);
-    console.log(formatDate(selectedDate));
-
     try {
       const response = await axios.get(
-        `http://172.20.10.2:3000/field-order/fields/${field._id}/available-slots`,
+        `http://192.168.1.70:3000/field-order/fields/${field._id}/available-slots`,
         {
           params: {
             date: formatDate(selectedDate),
@@ -102,13 +105,25 @@ const FieldDetailScreen = ({ route }) => {
 
     try {
       const response = await axios.post(
-        "http://172.20.10.2:3000/field-order",
+        "http://192.168.1.70:3000/field-order",
         bookingData
       );
-      if (response.status === 200) {
+      if (response.status === 201) {
         Alert.alert(
           "Booking Successful",
-          "Your booking has been successfully placed!"
+          "Your booking has been successfully placed!",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                // Reset navigation stack to the same screen to refresh it
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "BookingList" }], // Replace with your current screen name
+                });
+              },
+            },
+          ]
         );
       }
     } catch (error) {
@@ -212,7 +227,7 @@ const FieldDetailScreen = ({ route }) => {
                     },
                   ]}
                 >
-                  {formatTime(timeSlot.start)} - {formatTime(timeSlot.end)}
+                  {timeSlot.start} - {timeSlot.end}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -231,6 +246,24 @@ const FieldDetailScreen = ({ route }) => {
       >
         <Text style={styles.bookButtonText}>Đặt sân</Text>
       </TouchableOpacity>
+      {/* Feedback Section */}
+      <Text style={styles.sectionTitle}>Feedback</Text>
+      {field.feedback && field.feedback.length > 0 ? (
+        <FlatList
+          data={field.feedback}
+          keyExtractor={(item, index) => `${item._id}-${index}`}
+          renderItem={({ item }) => (
+            <View style={styles.feedbackContainer}>
+              <Text style={styles.feedbackText}>{item.comment}</Text>
+              <Text style={styles.feedbackDate}>
+                {new Date(item.date).toLocaleDateString()}
+              </Text>
+            </View>
+          )}
+        />
+      ) : (
+        <Text style={styles.noFeedbackText}>No feedback available</Text>
+      )}
     </View>
   );
 };
@@ -328,5 +361,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "bold",
+  },
+  feedbackContainer: {
+    backgroundColor: "#f0f0f0",
+    padding: 8,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  feedbackDate: {
+    fontSize: 12,
+    color: "#888",
+    textAlign: "right",
+  },
+  noFeedbackText: {
+    fontSize: 14,
+    color: "#888",
+    fontStyle: "italic",
   },
 });

@@ -8,6 +8,20 @@ const EquipmentsSchema = new mongoose.Schema({
       required: true,
     },
   ],
+  sportName: {
+    type: String,
+    enum: {
+      values: ["Football", "Volleyball", "Badminton", "Tennis", "Table Tennis"],
+      message:
+        "{VALUE} is not a valid sport name. Please select from Football, Volleyball, Badminton, Tennis, or Table Tennis.",
+    },
+    required: [true, "The sport name is required"],
+  },
+  ownerId: {
+    type: mongoose.Types.ObjectId,
+    ref: "Users",
+    required: true,
+  },
   price: {
     type: Number,
     required: true,

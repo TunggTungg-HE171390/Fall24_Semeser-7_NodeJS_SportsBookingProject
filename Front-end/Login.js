@@ -22,6 +22,8 @@ export default function Login({ navigation }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   const api = process.env.REACT_APP_IP_Address;
+  console.log(api);
+
   const dispatch = useDispatch();
   const handleLogin = async () => {
     try {

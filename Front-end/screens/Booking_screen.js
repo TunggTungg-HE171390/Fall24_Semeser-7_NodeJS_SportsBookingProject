@@ -27,7 +27,7 @@ const BookingScreen = () => {
   const fetchFields = async (newPage = 1) => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://172.20.10.2:3000/field`, {
+      const response = await axios.get(`http://192.168.1.70:3000/field`, {
         params: {
           page: newPage,
           limit: 2,
@@ -77,7 +77,7 @@ const BookingScreen = () => {
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.sportName}>Môn: {item.sportName}</Text>
         <Text style={styles.address}>Địa chỉ: {item.address}</Text>
-        <Text style={styles.price}>{item.price} VND / Ca</Text>
+        <Text style={styles.price}>{item.price.toLocaleString()} VND / Ca</Text>
         <Text style={styles.totalFields}>Tổng số sân: {item.totalFields}</Text>
       </View>
     </TouchableOpacity>
