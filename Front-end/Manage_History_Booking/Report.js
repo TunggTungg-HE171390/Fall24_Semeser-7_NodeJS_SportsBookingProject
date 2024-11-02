@@ -35,8 +35,7 @@ export default function Report() {
   const getFeedbackByCustomerId = async () => {
     try {
       if (!userId) return;
-      // console.log(userId);
-      const res = await axios.get(`http://192.168.20.35:3000/feedback/${userId}`);
+      const res = await axios.get(`http://192.168.0.102:3000/feedback/${userId}`);
       setReviews(res.data.feedbacks);
     } catch (error) {
       console.log("Error fetching feedback:", error);
@@ -59,7 +58,7 @@ export default function Report() {
         detail: updatedDetail,
       };
 
-      await axios.put(`http://192.168.20.35:3000/feedback/update/${selectedReview._id}`, updatedReview);
+      await axios.put(`http://192.168.0.102:3000/feedback/update/${selectedReview._id}`, updatedReview);
       Alert.alert("Success", "Feedback has been updated successfully");
 
       setReviews(
@@ -85,7 +84,7 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(`http://192.168.20.35:3000/feedback/delete/${selectedReview._id}`);
+      await axios.delete(`http://192.168.0.102:3000/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter(review => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
@@ -98,15 +97,16 @@ export default function Report() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.label}>Đánh giá về các sân</Text>
+
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Đánh giá</Text>
+        <Text style={styles.title}>Lọc số sao</Text>
         <TouchableOpacity style={styles.filterButton} >
           <Icon name="sliders" size={16} color="#ccc" style={{ marginRight: 5 }} />
           <Text style={styles.filterText}>Bộ lọc</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.label}>Đánh giá trước đó về các sân:</Text>
 
       <ScrollView
         style={styles.reviewContainer}
@@ -127,17 +127,23 @@ export default function Report() {
                 </Text>
                 <Text style={styles.reviewFeedback}>{review.detail}</Text>
                 <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity
+                    style={styles.editButtonDetail}
+                    onPress={() => handleEditPress(review)}
+                  >
+                    <Text style={styles.editButtonText}>Chi tiết</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.editButton}
                     onPress={() => handleEditPress(review)}
                   >
-                    <Text style={styles.editButtonText}>Edit</Text>
+                    <Text style={styles.editButtonText}>Sửa</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.editButtonDelete}
                     onPress={() => handleDeletePress(review)}
                   >
-                    <Text style={styles.editButtonText}>Delete</Text>
+                    <Text style={styles.editButtonText}>Xóa</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -221,18 +227,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 10,
   },
   label: {
-    fontSize: 18,
     marginBottom: 10,
+    fontSize: 24,
+    fontWeight: 'bold',
+    alignSelf: 'center',
   },
   reviewContainer: {
     width: "100%",
-    marginTop: 20,
   },
   scrollContentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 8,
   },
   reviewItem: {
     flexDirection: "row",
@@ -241,6 +248,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
+    backgroundColor: "#fff",
   },
   reviewImage: {
     width: 80,
@@ -258,6 +266,14 @@ const styles = StyleSheet.create({
   reviewFeedback: {
     fontSize: 16,
   },
+  editButtonDetail:{
+    marginTop: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: "green",
+    borderRadius: 5,
+    alignSelf: "flex-start",
+  },
   editButton: {
     marginTop: 10,
     paddingVertical: 5,
@@ -265,6 +281,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#007bff",
     borderRadius: 5,
     alignSelf: "flex-start",
+    marginLeft: 10,
   },
   editButtonDelete: {
     marginTop: 10,

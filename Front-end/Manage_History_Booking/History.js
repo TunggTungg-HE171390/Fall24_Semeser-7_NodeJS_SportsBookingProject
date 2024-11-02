@@ -22,7 +22,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.20.35:3000/field-order/customer/${userId}`);
+      const res = await axios.get(`http://192.168.0.102:3000/field-order/customer/${userId}`);
       const fetchedOrders = res.data.data || [];
       const updatedOrders = fetchedOrders.map((order) => {
         const [time, date] = order.orderDate.split(" ");
@@ -52,7 +52,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.20.35:3000/field-order/detail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.0.102:3000/field-order/detail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       setModalVisible(true);
     } catch (error) {
@@ -103,9 +103,9 @@ export default function History() {
             <Text>Ngày đặt:{selectedOrder?.orderDate || "N/A"}</Text>
             {selectedOrder?.fieldTime ? (
               <View>
-                <Text>Thời gian: {selectedOrder.fieldTime}</Text>
                 <Text>Địa điểm: {selectedOrder.fieldName || "N/A"}</Text>
                 <Text>Tên sân: {selectedOrder.subFieldName || "N/A"}</Text>
+                <Text>Thời gian: {selectedOrder.fieldTime}</Text>
               </View>
             ) : (
               <Text>Thông tin thời gian không có sẵn</Text>
@@ -149,7 +149,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    marginTop: 25,
+    marginTop: 12,
+    backgroundColor: "gray",
   },
   header: {
     flexDirection: "row",
@@ -207,7 +208,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
-    marginBottom: 25,
+    marginBottom: 18,
+    width: '96%', // Đảm bảo title chiếm toàn bộ chiều ngang
   },
   title: {
     flex: 1,

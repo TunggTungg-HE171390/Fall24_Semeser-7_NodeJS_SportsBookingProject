@@ -35,4 +35,9 @@ router.get(
   FieldOrderController.getFieldOrdersByCustomerId
 );
 
+// Get count field orders by customer ID
+router.get(
+  "/count-by-customer/:id", FieldOrderController.getCountFieldOrderByCustomerId
+);
+
 module.exports = router;

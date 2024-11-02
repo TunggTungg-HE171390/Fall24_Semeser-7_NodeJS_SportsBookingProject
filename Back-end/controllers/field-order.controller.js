@@ -347,14 +347,19 @@ async function getDetailByFieldOrdersId(req, res, next) {
     }
 
     // Tìm kiếm subField theo subFieldId
-    const selectedSubField = detail_field_orders.fieldId?.subFields?.find(
-      (subField) => subField._id.toString() === detail_field_orders.subFieldId.toString()
-    );
+    const selectedSubField = detail_field_orders.fieldId
+    ?.subFields?.find(
+      (subField) => subField._id.toString() === detail_field_orders.subFieldId.toString())
+      ;
 
     // Tìm kiếm slot theo slotId
     const selectedSlot = selectedSubField?.fieldTime?.find(
       (slot) => slot._id.toString() === detail_field_orders.slotId.toString()
     );
+
+    console.log("Field ID:", detail_field_orders.fieldId);
+console.log("SubField ID:", detail_field_orders.subFieldId);
+console.log("Selected SubField:", selectedSubField);
 
     const formattedFieldOrders = {
       _id: detail_field_orders._id,
@@ -394,6 +399,20 @@ async function getDetailByFieldOrdersId(req, res, next) {
   }
 }
 
+async function getCountFieldOrderByCustomerId(req, res, next) {
+  try {
+    const count = await db.fieldOrder.countDocuments({customerId: req.params.id})
+    console.log(count);
+    res.status(200).json({
+      message: "Get count field orders successfully",
+      data: count,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 module.exports = {
   getAllFieldOrders,
   createFieldOrder,
@@ -403,4 +422,5 @@ module.exports = {
   getAvailableSlotsForField,
   getFieldOrdersByCustomerId,
   getDetailByFieldOrdersId,
+  getCountFieldOrderByCustomerId
 };

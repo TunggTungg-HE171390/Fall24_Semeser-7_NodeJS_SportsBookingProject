@@ -54,19 +54,19 @@ const changeUserStatus = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     const userId = await userModel.findById(req.params.id);
-
+    console.log(userId);
     if (!userId) {
       return res.status(404).json({
         message: "User not found",
       });
     }
 
-    if (!req.body.oldPassword || !req.body.newPassword) {
+    if (!req.body.password || !req.body.confirmPassword) {
       return res.status(400).json({
         message: "Old password and new password are required",
       });
     }
-    if (req.body.oldPassword === req.body.newPassword) {
+    if (req.body.password === req.body.confirmPassword) {
       return res.status(400).json({
         message: "New password must be different from old password",
       });
@@ -77,7 +77,7 @@ const changePassword = async (req, res, next) => {
 
     while (attempts > 0) {
       isMatch = await bcrypt.compare(
-        req.body.oldPassword,
+        req.body.password,
         userId.account.password
       );
 
@@ -100,7 +100,7 @@ const changePassword = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(
-      req.body.newPassword,
+      req.body.confirmPassword,
       parseInt(process.env.SECRET_PASSWORD)
     );
     userId.account.password = hashedPassword;
@@ -108,6 +108,7 @@ const changePassword = async (req, res, next) => {
 
     return res.status(200).json({
       message: "Change password successfully",
+      pass: req.body.confirmPassword
     });
   } catch (error) {
     next(error);
@@ -116,7 +117,6 @@ const changePassword = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    
     const userInfo = await userModel.findById(req.params.id);
     res.status(200).json(userInfo);
   } catch (error) {

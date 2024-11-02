@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Profile from '../Manage_History_Booking/Profile';
@@ -6,12 +6,31 @@ import History from '../Manage_History_Booking/History';
 import Report from '../Manage_History_Booking/Report';
 import Setting from '../Manage_History_Booking/Setting';
 import { useSelector } from 'react-redux';
-
+import axios from "axios";
 
 export default function CustomTabScreen() {
-  const [selectedTab, setSelectedTab] = useState('History');
+  const [selectedTab, setSelectedTab] = useState('Profile');
+  const [count, setCount] = useState(0);
   const userName = useSelector(state => state.auth.user?.name);
-  // const userId = useSelector(state => state.auth.user?.id);
+  const userId = useSelector(state => state.auth.user?.id);
+
+  useEffect(() => {
+    if (userId) {
+      getCountFieldOrderByCustomerId();
+    }
+  }, [userId]);
+
+  const getCountFieldOrderByCustomerId = async () => {
+    try {
+      console.log("Fetching count for user:", userId);
+      const res = await axios.get(`http://192.168.0.102:3000/field-order/count-by-customer/${userId}`);
+      const count = res.data.data;
+      setCount(count);
+      console.log("Count fetched successfully:", count);
+    } catch (error) {
+      console.error("Error fetching field orders:", error.response || error.message || error);
+    }
+  };
 
   const renderContent = () => {
     switch (selectedTab) {
@@ -31,41 +50,60 @@ export default function CustomTabScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{
-            uri: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL",
-          }}
-          style={styles.profileImage}
-        />
-      </View>
-      <TouchableOpacity style={styles.touchableContainer}>
-        <View style={styles.textContainer}>
-          <Text style={styles.profileName}>{userName}</Text>
-          <Icon name="wrench" size={20} color="#000" />
+        <View style={styles.profileContainerInfo}>
+          <Image
+            source={{
+              uri: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL",
+            }}
+            style={styles.profileImage}
+          />
         </View>
-      </TouchableOpacity>
 
-      <View style={styles.tabBarContainer}>
-        {["Profile", "History", "Report", "Setting"].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[
-              styles.tabButton,
-              selectedTab === tab && styles.activeTabButton,
-            ]}
-            onPress={() => setSelectedTab(tab)}
-          >
-            <Text
-              style={
-                selectedTab === tab ? styles.activeTabText : styles.tabText
-              }
-            >
-              {tab}
-            </Text>
+        <View style={styles.threadButton}>
+          <TouchableOpacity style={{ flexDirection: 'row' }}>
+            <Icon name="fire" size={18} color="red" style={styles.icon} />
+            <Text style={{ color: "white" }}>Số lửa đã đạt: {count} </Text>
           </TouchableOpacity>
-        ))}
+        </View>
       </View>
 
+      <View style={styles.profileName}>
+        <Text style={styles.profileNameText}>Tài khoản: {userName}</Text>
+      </View>
+
+      <View style={styles.profileContainerButton}>
+        <View style={styles.titleContainer}>
+          <TouchableOpacity style={styles.editButton}>
+            <Icon name="edit" size={18} color="#ccc" style={styles.icon} />
+            <Text style={styles.buttonText}>Chỉnh sửa trang cá nhân</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.menu}>
+          <TouchableOpacity style={styles.moreButton}>
+            <Text style={styles.buttonText}>...</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.componentUnder}>
+        <View style={styles.tabBarContainer}>
+          {["Profile", "History", "Report", "Setting"].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[
+                styles.tabButton,
+                selectedTab === tab && styles.activeTabButton,
+              ]}
+              onPress={() => setSelectedTab(tab)}
+            >
+              <Text style={styles.tabText}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
       {/* Tab Content */}
       <View style={styles.component}>{renderContent()}</View>
     </View>
@@ -75,12 +113,13 @@ export default function CustomTabScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 20,
+    // marginTop: 20,
   },
   component: {
     flex: 1,
     height: "100%",
     width: "100%",
+    backgroundColor: "gray",
   },
   tabBarContainer: {
     flexDirection: "row",
@@ -89,21 +128,28 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#e0e0e0",
+    borderRadius: 25,
+    backgroundColor: "#000000",
+    width: "98%",
+    alignSelf: "center",
+    marginTop: 7,
   },
   tabButton: {
     padding: 10,
   },
   activeTabButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: "#2F95DC",
+    backgroundColor: "#ff6b01",
+    borderRadius: 15,
+    paddingVertical: 11,
   },
   tabText: {
     fontSize: 14,
-    color: "gray",
+    color: "white",
+    fontWeight: "600",
   },
   activeTabText: {
     fontSize: 14,
-    color: "#2F95DC",
+    color: "#000000",
     fontWeight: "600",
   },
   profileImage: {
@@ -113,14 +159,19 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: "#ff6b01",
     marginBottom: 15,
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   profileContainer: {
     marginTop: 40,
-    alignItems: "center",
+    width: "98%",
+    marginLeft: "10%",
+    alignSelf: "center",
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   touchableContainer: {
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "#ff6b01",
     borderRadius: 25,
     paddingVertical: 10,
@@ -137,13 +188,87 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
   },
-  profileName: {
+  profileNameText: {
     fontSize: 18,
     fontWeight: "bold",
-    textAlign: "center",
     color: "#333",
+  },
+  profileName: {
+    marginBottom: 10,
+    marginLeft: 20,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#555',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  buttonText: {
+    color: '#ccc',
+    fontSize: 16,
+  },
+  moreButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: '#555',
+    borderRadius: 6,
+    backgroundColor: '#555',
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    backgroundColor: '#333',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 8,
+    width: '76%',
+    marginLeft: 5,
+  },
+  menu: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    backgroundColor: '#333',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 8,
+    width: '18%',
+  },
+  profileContainerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '98%',
+    marginBottom: 10,
+  },
+  profileContainerInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    // width: '98%',
+  },
+  componentUnder: {
+    backgroundColor: "gray",
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12,
+  },
+  threadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ff6b01',
+    paddingHorizontal: 12,
+    paddingVertical: 22,
+    borderRadius: 10,
+    marginRight: 22,
+    marginBottom: 18,
   },
 });

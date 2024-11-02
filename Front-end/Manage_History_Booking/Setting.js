@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 export default function Setting({ navigation }) {
   const [showModal, setShowModal] = useState(false);
   const userName = useSelector(state => state.auth.user?.name);
+  const userId = useSelector((state) => state.auth.user?.id);
 
   const [formData, setFormData] = useState({ name: userName, password: '', newPassword: '', confirmPassword: '' });
   const [modalVisible, setModalVisible] = useState(false);
@@ -24,24 +25,26 @@ export default function Setting({ navigation }) {
       return;
     }
 
-    axios.post("http://192.168.20.35:3000/auth/change-password", formData)
+    axios.post(`http://192.168.0.102:3000/user/change-password/${userId}`, formData)
       .then(res => {
         console.log(res);
         Alert.alert("Success", "Password changed successfully");
         setModalVisible(false);
         setShowModal(false);
-        navigation.navigate("Login");
+        dispatch(logout());
+        navigation.navigate("Login");        
       })
       .catch(error => {
         const errorMessage = error.response?.data?.message || "Đăng ký thất bại";
         console.error("Lỗi:", errorMessage);
+        console.log(formData);
         setErrorMessage(errorMessage);
         setModalVisible(true);
       });
   };
 
   const handleLogout = async () => {
-    axios.post("http://192.168.20.35:3000/auth/sign-out")
+    axios.post("http://192.168.0.102:3000/auth/sign-out")
       .then(async (res) => {
         console.log(res.data.message);
         await AsyncStorage.removeItem('authToken');
@@ -165,7 +168,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   modalButton: {
-    backgroundColor: 'orange',
+    backgroundColor: '#ff6b01',
     padding: 10,
     borderRadius: 5,
     marginTop: 10,
