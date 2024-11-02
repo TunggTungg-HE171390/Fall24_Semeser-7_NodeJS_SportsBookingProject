@@ -40,6 +40,18 @@ const FieldsSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  openingTime: {
+    type: String,
+    required: true,
+  },
+  closingTime: {
+    type: String,
+    required: true,
+  },
+  slotDuration: {
+    type: String,
+    required: true,
+  },
   subFields: [
     {
       name: {

@@ -9,12 +9,15 @@ function generateSubFields(
   closingTime,
   slotDuration
 ) {
+  console.log(totalFields, openingTime, closingTime, slotDuration);
+
   const subFields = [];
   const openingDate = new Date(`1970-01-01T${openingTime}:00`);
   const closingDate = new Date(`1970-01-01T${closingTime}:00`);
 
-  const totalOperatingTime = (closingDate - openingDate) / (1000 * 60); // convert to minutes
-  const slotsPerDay = Math.floor(totalOperatingTime / slotDuration);
+  const totalOperatingTime =
+    (Number(closingDate) - Number(openingDate)) / (1000 * 60); // convert to minutes
+  const slotsPerDay = Math.floor(totalOperatingTime / +slotDuration);
 
   for (let i = 1; i <= totalFields; i++) {
     const subField = {
@@ -50,6 +53,8 @@ function generateSubFields(
 const addField = async (req, res, next) => {
   try {
     const data = req.body;
+    console.log(data);
+
     const {
       totalFields,
       openingTime,
@@ -89,6 +94,8 @@ const updateField = async (req, res, next) => {
   try {
     const fieldId = req.params.id;
     const updateData = req.body;
+    console.log(updateData);
+
     const {
       ownerId,
       totalFields,
@@ -114,6 +121,7 @@ const updateField = async (req, res, next) => {
         closingTime,
         slotDuration
       );
+      console.log(updateData.subFields);
     }
 
     const updatedField = await Field.findByIdAndUpdate(fieldId, updateData, {
@@ -132,11 +140,27 @@ const updateField = async (req, res, next) => {
 const deleteField = async (req, res, next) => {
   try {
     const fieldId = req.params.id;
-    const deletedField = await Field.findByIdAndDelete(fieldId);
-    if (!deletedField) {
+
+    // Lấy field hiện tại
+    const field = await Field.findById(fieldId);
+
+    if (!field) {
       return res.status(404).json({ message: "Field not found." });
     }
-    res.status(200).json({ message: "Field deleted successfully!" });
+
+    // Đổi trạng thái giữa ACTIVE và INACTIVE
+    const newStatus = field.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    field.status = newStatus;
+
+    // Lưu lại trạng thái mới
+    await field.save();
+
+    res
+      .status(200)
+      .json({
+        message: `Field status changed to ${newStatus} successfully!`,
+        field,
+      });
   } catch (error) {
     next(error);
   }
