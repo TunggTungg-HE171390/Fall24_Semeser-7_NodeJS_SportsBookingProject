@@ -6,6 +6,8 @@ const {
   getEquipmentById,
   deleteEquipment,
   rentalEquipment,
+  getOrdersWithTimeFilter,
+  getOrderById,
 } = require("../controllers/equipment.controller");
 
 const router = express.Router();
@@ -26,5 +28,9 @@ router.put("/update/:id", updateEquipment);
 router.put("/delete/:id", deleteEquipment);
 
 router.post("/rental", rentalEquipment);
+
+router.get("/equipment-orders/:filter", getOrdersWithTimeFilter);
+
+router.get("/equipment-orders/order/:id", getOrderById);
 
 module.exports = router;

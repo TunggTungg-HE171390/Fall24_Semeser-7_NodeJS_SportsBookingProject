@@ -63,7 +63,7 @@ const FieldDetailScreen = ({ route }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://172.30.0.1:3000/field-order/fields/${field._id}/available-slots`,
+        `http://192.168.1.70:3000/field-order/fields/${field._id}/available-slots`,
         {
           params: {
             date: formatDate(selectedDate),
@@ -105,7 +105,7 @@ const FieldDetailScreen = ({ route }) => {
 
     try {
       const response = await axios.post(
-        "http://172.30.0.1:3000/field-order",
+        "http://192.168.1.70:3000/field-order",
         bookingData
       );
       if (response.status === 201) {
