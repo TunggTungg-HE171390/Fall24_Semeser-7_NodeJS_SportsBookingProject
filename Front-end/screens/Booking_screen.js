@@ -1,378 +1,244 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
   TextInput,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  ActivityIndicator,
 } from "react-native";
+import axios from "axios";
+import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from "@expo/vector-icons";
-import Slider from "@react-native-community/slider";
-import DropDownPicker from "react-native-dropdown-picker"; // Import DropDownPicker
 import { useNavigation } from "@react-navigation/native";
-
-const data = [
-  {
-    id: "1",
-    name: "Sân Tennis",
-    sport: "Tennis",
-    location: "Hoa Lac",
-    price: 100000,
-    image: require("../assets/images/san-tennis.jpg"),
-    rating: 4.5,
-    totalFields: 5,
-    reviews: [
-      { user: "User1", comment: "Sân sạch sẽ, thoáng mát", rating: 4 },
-      { user: "User2", comment: "Giá hợp lý, dịch vụ tốt", rating: 5 },
-      { user: "User3", comment: "Sân rất tốt, tuy nhiên hơi xa", rating: 4 },
-    ],
-  },
-  {
-    id: "2",
-    name: "Football",
-    sport: "Football",
-    location: "Hoa Lac",
-    price: 200000,
-    image: require("../assets/images/san-nhan-tao.jpg"),
-    rating: 4.8,
-    totalFields: 3,
-    reviews: [
-      {
-        user: "User1",
-        comment: "Sân lớn, sạch sẽ, nhưng giá hơi cao",
-        rating: 4,
-      },
-      { user: "User2", comment: "Thích hợp cho nhóm đông người", rating: 5 },
-      { user: "User3", comment: "Sân rộng, chất lượng tốt", rating: 5 },
-    ],
-  },
-  {
-    id: "3",
-    name: "Badminton",
-    sport: "Badminton",
-    location: "Cau Giay",
-    price: 150000,
-    image: require("../assets/images/san-cau-long.jpg"),
-    rating: 4.2,
-    totalFields: 7,
-    reviews: [
-      { user: "User1", comment: "Sân đẹp, có điều hòa", rating: 4 },
-      { user: "User2", comment: "Khá đông vào cuối tuần", rating: 3 },
-      { user: "User3", comment: "Giá cả hợp lý, dịch vụ ổn", rating: 4 },
-    ],
-  },
-];
-
 const BookingScreen = () => {
-  const [selectedSport, setSelectedSport] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [minPrice, setMinPrice] = useState(50000);
-  const [maxPrice, setMaxPrice] = useState(300000);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("price-asc"); // Mặc định sắp xếp tăng dần
-  const [openFilter, setOpenFilter] = useState(false);
-  const [openSport, setOpenSport] = useState(false); // Trạng thái dropdown môn thể thao
-  const [openLocation, setOpenLocation] = useState(false); // Trạng thái dropdown địa chỉ
-
   const navigation = useNavigation();
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
+  const [selectedSport, setSelectedSport] = useState(null); // Sport filter
+  const [openSport, setOpenSport] = useState(false); // State for DropDownPicker
 
-  // Đảm bảo chỉ một dropdown mở tại một thời điểm
-  const closeAllDropdowns = () => {
-    setOpenFilter(!openFilter);
-    setOpenSport(false);
-    setOpenLocation(false);
+  // Fetch data from API
+  const fetchFields = async (newPage = 1) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`http://192.168.1.70:3000/field`, {
+        params: {
+          page: newPage,
+          limit: 2,
+          searchQuery,
+          sortOrder,
+          sportName: selectedSport,
+        },
+      });
+      console.log("Response:", response.data);
+
+      const { data: fields, currentPage, totalPages } = response.data;
+
+      if (newPage === 1) {
+        setData(fields); // Reset data on new search
+      } else {
+        setData((prevData) => [...prevData, ...fields]);
+      }
+
+      setPage(currentPage);
+      setTotalPages(totalPages);
+    } catch (error) {
+      console.error("Error fetching fields:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Hàm thay đổi thứ tự sắp xếp giá
-  const toggleSortOrder = () => {
-    setSortOrder((prevSortOrder) =>
-      prevSortOrder === "price-asc" ? "price-desc" : "price-asc"
-    );
+  // Fetch data on component mount and when searchQuery, sortOrder, or selectedSport changes
+  useEffect(() => {
+    fetchFields();
+  }, [searchQuery, sortOrder, selectedSport]);
+
+  // Load more data when reaching the end of the list
+  const loadMore = () => {
+    if (page < totalPages && !isLoading) {
+      fetchFields(page + 1);
+    }
   };
-
-  const filterData = data
-    .filter((item) => {
-      const matchesSport =
-        selectedSport === null || item.sport === selectedSport;
-      const matchesLocation =
-        selectedLocation === null || item.location === selectedLocation;
-      const matchesPrice = item.price >= minPrice && item.price <= maxPrice;
-      const matchesSearchQuery =
-        searchQuery === "" ||
-        item.username.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return (
-        matchesSport && matchesLocation && matchesPrice && matchesSearchQuery
-      );
-    })
-    .sort((a, b) => {
-      if (sortOrder === "price-asc") return a.price - b.price;
-      if (sortOrder === "price-desc") return b.price - a.price;
-      return 0;
-    });
 
   const renderField = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("FieldDetail", { field: item })}
+      style={styles.card}
     >
-      <View style={styles.card}>
-        <Image source={item.image} style={styles.image} />
-        <View style={styles.infoContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.price}>
-              {item.price.toLocaleString()} VND/h
-            </Text>
-            <View style={styles.locationContainer}>
-              <Ionicons name="location-outline" size={14} color="gray" />
-              <Text style={styles.location}>{item.location}</Text>
-            </View>
-            <Text style={styles.rating}>Đánh giá: {item.rating} ★</Text>
-            <Text style={styles.totalFields}>
-              Tổng số sân: {item.totalFields}
-            </Text>
-          </View>
-          <TouchableOpacity>
-            <Ionicons name="share-social-outline" size={24} color="gray" />
-          </TouchableOpacity>
-        </View>
+      <Image source={{ uri: item.image[0] }} style={styles.image} />
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text style={styles.sportName}>Môn: {item.sportName}</Text>
+        <Text style={styles.address}>Địa chỉ: {item.address}</Text>
+        <Text style={styles.price}>{item.price.toLocaleString()} VND / Ca</Text>
+        <Text style={styles.totalFields}>Tổng số sân: {item.totalFields}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchFilterContainer}>
+      {/* Search bar */}
+      <View style={styles.filterRow}>
         {/* Search bar */}
         <TextInput
           style={styles.searchBar}
-          placeholder="Tìm kiếm theo tên..."
+          placeholder="Tìm kiếm sân..."
           value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)} // Đóng các dropdown khi tìm kiếm
+          onChangeText={(text) => setSearchQuery(text)}
         />
 
-        {/* Nút sắp xếp theo giá */}
-        <TouchableOpacity onPress={toggleSortOrder} style={styles.sortButton}>
+        {/* Sort by price button */}
+        <TouchableOpacity
+          onPress={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+          style={styles.sortButton}
+        >
           <Text style={styles.sortText}>Giá</Text>
           <Ionicons
             name={
-              sortOrder === "price-asc"
-                ? "arrow-up-outline"
-                : "arrow-down-outline"
+              sortOrder === "asc" ? "arrow-up-outline" : "arrow-down-outline"
             }
             size={16}
             color="gray"
           />
         </TouchableOpacity>
-
-        {/* Nút mở/đóng bộ lọc */}
-        <TouchableOpacity onPress={closeAllDropdowns}>
-          <Ionicons name="options-outline" size={24} color="gray" />
-        </TouchableOpacity>
       </View>
 
-      {/* Bộ lọc */}
-      {openFilter && (
-        <View style={styles.filterContainer}>
-          <View style={styles.dropdownRow}>
-            {/* Dropdown môn thể thao */}
-            <DropDownPicker
-              open={openSport}
-              value={selectedSport}
-              items={[
-                { label: "Tất cả", value: null },
-                { label: "Tennis", value: "Tennis" },
-                { label: "Football", value: "Football" },
-                { label: "Badminton", value: "Badminton" },
-              ]}
-              setOpen={(open) => {
-                setOpenSport(open);
-              }}
-              setValue={setSelectedSport}
-              placeholder="Chọn môn thể thao"
-              containerStyle={styles.dropdownContainer}
-            />
+      {/* Sport filter dropdown */}
+      <DropDownPicker
+        open={openSport}
+        value={selectedSport}
+        items={[
+          { label: "Tất cả", value: null },
+          { label: "Football", value: "Football" },
+          { label: "Volleyball", value: "Volleyball" },
+          { label: "Badminton", value: "Badminton" },
+          { label: "Tennis", value: "Tennis" },
+        ]}
+        setOpen={setOpenSport}
+        setValue={setSelectedSport}
+        placeholder="Chọn môn thể thao"
+        containerStyle={styles.dropdownContainer}
+      />
 
-            {/* Dropdown địa chỉ */}
-            <DropDownPicker
-              open={openLocation}
-              value={selectedLocation}
-              items={[
-                { label: "Tất cả", value: null },
-                { label: "Hoa Lac", value: "Hoa Lac" },
-                { label: "Cau Giay", value: "Cau Giay" },
-              ]}
-              setOpen={(open) => {
-                setOpenLocation(open);
-              }}
-              setValue={setSelectedLocation}
-              placeholder="Chọn địa chỉ"
-              containerStyle={styles.dropdownContainer}
-            />
-          </View>
-
-          {/* Price range filter */}
-          <View style={styles.priceFilterContainer}>
-            <Text>Giá từ: {minPrice.toLocaleString()} VND</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={50000}
-              maximumValue={300000}
-              step={10000}
-              value={minPrice}
-              onValueChange={(value) => setMinPrice(value)}
-              minimumTrackTintColor="#1EB1FC"
-              maximumTrackTintColor="#d3d3d3"
-              thumbTintColor="#1EB1FC"
-            />
-            <Text>Giá đến: {maxPrice.toLocaleString()} VND</Text>
-            <Slider
-              style={styles.slider}
-              minimumValue={50000}
-              maximumValue={300000}
-              step={10000}
-              value={maxPrice}
-              onValueChange={(value) => setMaxPrice(value)}
-              minimumTrackTintColor="#1EB1FC"
-              maximumTrackTintColor="#d3d3d3"
-              thumbTintColor="#1EB1FC"
-            />
-          </View>
-        </View>
-      )}
-
-      {/* Danh sách sân */}
+      {/* Field list */}
       <FlatList
-        data={filterData}
-        keyExtractor={(item) => item.id}
+        data={data}
+        keyExtractor={(item) => item._id}
         renderItem={renderField}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<View style={{ height: 10 }} />}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isLoading && <ActivityIndicator size="large" color="#0000ff" />
+        }
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+export default BookingScreen;
+
+const styles = {
   container: {
     flex: 1,
-    paddingHorizontal: 10,
+    padding: 16,
     backgroundColor: "#fff",
   },
-  searchFilterContainer: {
+  filterRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    backgroundColor: "#f7f7f7",
+    padding: 8,
+    borderRadius: 10,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // Shadow for Android
   },
   searchBar: {
     flex: 1,
-    height: 40,
-    borderColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
+    borderColor: "#ddd",
+    backgroundColor: "#ffffff",
     fontSize: 14,
+    marginRight: 10,
   },
   sortButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: 10,
-    borderColor: "#ccc",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
+    borderColor: "#ddd",
   },
   sortText: {
     fontSize: 14,
-    marginRight: 5,
-    color: "gray",
+    color: "#333",
+    marginRight: 4,
   },
-  filterContainer: {
-    paddingVertical: 10,
-  },
-  dropdownRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  dropdownContainer: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  priceFilterContainer: {
-    marginVertical: 10,
-  },
-  slider: {
-    width: "100%",
-    height: 40,
-    marginVertical: 10,
-  },
+
   list: {
-    paddingBottom: 20,
+    marginTop: 16,
+    paddingBottom: 16,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginBottom: 15,
-    overflow: "hidden",
-    elevation: 2,
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    borderWidth: 2,
-    borderColor: "#ccc",
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+    marginBottom: 16,
   },
   image: {
     width: 100,
     height: 100,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    resizeMode: "cover",
-    marginRight: 10,
+    borderRadius: 8,
+    marginRight: 16,
   },
   infoContainer: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-  },
-  textContainer: {
-    flex: 1,
+    justifyContent: "center",
   },
   name: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    color: "#333333",
+    marginBottom: 4,
+  },
+  sportName: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1E90FF",
+    marginBottom: 2,
+  },
+  address: {
+    fontSize: 14,
+    color: "#555555",
+    marginBottom: 2,
   },
   price: {
-    fontSize: 14,
-    color: "#28a745",
-    marginBottom: 5,
-  },
-  locationContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  location: {
-    marginLeft: 5,
-    fontSize: 14,
-    color: "gray",
-  },
-  rating: {
-    fontSize: 12,
-    color: "#f39c12",
-    marginBottom: 5,
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#E74C3C",
+    marginVertical: 6,
   },
   totalFields: {
     fontSize: 12,
-    color: "#3498db",
+    color: "#777777",
+    marginTop: 4,
   },
-});
-
-export default BookingScreen;
+};

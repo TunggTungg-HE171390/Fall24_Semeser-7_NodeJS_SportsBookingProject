@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Modal,
   TextInput,
+  FlatList,
   Alert,
 } from "react-native";
 import axios from "axios";
@@ -26,14 +27,13 @@ export default function Setting() {
   const dispatch = useDispatch();
   const handleChangePassword = () => {
     // Logic for changing password
-    Alert("Password changed successfully");
+    alert("Password changed successfully");
     setShowModal(false);
   };
 
   const handleLogout = async () => {
     axios
       .post(`${api}/auth/sign-out`)
-
       .then(async (res) => {
         console.log(res.data.message);
         // Xóa token từ AsyncStorage

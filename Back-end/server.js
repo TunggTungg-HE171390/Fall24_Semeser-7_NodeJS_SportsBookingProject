@@ -58,8 +58,9 @@ app.use((err, req, res, next) => {
   });
 });
 
+const ip = getLocalIP();
+
 app.listen(process.env.PORT, () => {
-  console.log(`Server running at http://192.168.1.136:${process.env.PORT}`);
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
   db.connectDB();

@@ -65,6 +65,8 @@ const getAllFieldOrders = async (req, res) => {
 // Create a new field order
 const createFieldOrder = async (req, res) => {
   try {
+    console.log(req.body);
+
     const {
       customerId,
       fieldId,
@@ -73,16 +75,26 @@ const createFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
+      price,
     } = req.body;
 
     // Validate entity existence
     await checkExistence(customerId, fieldId, subFieldId, slotId);
 
     // Validate order date
-    if (orderDate && new Date(orderDate) < new Date()) {
-      return res
-        .status(400)
-        .json({ message: "Order date must be in the present or future." });
+    if (orderDate) {
+      const currentDate = new Date();
+      const orderDateOnly = new Date(orderDate);
+
+      // Set the time components to zero for both dates to ignore hours, minutes, and seconds
+      currentDate.setHours(0, 0, 0, 0);
+      orderDateOnly.setHours(0, 0, 0, 0);
+
+      if (orderDateOnly < currentDate) {
+        return res
+          .status(400)
+          .json({ message: "Order date must be in the present or future." });
+      }
     }
 
     // Check if the slot is available for the specific field and subField
@@ -101,6 +113,7 @@ const createFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
+      price,
     });
     const savedOrder = await newOrder.save();
     res.status(201).json(savedOrder);
@@ -120,6 +133,7 @@ const updateFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
+      price,
     } = req.body;
 
     // Validate entity existence
@@ -155,6 +169,7 @@ const updateFieldOrder = async (req, res) => {
         orderDate,
         status,
         equipmentOrderId,
+        price,
       },
       { new: true }
     );
@@ -205,7 +220,7 @@ const deleteFieldOrder = async (req, res) => {
 const getAvailableSlotsForField = async (req, res) => {
   try {
     const { fieldId } = req.params;
-    const { date } = req.query;
+    const { date, subFieldId } = req.query;
 
     if (!date) {
       return res
@@ -213,16 +228,33 @@ const getAvailableSlotsForField = async (req, res) => {
         .json({ message: "Date query parameter is required" });
     }
 
+    console.log(`Date: ${date}`);
+
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Retrieve all booked slots for the day for the specific field
-    const bookedSlots = await FieldOrders.find({
+    // Check if the selected date is today
+    const today = new Date();
+    const isToday =
+      startOfDay.getDate() === today.getDate() &&
+      startOfDay.getMonth() === today.getMonth() &&
+      startOfDay.getFullYear() === today.getFullYear();
+    console.log(isToday);
+
+    // Retrieve all booked slots for the day for the specific field and subFieldId if provided
+    const bookedSlotsQuery = {
       fieldId,
       orderDate: { $gte: startOfDay, $lte: endOfDay },
-    }).select("subFieldId slotId");
+    };
+    if (subFieldId) {
+      bookedSlotsQuery.subFieldId = subFieldId;
+    }
+
+    const bookedSlots = await FieldOrders.find(bookedSlotsQuery).select(
+      "subFieldId slotId"
+    );
 
     const bookedSubFields = bookedSlots.map((slot) => ({
       subFieldId: slot.subFieldId,
@@ -235,18 +267,51 @@ const getAvailableSlotsForField = async (req, res) => {
       return res.status(404).json({ message: "Field not found" });
     }
 
-    const availableSlots = field.subFields.map((subField) => ({
-      name: subField.name,
-      subFieldId: subField._id,
-      availableSlots: subField.fieldTime.filter(
-        (slot) =>
-          !bookedSubFields.some(
+    // Get the current time if the selected date is today
+    const currentTime = isToday ? new Date() : null;
+
+    console.log(`Current time: ${currentTime}`);
+
+    // Filter for a specific subField or all subFields if no specific subFieldId is provided
+    const availableSlots = field.subFields
+      .filter((subField) => !subFieldId || subField._id.equals(subFieldId))
+      .map((subField) => ({
+        name: subField.name,
+        subFieldId: subField._id,
+        availableSlots: subField.fieldTime.filter((slot) => {
+          // Check if the slot is booked
+          const isBooked = bookedSubFields.some(
             (booked) =>
               booked.subFieldId.equals(subField._id) &&
               booked.slotId.equals(slot._id)
-          )
-      ),
-    }));
+          );
+
+          // If the slot is booked, skip it
+          if (isBooked) return false;
+
+          // If today, only include slots that start after the current time
+          if (isToday) {
+            // Log the current date and time
+            console.log("current time", currentTime);
+
+            // Assuming slot.start is a string like "20:00", split it to get hours and minutes
+            const [slotHour, slotMinute] = slot.start.split(":").map(Number);
+
+            // Create a Date object for the slot start time on the current day
+            const slotStartTime = new Date(currentTime);
+            slotStartTime.setHours(slotHour, slotMinute, 0, 0); // Set hours, minutes, seconds, and milliseconds
+
+            // Log the slot start time
+            console.log("slot start time", slotStartTime);
+
+            // Return whether the slot start time is after the current time
+            return slotStartTime > currentTime;
+          }
+
+          // For future dates, include all available slots
+          return true;
+        }),
+      }));
 
     res.json(availableSlots);
   } catch (error) {

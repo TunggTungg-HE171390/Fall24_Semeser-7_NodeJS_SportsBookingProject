@@ -22,6 +22,7 @@ export default function RegisterScreen({ navigation }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
+
   const api = process.env.REACT_APP_IP_Address;
 
   useEffect(() => {
