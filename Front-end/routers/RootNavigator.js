@@ -1,26 +1,35 @@
+// module ở đây
 import React from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, StyleSheet, Text } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-import Tab_bar from "../components/Tab_bar";
+
+// màn hình ở đây
 import Booking_screen from "../screens/Booking_screen";
 import Explore_screen from "../screens/Explore_screen";
 import SigninScreen from "../Login";
 import FieldDetailScreen from "../screens/FieldDetailScreen";
 import FieldListScreen from "../screens/FieldListScreen";
 import FieldAdminDetailScreen from "../screens/FieldAdminsDetail";
-import Header from "../layout/Header";
 import ManageAccount from "../screens/ManageAccount";
 import AccountDetail from "../screens/AccountDetail";
 import Dashboard from "../screens/Dashbord";
-import { ROUTER } from "../utils/constant";
 import RentalEquipmentScreen from "../screens/RentalEquipmentScreen";
 import EquipmentDetailScreen from "../screens/EquipmentDetailsScreen";
-import TabScreen from "../components/Tab_Navigator";
 import SportSelected from "../screens/SportSelected";
 import RegisterScreen from "../screens/Register_screen";
-import { useSelector } from "react-redux";
 import EquipmentListScreen from "../screens/EquipmentList";
+import PostApprovalScreen from "../screens/PostApprovalScreen";
+
+// navigation
+import TabScreen from "../components/Tab_Navigator";
+import PostNavigator from "./PostNavigator";
+
+//khác
+import Tab_bar from "../components/Tab_bar";
+import Header from "../layout/Header";
+import { ROUTER } from "../utils/constant";
+import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -114,12 +123,31 @@ function AdminRole() {
         initialRouteName={ROUTER.DASHBOARD}
         screenOptions={{ headerShown: false }}
       >
+        <Stack.Screen
+          name={ROUTER.POST_APPROVAL}
+          component={PostApprovalScreen}
+        />
         <Stack.Screen name={ROUTER.MANAGE_ACCOUNT} component={ManageAccount} />
         <Stack.Screen name={ROUTER.ACCOUNT_DETAIL} component={AccountDetail} />
         <Stack.Screen name={ROUTER.DASHBOARD} component={Dashboard} />
         <Stack.Screen name="Profile" component={ProfileStack} />
       </Stack.Navigator>
     </SafeAreaView>
+  );
+}
+
+function PostStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Post"
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen
+        name="Post"
+        component={PostNavigator}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
   );
 }
 
@@ -143,8 +171,12 @@ function Main() {
       )}
       {role === 2 && (
         <>
+          <Tab.Screen name="PostMain" component={PostStack} />
           <Tab.Screen name="Field" component={FieldStack} />
-          <Tab.Screen name="Profile" component={EquipmentAdminStack} />
+          <Tab.Screen
+            name="EquipmentAdminStack"
+            component={EquipmentAdminStack}
+          />
         </>
       )}
       {role === 3 && <Stack.Screen name="Admin" component={AdminRole} />}

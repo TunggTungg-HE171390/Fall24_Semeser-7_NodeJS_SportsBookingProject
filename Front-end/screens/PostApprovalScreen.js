@@ -7,31 +7,84 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  SafeAreaView,
   Alert,
 } from "react-native";
-import { Search, MapPin, Share2, Plus } from "lucide-react-native";
+import { Search, MapPin, Share2, Check, X } from "lucide-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import PostAPI from "../api/post.service";
 import DetailedPostModal from "../components/Detailed_post_modal";
 import { useSelector } from "react-redux";
+import { POST_STATUS } from "../utils/constant";
 
-const Explore_screen = () => {
+const PostApprovalScreen = () => {
+  const user = useSelector((state) => state?.auth?.user);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [detailedPostModalVisible, setDetailedPostModalVisible] =
     useState(false);
-
-  const [posts, setPosts] = useState([]);
-  const user = useSelector((state) => state?.auth.user);
-  console.log("userId:  ", user?.id);
-  console.log("userRole:  ", user?.role);
-  async function fetchPosts() {
-    const res = await PostAPI.getAllPosts();
-    setPosts(res);
-  }
+  const [pendingPosts, setPendingPosts] = useState([]);
+  const [selectedPosts, setSelectedPosts] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(false);
+  const fetchPosts = async () => {
+    try {
+      //
+      setIsLoading(true);
+      const posts = await PostAPI.getPostsPending();
+      setPendingPosts(posts);
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  const handleCheckbox = (postId) => {
+    setSelectedPosts((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleUpdateStatus = async (newStatus) => {
+    console.log("newStatus: ", newStatus);
+    console.log("selectedPosts: ", selectedPosts);
+    console.log("user: ", user.id);
+    try {
+      setIsLoading(true);
+      const userId = user?.id;
+      const res = await PostAPI.updateStatusOfPosts(
+        selectedPosts,
+        userId,
+        newStatus
+      );
+
+      if (res?.success === true) {
+        await fetchPosts();
+        setSelectedPosts(new Set());
+        Alert.alert(
+          "Success",
+          `Successfully updated ${selectedPosts.size} posts`
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAccept = () => handleUpdateStatus(POST_STATUS.PUBLISHED);
+  const handleReject = () => handleUpdateStatus(POST_STATUS.DENIED);
 
   const timeFilters = ["Tomorrow", "Next week", "Next Month", "All upcoming"];
 
@@ -39,6 +92,8 @@ const Explore_screen = () => {
     if (!post) {
       return null;
     }
+    const isSelected = selectedPosts.has(post._id);
+
     return (
       <TouchableOpacity
         style={styles.eventCard}
@@ -47,7 +102,15 @@ const Explore_screen = () => {
           setDetailedPostModalVisible(true);
         }}
       >
-        {/* sửa chỗ này */}
+        <TouchableOpacity
+          style={[styles.checkbox, isSelected && styles.checkboxSelected]}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleCheckbox(post._id);
+          }}
+        >
+          {isSelected && <Check color="#fff" size={16} />}
+        </TouchableOpacity>
         <Image source={{ uri: post?.image?.[0] }} style={styles.eventImage} />
         <View style={styles.eventInfo}>
           <Text style={styles.eventTitle}>{post?.title}</Text>
@@ -59,6 +122,7 @@ const Explore_screen = () => {
             <Text style={styles.eventLocationText}>
               {post?.location?.address}
             </Text>
+            <Text>Status: {post?.status}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.shareButton}>
@@ -67,10 +131,11 @@ const Explore_screen = () => {
       </TouchableOpacity>
     );
   };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <ScrollView style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollContainer}>
           <View style={styles.header}>
             <TextInput style={styles.searchInput} placeholder="Search Sports" />
             <TouchableOpacity style={styles.iconButton}>
@@ -78,43 +143,47 @@ const Explore_screen = () => {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.sectionTitle}>Find events near</Text>
-          <View style={styles.locationRow}>
-            <Text style={styles.locationText}>Hoa Lac</Text>
-            <TouchableOpacity>
-              <Text style={styles.changeText}>CHANGE</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView horizontal style={styles.timeFilter}>
-            {timeFilters.map((item, index) => (
-              <TouchableOpacity key={index} style={styles.timeFilterItem}>
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Post here */}
-          <Text style={styles.sectionTitle}>Your posts</Text>
-          {posts.map((post) => (
+          <Text style={styles.sectionTitle}>Pending Posts</Text>
+          {pendingPosts.map((post) => (
             <EventCard key={post._id} post={post} />
           ))}
         </ScrollView>
 
-        {/* Modal here */}
+        <View style={styles.bottomButtons}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.rejectButton]}
+            onPress={handleReject}
+            disabled={selectedPosts.size === 0}
+          >
+            <X color="#fff" size={20} />
+            <Text style={styles.buttonText}>Reject</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.acceptButton]}
+            onPress={handleAccept}
+            disabled={selectedPosts.size === 0}
+          >
+            <Check color="#fff" size={20} />
+            <Text style={styles.buttonText}>Accept</Text>
+          </TouchableOpacity>
+        </View>
 
         <DetailedPostModal
           visible={detailedPostModalVisible}
           event={selectedEvent || {}}
           onClose={() => setDetailedPostModalVisible(false)}
         />
-      </View>
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  scrollContainer: {
     flex: 1,
     backgroundColor: "#fff",
   },
@@ -174,6 +243,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: "#ddd",
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxSelected: {
+    backgroundColor: "#4CAF50",
+    borderColor: "#4CAF50",
+  },
   eventImage: {
     width: 60,
     height: 60,
@@ -203,58 +286,32 @@ const styles = StyleSheet.create({
   shareButton: {
     padding: 5,
   },
-  genreGrid: {
+  bottomButtons: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-around",
-    padding: 10,
+    padding: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    justifyContent: "space-between",
   },
-  genreItem: {
-    width: "48%",
-    aspectRatio: 1,
-    marginBottom: 10,
-    justifyContent: "center",
+  actionButton: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 8,
+    flex: 0.48,
   },
-  genreImage: {
-    width: "100%",
-    height: "80%",
-    borderRadius: 10,
+  rejectButton: {
+    backgroundColor: "#FF5252",
   },
-  genreText: {
-    marginTop: 5,
+  acceptButton: {
+    backgroundColor: "#4CAF50",
+  },
+  buttonText: {
+    color: "#fff",
     fontWeight: "bold",
-  },
-  addButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    backgroundColor: "orange",
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 5,
-  },
-  deleteButton: {
-    backgroundColor: "red",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    height: "100%",
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  editButton: {
-    backgroundColor: "green",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    height: "100%",
-    borderRadius: 10,
-    marginRight: 10,
+    marginLeft: 8,
   },
 });
 
-export default Explore_screen;
+export default PostApprovalScreen;

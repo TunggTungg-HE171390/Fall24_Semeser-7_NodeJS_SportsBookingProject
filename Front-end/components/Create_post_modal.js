@@ -68,12 +68,7 @@ const CreatePostModal = ({ visible, onClose, onAdd }) => {
   };
 
   const handleAddPost = async () => {
-    if (
-      !newPost.title ||
-      !newPost.address ||
-      !newPost.description ||
-      newPost.images.length === 0
-    ) {
+    if (!newPost.title || !newPost.address || !newPost.description) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }

@@ -1,6 +1,6 @@
 const postModel = require("../models/post.model");
-const httpErrors = require("http-errors");
-const { POST_STATUS } = require("../utils/codes");
+const userModel = require("../models/user.model");
+const { POST_STATUS, USER_ROLES } = require("../utils/codes");
 
 const storage = require("../utils/firebase.config");
 const {
@@ -43,10 +43,7 @@ const getPostById = async (req, res) => {
 
 const getPostsByOwner = async (req, res) => {
   try {
-    const posts = await postModel.find({ ownerId: req.params.id });
-    if (!posts) {
-      throw httpErrors.NotFound("Posts not found");
-    }
+    const posts = await postModel.find({ ownerId: req.params.ownerId }).exec();
     res.status(200).json({
       message: "List of posts",
       result: posts,
@@ -60,12 +57,6 @@ const getPostsByOwner = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  /**
-   * Create a new post
-   * @param {Object} req - Request object
-   * @param {Object} res - Response object
-   * @returns {Promise<void>}
-   */
   try {
     const ownerId = req.params.id;
 
@@ -74,7 +65,7 @@ const createPost = async (req, res) => {
       description: req.body.description,
       date: new Date(),
       image: [],
-      status: POST_STATUS.PUBLISHED,
+      status: POST_STATUS.PENDING,
       ownerId: ownerId,
       //fieldId: req.body.fieldId,
       filedId: null,
@@ -86,28 +77,27 @@ const createPost = async (req, res) => {
     };
 
     const post = await postModel.create(body);
+    if (req.files) {
+      // Process images if provided
+      const uploadPromises = req.files.map(async (image) => {
+        const storageRef = ref(
+          storage,
+          `posts/${ownerId}/${post._id}/${image.originalname}`
+        );
 
-    // Process images if provided
-    const uploadPromises = req.files.map(async (image) => {
-      const storageRef = ref(
-        storage,
-        `posts/${ownerId}/${post._id}/${image.originalname}`
-      );
+        const metadata = {
+          contentType: image.mimetype,
+        };
 
-      const metadata = {
-        contentType: image.mimetype,
-      };
+        const snapshot = await uploadBytes(storageRef, image.buffer, metadata);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return downloadURL; // Return the download URL for each uploaded image
+      });
 
-      const snapshot = await uploadBytes(storageRef, image.buffer, metadata);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      return downloadURL; // Return the download URL for each uploaded image
-    });
-
-    const imageUrls = await Promise.all(uploadPromises);
-    console.log("Image URLs: " + imageUrls);
-    post.image = imageUrls;
-    await post.save();
-
+      const imageUrls = await Promise.all(uploadPromises);
+      post.image = imageUrls;
+      await post.save();
+    }
     await postModel.findById(post._id).then((post) => {
       res.status(201).json({
         message: "Post created",
@@ -196,22 +186,96 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     const postId = req.params.id;
+    const userId = req.query.userId;
+    const userInfo = await userModel.findById(userId);
     const post = await postModel.findOne({ _id: postId });
+    console.log(userInfo.role);
+    if (!userInfo) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
     if (!post) {
       return res.status(404).json({
         message: "Post not found",
       });
     }
+
+    if (userInfo.role !== USER_ROLES.FIELD_OWNER && post.ownerId !== userId) {
+      return res.status(403).json({
+        message: "You are not authorized to delete this post",
+      });
+    }
+
     post.status = POST_STATUS.DELETED;
     await post.save();
 
     res.status(200).json({
       message: "Post deleted",
-      result: await postModel.findById(postId),
+      result: post,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       status: err.status,
+      message: err.message,
+    });
+  }
+};
+
+const getPostsPending = async (req, res, next) => {
+  try {
+    const posts = await postModel.find({ status: POST_STATUS.PENDING }).exec();
+
+    res.status(200).json({
+      message: "List of posts",
+      result: posts,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: err.status || 500,
+      message: err.message,
+    });
+  }
+};
+
+const updateStatusOfPosts = async (req, res) => {
+  const { postIds, userId, newStatus } = req.body;
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    if (user.role !== USER_ROLES.ADMIN) {
+      return res.status(403).json({
+        message: "You are not authorized to update posts",
+      });
+    }
+
+    if (!Array.isArray(postIds) || !postIds.length || !newStatus) {
+      return res.status(400).json({ message: "Invalid input data." });
+    }
+
+    const result = await postModel.updateMany(
+      {
+        _id: { $in: postIds },
+      },
+      { status: newStatus },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      numberOfAffectedDocuments: result.modifiedCount,
+      message: `Posts updated to ${newStatus}`,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: err.status || 500,
       message: err.message,
     });
   }
@@ -223,4 +287,7 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  getPostsByOwner,
+  getPostsPending,
+  updateStatusOfPosts,
 };
