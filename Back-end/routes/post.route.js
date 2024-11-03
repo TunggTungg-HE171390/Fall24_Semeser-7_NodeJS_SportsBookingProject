@@ -8,6 +8,12 @@ const { PostController } = require("../controllers");
 
 const upload = require("../utils/multer.config");
 
+// get posts pending
+router.get("/get-pending", PostController.getPostsPending);
+
+// Update status of posts
+router.put("/update-status", PostController.updateStatusOfPosts);
+
 // Get all posts
 router.get("/", PostController.getAllPosts);
 
@@ -15,7 +21,6 @@ router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getPostById);
 
 // Create post
-//router.post("/:id", upload.array("images", 5), PostController.createPost);
 router.post("/:id", upload.array("images", 5), PostController.createPost);
 
 // Update post
@@ -27,5 +32,8 @@ router.put(
 
 // Delete post
 router.delete("/:id", PostController.deletePost);
+
+// Get posts by owner
+router.get("/owner/:ownerId", PostController.getPostsByOwner);
 
 module.exports = router;

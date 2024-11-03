@@ -197,7 +197,7 @@ const EditPostModal = ({ visible, onClose, post, onUpdate }) => {
             style={[styles.button, styles.buttonClose]}
             onPress={handleUpdatePost}
           >
-            <Text style={styles.textStyle}>Add Event</Text>
+            <Text style={styles.textStyle}>Edit Event</Text>
           </TouchableOpacity>
         </View>
       </View>

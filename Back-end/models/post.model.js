@@ -31,12 +31,14 @@ const PostSchema = new mongoose.Schema({
   location: {
     longitude: String,
     latitude: String,
-    address: String,
+    address: {
+      type: String,
+    },
   },
   status: {
     type: Number,
     default: 1,
-    enum: [1, 2, 3],
+    enum: [1, 2, 3, 4],
     required: true,
   },
   ownerId: {

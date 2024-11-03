@@ -17,6 +17,8 @@ const SideBar = ({ visible, onClose }) => {
       navigation.navigate(ROUTER.MANAGE_ACCOUNT);
     } else if (tab === "Profile") {
       navigation.navigate("Profile");
+    } else if (tab === ROUTER.POST_APPROVAL) {
+      navigation.navigate(ROUTER.POST_APPROVAL);
     }
 
     onClose();
@@ -53,6 +55,7 @@ const SideBar = ({ visible, onClose }) => {
           />
           <Text style={[styles.tabText, { marginLeft: 10 }]}>Dashboard</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => handleTabChange(ROUTER.MANAGE_ACCOUNT)}
           style={[
@@ -67,6 +70,23 @@ const SideBar = ({ visible, onClose }) => {
           />
           <Text style={[styles.tabText, { marginLeft: 10 }]}>
             Manage Account
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => handleTabChange(ROUTER.POST_APPROVAL)}
+          style={[
+            styles.tab,
+            currentTab === ROUTER.POST_APPROVAL && styles.activeTab,
+          ]}
+        >
+          <Ionicons
+            name="people-outline"
+            size={24}
+            color={currentTab === ROUTER.POST_APPROVAL ? "#fff" : "#000"}
+          />
+          <Text style={[styles.tabText, { marginLeft: 10 }]}>
+            Approve Posts
           </Text>
         </TouchableOpacity>
       </View>
