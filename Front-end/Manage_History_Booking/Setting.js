@@ -25,7 +25,7 @@ export default function Setting({ navigation }) {
       return;
     }
 
-    axios.post(`http://192.168.20.52:3000/user/change-password/${userId}`, formData)
+    axios.post(`http://192.168.1.38:3000/user/change-password/${userId}`, formData)
       .then(res => {
         console.log(res);
         Alert.alert("Success", "Password changed successfully");
@@ -44,7 +44,7 @@ export default function Setting({ navigation }) {
   };
 
   const handleLogout = async () => {
-    axios.post("http://192.168.20.52:3000/auth/sign-out")
+    axios.post("http://192.168.1.38:3000/auth/sign-out")
       .then(async (res) => {
         console.log(res.data.message);
         await AsyncStorage.removeItem('authToken');

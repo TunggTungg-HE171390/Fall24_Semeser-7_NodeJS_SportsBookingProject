@@ -23,7 +23,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.20.52:3000/field-order/customer/${userId}`);
+      const res = await axios.get(`http://192.168.1.38:3000/field-order/customer/${userId}`);
       const fetchedOrders = res.data.data || [];
       const updatedOrders = fetchedOrders.map((order) => {
         const [time, date] = order.orderDate.split(" ");
@@ -53,7 +53,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.20.52:3000/field-order/detail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.1.38:3000/field-order/detail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       setModalVisible(true);
     } catch (error) {
@@ -72,7 +72,7 @@ export default function History() {
 
   const checkFeedbackExist = async (fieldId) => {
     try {
-      const res = await axios.get(`http://192.168.20.52:3000/field/check-comment/${fieldId}/${userId}`);
+      const res = await axios.get(`http://192.168.1.38:3000/field/check-comment/${fieldId}/${userId}`);
       setCheckFeedback(res.data.message)
       console.log("Mess:"+fieldId, res.data.message)
     } catch (error) {
