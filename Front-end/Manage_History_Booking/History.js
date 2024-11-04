@@ -11,6 +11,7 @@ export default function History() {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [checkFeedback, setCheckFeedback] = useState("");
 
   const userId = useSelector((state) => state.auth.user?.id);
 
@@ -22,7 +23,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/customer/${userId}`);
+      const res = await axios.get(`http://192.168.20.52:3000/field-order/customer/${userId}`);
       const fetchedOrders = res.data.data || [];
       const updatedOrders = fetchedOrders.map((order) => {
         const [time, date] = order.orderDate.split(" ");
@@ -52,7 +53,7 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/detail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.20.52:3000/field-order/detail/${fieldOrderId}`);
       setSelectedOrder(res.data.data);
       setModalVisible(true);
     } catch (error) {
@@ -60,20 +61,48 @@ export default function History() {
     }
   };
 
+  const onCheckFeedback = (order) => {
+    if (order.fieldId) {
+      checkFeedbackExist(order.fieldId); // Gọi hàm với `fieldId` từ đơn hàng
+    } else {
+      console.log("Không tìm thấy fieldId trong đơn hàng");
+    }
+  };
+
+
+  const checkFeedbackExist = async (fieldId) => {
+    try {
+      const res = await axios.get(`http://192.168.20.52:3000/field/check-comment/${fieldId}/${userId}`);
+      setCheckFeedback(res.data.message)
+      console.log("Mess:"+fieldId, res.data.message)
+    } catch (error) {
+      console.log("Error fetching field order detail:", error);
+    }
+  }
+
   const onDayPress = (day) => {
     console.log("Day pressed:", day);
     const ordersForDay = orders.filter((o) =>
       o.formattedOrderDate === day.dateString // Collect all orders with the same formattedOrderDate
     );
-
+  
     if (ordersForDay.length > 0) {
-      console.log("Orders found:", ordersForDay);
+      const fieldIds = ordersForDay.map(order => order.fieldId);
+      
+      // Nếu `checkFeedbackExist()` cần gọi cho từng ID riêng lẻ
+      fieldIds.forEach(order => {
+        checkFeedbackExist(order._id)
+      });
+      
+      console.log("ID2:", fieldIds.map(order => order._id));
+      
       setSelectedOrder(ordersForDay);
       setModalVisible(true);
     } else {
       console.log("No orders found for the selected day.");
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -138,6 +167,9 @@ export default function History() {
                         <Text style={{ fontWeight: "bold" }}>Tổng tiền: 0 VND</Text>
                       </View>
                     )}
+                    <TouchableOpacity onPress={() => checkFeedbackExist(order.fieldId)}>
+                      <Text style={styles.feedbacks}>{checkFeedback}</Text>
+                    </TouchableOpacity>
                   </View>
                 ))
               ) : (
@@ -154,7 +186,6 @@ export default function History() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -241,4 +272,7 @@ const styles = StyleSheet.create({
     color: '#ccc', // Màu chữ của nút "Bộ lọc"
     fontSize: 14,
   },
+  feedbacks:{
+    color: 'red',
+  }
 });

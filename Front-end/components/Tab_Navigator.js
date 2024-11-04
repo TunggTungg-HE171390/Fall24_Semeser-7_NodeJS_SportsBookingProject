@@ -15,6 +15,8 @@ export default function CustomTabScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   const userName = useSelector(state => state.auth.user?.name);
   const userId = useSelector(state => state.auth.user?.id);
@@ -28,7 +30,7 @@ export default function CustomTabScreen() {
   const getCountFieldOrderByCustomerId = async () => {
     try {
       console.log("Fetching count for user:", userId);
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/count-by-customer/${userId}`);
+      const res = await axios.get(`http://192.168.20.52:3000/field-order/count-by-customer/${userId}`);
       const count = res.data.data;
       setCount(count);
       console.log("Count fetched successfully:", count);
@@ -39,7 +41,7 @@ export default function CustomTabScreen() {
 
   const userInfoDetail = async () => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/user/userInfo/${userId}`);
+      const res = await axios.get(`http://192.168.20.52:3000/user/userInfo/${userId}`);
       setName(res.data.profile.name);
       setPhone(res.data.profile.phone);
       console.log("User details fetched:", res.data.profile.name, res.data.profile.phone);
@@ -51,12 +53,25 @@ export default function CustomTabScreen() {
   const handleUpdate = async () => {
     try {
       const updatedData = { name, phone };
-      await axios.post(`http://192.168.1.38:3000/user/updateInfo/${userId}`, updatedData);
+      await axios.post(`http://192.168.20.52:3000/user/updateInfo/${userId}`, updatedData);
       console.log("User information updated successfully");
       Alert.alert("Success", "Update user information successfully");
       setVisible(false);
     } catch (error) {
       console.error("Error updating user information:", error);
+      if (error.response) {
+        // Nếu có phản hồi từ server, hiển thị thông báo lỗi
+        const message = error.response.data.message;
+        console.log(message);
+        setErrorMessage(message);
+      } else if (error.request) {
+        // Nếu không nhận được phản hồi từ server
+        setErrorMessage("Không thể kết nối đến server. Vui lòng thử lại sau.");
+      } else {
+        // Các lỗi khác (ví dụ: lỗi khi cấu hình yêu cầu)
+        setErrorMessage("Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+      console.log(error.response || error.message);
     }
   };
 
@@ -78,20 +93,21 @@ export default function CustomTabScreen() {
   const handleEditButtonPress = async () => {
     await userInfoDetail(); // Gọi hàm để lấy dữ liệu người dùng trước khi mở modal
     setVisible(true); // Sau khi có dữ liệu, mới mở modal
+    setErrorMessage('');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-      <View style={styles.profileContainerInfo}>
-      <Image
-        source={{
-          uri: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL",
-        }}
-        style={styles.profileImage}
-      />
-      <Icon name="camera" size={30} color="black" style={styles.cameraIcon} />
-    </View>
+        <View style={styles.profileContainerInfo}>
+          <Image
+            source={{
+              uri: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQYbPC_y5E_pg3CiD_uFQi2BKqQJJJx04BaHsF1Xlse_W5q_VdL",
+            }}
+            style={styles.profileImage}
+          />
+          <Icon name="camera" size={30} color="black" style={styles.cameraIcon} />
+        </View>
 
         <View style={styles.threadButton}>
           <TouchableOpacity style={{ flexDirection: 'row' }}>
@@ -101,21 +117,15 @@ export default function CustomTabScreen() {
         </View>
       </View>
 
-      <View style={styles.profileName}>
-        <Text style={styles.profileNameText}>Tài khoản: {userName}</Text>
-      </View>
-
       <View style={styles.profileContainerButton}>
         <View style={styles.titleContainer}>
-          <TouchableOpacity style={styles.editButton} onPress={handleEditButtonPress}>
-            <Icon name="edit" size={18} color="#ccc" style={styles.icon} />
-            <Text style={styles.buttonText}>Chỉnh sửa trang cá nhân</Text>
-          </TouchableOpacity>
+          <Text style={styles.profileNameText}>{userName}</Text>
         </View>
 
         <View style={styles.menu}>
-          <TouchableOpacity style={styles.moreButton}>
-            <Text style={styles.buttonText}>...</Text>
+          <TouchableOpacity style={styles.editButton} onPress={handleEditButtonPress}>
+            <Icon name="edit" size={18} color="#ccc" style={styles.icon} />
+            <Text style={styles.buttonText}>Chỉnh sửa</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -151,7 +161,7 @@ export default function CustomTabScreen() {
             <Text style={styles.modalTitle}>Update User Information</Text>
             <Text style={styles.label}>Name</Text>
             <TouchableOpacity style={[styles.inputContainer, { marginBottom: 20 }]}>
-            <TextInput
+              <TextInput
                 placeholder="Enter Name"
                 value={name}
                 onChangeText={setName}
@@ -168,6 +178,10 @@ export default function CustomTabScreen() {
                 keyboardType="phone-pad"
               />
             </TouchableOpacity>
+
+            {errorMessage ? (
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
 
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
@@ -188,7 +202,6 @@ export default function CustomTabScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // marginTop: 20,
   },
   component: {
     flex: 1,
@@ -207,7 +220,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     width: "98%",
     alignSelf: "center",
-    marginTop: 7,
+    marginTop: 10,
   },
   tabButton: {
     padding: 10,
@@ -235,6 +248,13 @@ const styles = StyleSheet.create({
     borderColor: "#ff6b01",
     marginBottom: 15,
     justifyContent: "flex-start",
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 75,
+    borderColor: '#0000000',
+    borderWidth: 5,
   },
   profileContainer: {
     marginTop: 40,
@@ -269,7 +289,7 @@ const styles = StyleSheet.create({
   profileNameText: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: "white",
   },
   profileName: {
     marginBottom: 10,
@@ -278,7 +298,7 @@ const styles = StyleSheet.create({
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#555',
+    backgroundColor: '#ff6b01',
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 6,
@@ -288,7 +308,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   buttonText: {
-    color: '#ccc',
+    color: 'white',
     fontSize: 16,
   },
   moreButton: {
@@ -307,36 +327,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 8,
-    width: '76%',
-    marginLeft: 5,
+    width: '40%',
+    marginLeft: 25,
   },
   menu: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    backgroundColor: '#333',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 8,
-    width: '18%',
+    width: '50%',
+    marginLeft: 35,
   },
   profileContainerButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '98%',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   profileContainerInfo: {
     position: 'relative',
-    width: 150, 
-    height: 150, 
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 75, 
-    borderColor: '#0000000',
-    borderWidth: '5px'
+    width: 150,
+    height: 150,
   },
   cameraIcon: {
     position: 'absolute',
@@ -402,11 +415,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
   },
-  label:{
+  label: {
     fontSize: 16,
     marginBottom: 5,
     color: "#333",
     fontWeight: 'bold',
     alignSelf: 'flex-start',
-  }
+  },
+  errorText: {
+    color: "red",
+    marginTop: 10,
+    alignSelf: 'flex-start',
+  },
 });

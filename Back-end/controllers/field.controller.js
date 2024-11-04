@@ -216,7 +216,7 @@ const getFieldByFeedbackId = async (req, res, next) => {
     const getAllFeedback = getField.feedBackId.map((f) => ({
       starNumber: f.starNumber,
       detail: f.detail,
-      customerName: f.customerId ? f.customerId.profile.name : "N/A", 
+      customerName: f.customerId ? f.customerId.profile.name : "N/A",
     }));
 
     res.status(200).json({
@@ -225,15 +225,47 @@ const getFieldByFeedbackId = async (req, res, next) => {
       address: getField.address,
       ownerName: fieldDetail.ownerId ? fieldDetail.ownerId.profile.name : "N/A",
       totalFields: getField.totalFields,
-      image: getField.image, 
-      feedback: getAllFeedback, 
+      image: getField.image,
+      feedback: getAllFeedback,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Export các hàm để sử dụng trong các phần khác của ứng dụng
+//Hàm kiểm tra xem field đó userId đã feedback chưa 
+const checkFeedbackExist = async (req, res, next) => {
+  try {
+    const { fieldId, userId } = req.params;
+
+    const field = await Field.findById(fieldId).populate("feedBackId");
+
+    if (!field) {
+      console.log('Field not found');
+      return { message: 'Field not found' };
+    }
+
+    const feedbacks = field.feedBackId.find((feedback) => feedback.customerId.toString() === userId);
+
+    console.log(userId);
+    console.log(field.feedBackId.map((feedback) => feedback.customerId.toString()));
+
+    if (!feedbacks) {
+      console.log('User has not commented on this field.');
+      res.status(200).json({
+        message: 'User has not commented on this field.',
+      })
+    }else{
+      console.log('User has not commented on this field.');
+      res.status(200).json({
+        message: 'OKKKK',
+      })
+    }
+  } catch (error) {
+    console.error('Error checking user feedback:', error);
+  }
+}
+
 module.exports = {
   addField,
   updateField,
@@ -241,4 +273,5 @@ module.exports = {
   getFields,
   getFieldById,
   getFieldByFeedbackId,
+  checkFeedbackExist
 };

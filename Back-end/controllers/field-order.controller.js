@@ -284,6 +284,7 @@ async function getFieldOrdersByCustomerId(req, res, next) {
       return {
         _id: order._id,
         customerName: order.customerId.profile.name,
+        fieldId: order.fieldId,
         fieldName: order.fieldId?.name,
         orderDate: new Date(order.orderDate).toLocaleString("vi-VN", {
           year: "numeric",
@@ -348,8 +349,8 @@ async function getDetailByFieldOrdersId(req, res, next) {
 
     // Tìm kiếm subField theo subFieldId
     const selectedSubField = detail_field_orders.fieldId
-    ?.subFields?.find(
-      (subField) => subField._id.toString() === detail_field_orders.subFieldId.toString())
+      ?.subFields?.find(
+        (subField) => subField._id.toString() === detail_field_orders.subFieldId.toString())
       ;
 
     // Tìm kiếm slot theo slotId
@@ -358,8 +359,8 @@ async function getDetailByFieldOrdersId(req, res, next) {
     );
 
     console.log("Field ID:", detail_field_orders.fieldId);
-console.log("SubField ID:", detail_field_orders.subFieldId);
-console.log("Selected SubField:", selectedSubField);
+    console.log("SubField ID:", detail_field_orders.subFieldId);
+    console.log("Selected SubField:", selectedSubField);
 
     const formattedFieldOrders = {
       _id: detail_field_orders._id,
@@ -401,7 +402,7 @@ console.log("Selected SubField:", selectedSubField);
 
 async function getCountFieldOrderByCustomerId(req, res, next) {
   try {
-    const count = await db.fieldOrder.countDocuments({customerId: req.params.id})
+    const count = await db.fieldOrder.countDocuments({ customerId: req.params.id })
     console.log(count);
     res.status(200).json({
       message: "Get count field orders successfully",
