@@ -373,30 +373,107 @@ const getAvailableSlotsForField = async (req, res) => {
   }
 };
 
+//bản gốc
+// async function getFieldOrdersByCustomerId(req, res, next) {
+//   try {
+//     console.log(req.params.id);
+//     const field_orders = await db.fieldOrder
+//       .find({ customerId: req.params.id })
+//       .populate("customerId", "profile.name")
+//       .populate("equipmentOrderId")
+//       .populate("equipmentOrderId.equipments.equipment_id", "equipmentName")
+//       .populate({
+//         path: "fieldTime.fieldId",
+//         model: "Fields",
+//         select: "name",
+//       });
+
+//     const formattedFieldOrders = field_orders.map((order) => ({
+//       _id: order._id,
+//       customerName: order.customerId?.profile?.name,
+//       fieldTime: order.fieldTime.map((time) => ({
+//         fieldName: time.fieldId?.name,
+//         start: time.start,
+//         end: time.end,
+//       })),
+//       equipmentOrder: order.equipmentOrderId,
+//     }));
+
+//     console.log(formattedFieldOrders);
+
+//     res.status(200).json({
+//       message: "Get field orders successfully",
+//       data: formattedFieldOrders,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+
+//bản của tùng
+
 async function getFieldOrdersByCustomerId(req, res, next) {
   try {
-    console.log(req.params.id);
+    console.log(req.params.customerId);
     const field_orders = await db.fieldOrder
-      .find({ customerId: req.params.id })
+      .find({ customerId: req.params.customerId })
       .populate("customerId", "profile.name")
-      .populate("equipmentOrderId")
-      .populate("equipmentOrderId.equipments.equipment_id", "equipmentName")
       .populate({
-        path: "fieldTime.fieldId",
-        model: "Fields",
-        select: "name",
+        path: "equipmentOrderId",
+        populate: {
+          path: "equipments.equipment_id",
+          model: "Equipments",
+          select: "equipmentName",
+        },
+      })
+      .populate({
+        path: "fieldId",
+        select: "name sportName subFields",
       });
 
-    const formattedFieldOrders = field_orders.map((order) => ({
-      _id: order._id,
-      customerName: order.customerId?.profile?.name,
-      fieldTime: order.fieldTime.map((time) => ({
-        fieldName: time.fieldId?.name,
-        start: time.start,
-        end: time.end,
-      })),
-      equipmentOrder: order.equipmentOrderId,
-    }));
+    const formattedFieldOrders = field_orders.map((order) => {
+      const selectedSubField = order.fieldId?.subFields?.find(
+        (subField) => subField._id.toString() === order.subFieldId.toString()
+      );
+
+      const selectedSlot = selectedSubField?.fieldTime?.find(
+        (slot) => slot._id.toString() === order.slotId.toString()
+      );
+
+      return {
+        _id: order._id,
+        customerName: order.customerId.profile.name,
+        fieldId: order.fieldId,
+        fieldName: order.fieldId?.name,
+        orderDate: new Date(order.orderDate).toLocaleString("vi-VN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        subFieldName: selectedSubField?.name || null,
+        fieldTime: selectedSlot
+          ? `${selectedSlot.start} - ${selectedSlot.end}`
+          : null,
+
+        equipmentOrder: order.equipmentOrderId.map((e) => ({
+          equipmentName: e.equipments.map(
+            (eName) => eName.equipment_id.equipmentName
+          ),
+          quantity: e.equipments.map((q) => q.quantity),
+          price: e.equipments.map((p) => p.price),
+        })),
+        totalPrice: order.equipmentOrderId.reduce((total, e) => {
+          return (
+            total +
+            e.equipments.reduce((subTotal, equipment) => {
+              return subTotal + equipment.price * equipment.quantity;
+            }, 0)
+          );
+        }, 0),
+      };
+    });
 
     console.log(formattedFieldOrders);
 
@@ -409,50 +486,154 @@ async function getFieldOrdersByCustomerId(req, res, next) {
   }
 }
 
+// bản gốc
+// async function getDetailByFieldOrdersId(req, res, next) {
+//   try {
+//     const detail_field_orders = await db.fieldOrder
+//       .findOne({ _id: req.params.id })
+//       .populate("customerId", "profile.name")
+//       .populate({
+//         path: "fieldTime.fieldId",
+//         model: "Fields",
+//         select: "name",
+//       });
+
+//     // Kiểm tra nếu không tìm thấy đơn đặt hàng nào
+//     if (!detail_field_orders) {
+//       return res.status(404).json({
+//         message: "Field order not found",
+//       });
+//     }
+
+//     const formattedFieldOrders = {
+//       _id: detail_field_orders._id,
+//       customerName: detail_field_orders.customerId?.profile?.name,
+//       fieldTime: detail_field_orders.fieldTime.map((time) => ({
+//         fieldName: time.fieldId?.name,
+//         start: new Date(time.start).toLocaleString("vi-VN", {
+//           year: "numeric",
+//           month: "2-digit",
+//           day: "2-digit",
+//           hour: "2-digit",
+//           minute: "2-digit",
+//         }),
+//         end: new Date(time.end).toLocaleString("vi-VN", {
+//           year: "numeric",
+//           month: "2-digit",
+//           day: "2-digit",
+//           hour: "2-digit",
+//           minute: "2-digit",
+//         }),
+//       })),
+//       equipmentOrder: detail_field_orders.equipmentOrderId,
+//     };
+
+//     res.status(200).json({
+//       message: "Get field orders successfully",
+//       data: formattedFieldOrders,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// }
+
+// bản của tùng
+
 async function getDetailByFieldOrdersId(req, res, next) {
   try {
+    console.log(req.params.id);
     const detail_field_orders = await db.fieldOrder
       .findOne({ _id: req.params.id })
       .populate("customerId", "profile.name")
       .populate({
-        path: "fieldTime.fieldId",
-        model: "Fields",
-        select: "name",
+        path: "equipmentOrderId",
+        populate: {
+          path: "equipments.equipment_id",
+          model: "Equipments",
+          select: "equipmentName",
+        },
+      })
+      .populate({
+        path: "fieldId",
+        select: "name sportName subFields",
       });
 
-    // Kiểm tra nếu không tìm thấy đơn đặt hàng nào
     if (!detail_field_orders) {
       return res.status(404).json({
         message: "Field order not found",
+        data: detail_field_orders,
       });
     }
+
+    // Tìm kiếm subField theo subFieldId
+    const selectedSubField = detail_field_orders.fieldId?.subFields?.find(
+      (subField) =>
+        subField._id.toString() === detail_field_orders.subFieldId.toString()
+    );
+    // Tìm kiếm slot theo slotId
+    const selectedSlot = selectedSubField?.fieldTime?.find(
+      (slot) => slot._id.toString() === detail_field_orders.slotId.toString()
+    );
+
+    console.log("Field ID:", detail_field_orders.fieldId);
+    console.log("SubField ID:", detail_field_orders.subFieldId);
+    console.log("Selected SubField:", selectedSubField);
 
     const formattedFieldOrders = {
       _id: detail_field_orders._id,
       customerName: detail_field_orders.customerId?.profile?.name,
-      fieldTime: detail_field_orders.fieldTime.map((time) => ({
-        fieldName: time.fieldId?.name,
-        start: new Date(time.start).toLocaleString("vi-VN", {
+      fieldName: detail_field_orders.fieldId?.name,
+      orderDate: new Date(detail_field_orders.orderDate).toLocaleString(
+        "vi-VN",
+        {
           year: "numeric",
           month: "2-digit",
           day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
-        }),
-        end: new Date(time.end).toLocaleString("vi-VN", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        }
+      ),
+
+      subFieldName: selectedSubField?.name || null,
+      fieldTime: selectedSlot.start + " - " + selectedSlot.end,
+
+      equipmentOrder: detail_field_orders.equipmentOrderId.map((e) => ({
+        equipmentName: e.equipments.map(
+          (eName) => eName.equipment_id.equipmentName
+        ),
+        quantity: e.equipments.map((q) => q.quantity),
+        price: e.equipments.map((p) => p.price),
       })),
-      equipmentOrder: detail_field_orders.equipmentOrderId,
+      totalPrice: detail_field_orders.equipmentOrderId.reduce((total, e) => {
+        return (
+          total +
+          e.equipments.reduce((subTotal, equipment) => {
+            return subTotal + equipment.price * equipment.quantity;
+          }, 0)
+        );
+      }, 0),
     };
+
+    console.log(formattedFieldOrders);
 
     res.status(200).json({
       message: "Get field orders successfully",
       data: formattedFieldOrders,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getCountFieldOrderByCustomerId(req, res, next) {
+  try {
+    const count = await db.fieldOrder.countDocuments({
+      customerId: req.params.id,
+    });
+    console.log(count);
+    res.status(200).json({
+      message: "Get count field orders successfully",
+      data: count,
     });
   } catch (error) {
     next(error);
@@ -469,4 +650,5 @@ module.exports = {
   getFieldOrdersByCustomerId,
   getDetailByFieldOrdersId,
   getFieldOrdersForDashboard,
+  getCountFieldOrderByCustomerId,
 };

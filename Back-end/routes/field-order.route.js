@@ -25,6 +25,16 @@ router.get(
   "/fields/:fieldId/available-slots",
   FieldOrderController.getAvailableSlotsForField
 );
+router.get(
+  "/customer/:customerId",
+  FieldOrderController.getFieldOrdersByCustomerId
+);
+
+// Get count field orders by customer ID
+router.get(
+  "/count-by-customer/:id",
+  FieldOrderController.getCountFieldOrderByCustomerId
+);
 
 //
 

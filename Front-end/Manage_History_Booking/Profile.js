@@ -1,44 +1,95 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 export default function Profile() {
-  const [viewType, setViewType] = useState('monthly');
+  const [viewType, setViewType] = useState("monthly");
+  const [userDetails, setUserDetails] = useState(null);
+
+  const userName = useSelector((state) => state.auth.user?.name);
+  const userId = useSelector((state) => state.auth.user?.id);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    userInfoDetail();
+  }, []);
+
+  const userInfoDetail = async () => {
+    try {
+      const res = await axios.get(
+        `http://192.168.0.104:3000/user/userInfo/${userId}`
+      );
+      setUserDetails(res.data);
+    } catch (error) {
+      console.log("Error fetching user details:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-    
-      {/* Khu vực để lựa chọn Monthly/Weekly View */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.button, viewType === 'monthly' && styles.activeButton]}
-          onPress={() => setViewType('monthly')}>
-          <Text style={styles.buttonText}>Monthly view</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, viewType === 'weekly' && styles.activeButton]}
-          onPress={() => setViewType('weekly')}>
-          <Text style={styles.buttonText}>Weekly view</Text>
-        </TouchableOpacity>
-      </View>
+      {userDetails ? (
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>Thông tin cá nhân</Text>
 
-      {/* Khu vực hiển thị Calendar */}
-      <View style={styles.calendar}>
-        <Calendar
-          markingType={'simple'}
-          markedDates={{
-            '2022-09-21': { selected: true, marked: true },
-            '2022-09-22': { marked: true },
-            '2022-09-23': { marked: true },
-            '2022-09-24': { marked: true },
-            '2022-09-28': { marked: true },
-            '2022-09-29': { marked: true },
-            '2022-09-30': { marked: true },
-            '2022-09-01': { marked: true },
-            '2022-09-02': { marked: true },
-          }}
-        />
-      </View>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>
+              Tài khoản: {userDetails.profile.name}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>
+              Email: {userDetails.account.email}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>
+              Chức vụ:{" "}
+              {userDetails.role === 1
+                ? "Thành viên"
+                : userDetails.role === 2
+                ? "Quản lý"
+                : userDetails.role === 3
+                ? "Admin"
+                : "Chưa xác định"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>
+              Số điện thoại: {userDetails.profile.phone}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>
+              {" "}
+              Chế độ tài khoản:
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    color:
+                      userDetails.role === 1
+                        ? "green"
+                        : userDetails.role === 2
+                        ? "red"
+                        : "black",
+                  },
+                ]}
+              >
+                {" "}
+                {userDetails.role === 1
+                  ? "ACTIVE"
+                  : userDetails.role === 2
+                  ? "BLOCK"
+                  : "Chưa xác định"}
+              </Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <Text>Loading user details...</Text>
+      )}
     </View>
   );
 }
@@ -46,32 +97,34 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    marginBottom: 120,
+    alignItems: "center",
+    padding: 20,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    alignSelf: "center",
     marginBottom: 20,
-     marginTop: 20,
-    width: '100%', // Đảm bảo header chiếm toàn bộ chiều ngang
   },
-  calendar: {
-    width: '100%', // Đảm bảo calendar chiếm toàn bộ chiều ngang
+  infoContainer: {
+    backgroundColor: "#f0f0f0",
+    padding: 20,
+    borderRadius: 15,
+    width: "100%",
+    height: "100%",
   },
   button: {
+    backgroundColor: "#e0e0e0",
     padding: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    width: '48%', // Đặt chiều rộng cho nút để chúng không chồng lên nhau
-  },
-  activeButton: {
-    backgroundColor: '#ff6b01',
+    borderRadius: 8,
+    marginVertical: 5,
   },
   buttonText: {
     fontSize: 16,
-    color: '#000',
-    textAlign:'center'
+    textAlign: "center",
+  },
+  infoText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
 });

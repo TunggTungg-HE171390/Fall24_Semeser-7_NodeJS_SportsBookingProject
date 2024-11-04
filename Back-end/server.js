@@ -15,6 +15,7 @@ const {
   FieldOrderRouter,
   FeedbackRouter,
   EquipmentRouter,
+  Equipment_OrderRouter,
 } = require("./routes");
 
 const db = require("./models");
@@ -39,6 +40,7 @@ app.use("/auth", AuthenticationRouter);
 app.use("/field-order", FieldOrderRouter);
 app.use("/feedback", FeedbackRouter);
 app.use("/equipment", EquipmentRouter);
+app.use("/equipment-order", Equipment_OrderRouter);
 
 app.use(async (err, req, res, next) => {
   res.status(err.status || 500).send({
@@ -59,5 +61,6 @@ app.use((err, req, res, next) => {
 app.listen(process.env.PORT, () => {
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
+  console.log(`Server running at http://${ip}:${process.env.PORT}`);
   db.connectDB();
 });

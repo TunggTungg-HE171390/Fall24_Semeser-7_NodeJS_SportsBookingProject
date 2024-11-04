@@ -21,20 +21,17 @@ export default function Login({ navigation }) {
   const [codeSent, setCodeSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const api = process.env.REACT_APP_IP_Address;
-
   const dispatch = useDispatch();
   const handleLogin = async () => {
-    // console.log(api);
     try {
-      const res = await axios.post(`${api}/auth/sign-in`, {
+      const res = await axios.post("http://192.168.0.104:3000/auth/sign-in", {
         identifier: identifier,
         password: password,
       });
 
+      console.log("Login successful");
       dispatch(login(res.data.userInfo));
-      // console.log("Login successful");
-      // console.log(res.data.userInfo);
+      console.log(res.data.userInfo);
       setErrorMessage("");
     } catch (error) {
       console.log("Login failed");
@@ -55,9 +52,12 @@ export default function Login({ navigation }) {
 
   const handleForgotPassword = async () => {
     try {
-      const res = await axios.post(`${api}/user/forgetPassword`, {
-        email: email,
-      });
+      const res = await axios.post(
+        "http://192.168.0.104:3000/user/forgetPassword",
+        {
+          email: email,
+        }
+      );
       console.log(res.data.message);
       setCodeSent(true);
       Alert.alert("Mã xác thực", "Mã xác thực đã được gửi đến email của bạn.");
