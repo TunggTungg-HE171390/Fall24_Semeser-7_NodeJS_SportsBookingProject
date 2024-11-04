@@ -21,7 +21,7 @@ import TabScreen from "../components/Tab_Navigator";
 import SportSelected from "../screens/SportSelected";
 import RegisterScreen from "../screens/Register_screen";
 import { useSelector } from "react-redux";
-import EquipmentListScreen from "../screens/EquipmentList";
+import EquipmentListScreen from "../screens/EquipmentListScreen";
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import {
   ShoppingCart,
@@ -15,58 +16,68 @@ import {
   Ban,
   Filter,
 } from "lucide-react-native";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import Swiper from "react-native-swiper";
 
-// Sample equipment data
-const equipmentData = [
-  {
-    id: "1",
-    name: "Tennis Racket",
-    price: "50,000 VND/h",
-    brand: "Wilson",
-    condition: "Excellent",
-    rating: "4.5",
-    availability: "Available",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmQRI2Y6AHsFYkKQWqdLosIP20N4Pg3gjbzA&s",
-  },
-  {
-    id: "2",
-    name: "Badminton Racket",
-    price: "30,000 VND/h",
-    brand: "Yonex",
-    condition: "Good",
-    rating: "4.2",
-    availability: "Rented",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmQRI2Y6AHsFYkKQWqdLosIP20N4Pg3gjbzA&s",
-  },
-  {
-    id: "3",
-    name: "Football",
-    price: "20,000 VND/h",
-    brand: "Nike",
-    condition: "Fair",
-    rating: "4.8",
-    availability: "Available",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmQRI2Y6AHsFYkKQWqdLosIP20N4Pg3gjbzA&s",
-  },
-];
-
-// Array of time filter options
 const timeFilters = ["Soccer", "Volleyball", "Badminton", "All sports"];
 
 const RentalEquipmentScreen = () => {
   const [favorites, setFavorites] = useState({});
-  const navigation = useNavigation(); // Initialize the navigation
+  const [equipmentData, setEquipmentData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
-  // Function to toggle favorite status
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    fetchEquipmentData();
+  }, [page]);
+
+  const fetchEquipmentData = async () => {
+    if (loading || !hasMoreData) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://192.168.1.13:3000/equipment?page=${page}&limit=10`
+      );
+      const newEquipments = response.data.equipments;
+
+      if (newEquipments.length > 0) {
+        setEquipmentData((prevData) => [...prevData, ...newEquipments]);
+      } else {
+        setHasMoreData(false); // No more data to load
+      }
+    } catch (error) {
+      console.error("Failed to fetch equipment data:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMoreData = () => {
+    if (!loading && hasMoreData) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   const toggleFavorite = (itemId) => {
     setFavorites((prevFavorites) => ({
       ...prevFavorites,
       [itemId]: !prevFavorites[itemId],
     }));
+  };
+
+  const renderEquipmentImages = (images) => {
+    return (
+      <Swiper style={styles.imageSwiper} showsPagination={false}>
+        {images.map((image, index) => (
+          <Image key={index} source={{ uri: image }} style={styles.image} />
+        ))}
+      </Swiper>
+    );
   };
 
   return (
@@ -92,40 +103,35 @@ const RentalEquipmentScreen = () => {
       </View>
 
       <FlatList
-        data={equipmentData}
-        keyExtractor={(item) => item.id}
+        data={equipmentData.filter((item) => item.status !== 0)} // Hide items with status 0
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
-            onPress={() => navigation.navigate("EquipmentDetail", { item })} // Navigate to details
+            onPress={() =>
+              navigation.navigate("EquipmentDetail", { id: item._id })
+            } // Pass the id here
           >
             <View style={styles.cardContent}>
-              <Image source={{ uri: item.image }} style={styles.image} />
+              {/* Swiper for multiple images */}
+              {renderEquipmentImages(item.image)}
+
               <View style={styles.cardDetails}>
-                <Text style={styles.equipmentName}>{item.name}</Text>
-                <Text style={styles.price}>{item.price}</Text>
+                <Text style={styles.equipmentName}>{item.equipmentName}</Text>
+                <Text style={styles.price}>
+                  {item.price.toLocaleString()} VND/h
+                </Text>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Brand:</Text>
-                  <Text style={styles.detailValue}>{item.brand}</Text>
+                  <Text style={styles.detailLabel}>Quantity:</Text>
+                  <Text style={styles.detailValue}>{item.quantity}</Text>
                 </View>
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Condition:</Text>
-                  <Text style={styles.detailValue}>{item.condition}</Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Rating:</Text>
+                  <Text style={styles.detailLabel}>Status:</Text>
                   <Text style={styles.detailValue}>
-                    {item.rating}
-                    <Text style={styles.starValue}> ★</Text>
-                  </Text>
-                </View>
-                <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>Availability:</Text>
-                  <Text style={styles.detailValue}>
-                    {item.availability === "Available" ? (
-                      <Text style={styles.available}>Available</Text>
+                    {item.quantity <= 0 ? (
+                      <Text style={styles.rented}>Unavailable</Text>
                     ) : (
-                      <Text style={styles.rented}>Out of stock</Text>
+                      <Text style={styles.available}>Available</Text>
                     )}
                   </Text>
                 </View>
@@ -133,19 +139,17 @@ const RentalEquipmentScreen = () => {
 
               {/* Favorite and Rental Buttons */}
               <View style={styles.actionButtons}>
-                {/* Rental Button */}
                 <TouchableOpacity style={styles.iconButton}>
-                  {item.availability === "Available" ? (
+                  {item.quantity > 0 ? (
                     <ShoppingCart size={24} color="#4caf50" />
                   ) : (
                     <Ban size={24} color="#d32f2f" />
                   )}
                 </TouchableOpacity>
 
-                {/* Favorite Button with Toggle */}
                 <TouchableOpacity
                   style={styles.iconButton}
-                  onPress={() => toggleFavorite(item.id)}
+                  onPress={() => toggleFavorite(item._id)}
                 >
                   {favorites[item.id] ? (
                     <Heart size={24} color="#ff1744" />
@@ -155,14 +159,20 @@ const RentalEquipmentScreen = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          </TouchableOpacity> // Make the entire card pressable
+          </TouchableOpacity>
         )}
+        onEndReached={loadMoreData}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={() => {
+          return loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : null;
+        }}
       />
     </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -171,7 +181,7 @@ const styles = StyleSheet.create({
   },
   filterMenu: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     paddingHorizontal: 10,
     marginBottom: 10,
   },
@@ -184,13 +194,14 @@ const styles = StyleSheet.create({
   },
   filterButtonText: {
     color: "#212121",
+    fontWeight: "500",
   },
   searchContainer: {
     flexDirection: "row",
     paddingHorizontal: 10,
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 30, // Increased margin for more space
+    marginTop: 30,
   },
   searchInput: {
     flex: 1,
@@ -215,6 +226,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  imageSwiper: {
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+  },
   image: {
     width: 100,
     height: 100,
@@ -233,6 +249,7 @@ const styles = StyleSheet.create({
   price: {
     color: "#B8860B",
     marginTop: 5,
+    fontSize: 16,
   },
   detailRow: {
     flexDirection: "row",
@@ -241,13 +258,12 @@ const styles = StyleSheet.create({
   detailLabel: {
     fontWeight: "bold",
     color: "#757575",
+    fontSize: 14,
   },
   detailValue: {
     marginLeft: 5,
     color: "#424242",
-  },
-  starValue: {
-    color: "#EEC900",
+    fontSize: 14,
   },
   available: {
     color: "#388e3c",
@@ -259,6 +275,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginTop: 10,
   },
   iconButton: {
     padding: 5,

@@ -1,215 +1,218 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
+  ActivityIndicator,
   TouchableOpacity,
+  ScrollView,
+  Modal,
   Alert,
   FlatList,
-  ScrollView,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { ShoppingCart, Heart, HeartOff } from "lucide-react-native";
+import axios from "axios";
+import {
+  ShoppingCart,
+  Heart,
+  HeartOff,
+  X,
+  Plus,
+  Minus,
+} from "lucide-react-native";
 
-const relatedItems = [
-  {
-    id: "1",
-    title: "Tennis Ball Set",
-    price: "30,000 VND/h",
-    image: "https://via.placeholder.com/100",
-  },
-  {
-    id: "2",
-    title: "Tennis Net",
-    price: "70,000 VND/h",
-    image: "https://via.placeholder.com/100",
-  },
-  {
-    id: "3",
-    title: "Tennis Shoes",
-    price: "120,000 VND/h",
-    image: "https://via.placeholder.com/100",
-  },
-];
-
-const EquipmentDetailScreen = ({ navigation }) => {
-  const [date, setDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  const [quantity, setQuantity] = useState(1);
-  const availableQuantity = 8;
+const EquipmentDetailScreen = ({ route }) => {
+  const { id } = route.params;
+  const [equipment, setEquipment] = useState(null);
+  const [relatedEquipment, setRelatedEquipment] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [mainImage, setMainImage] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [rentQuantity, setRentQuantity] = useState(1);
 
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
-  };
+  useEffect(() => {
+    const fetchEquipmentDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://192.168.1.13:3000/equipment/${id}`
+        );
+        setEquipment(response.data);
+        setMainImage(response.data.image[0]);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
 
-  const onStartTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || startTime;
-    setShowStartTimePicker(false);
-    setStartTime(currentTime);
-  };
+    const fetchRelatedEquipment = async () => {
+      try {
+        const response = await axios.get("http://192.168.1.13:3000/equipment");
+        const filteredEquipment = response.data.equipments.filter(
+          (item) => item._id !== id
+        );
+        setRelatedEquipment(filteredEquipment);
+      } catch (err) {
+        console.error("Failed to load related equipment:", err.message);
+      }
+    };
 
-  const onEndTimeChange = (event, selectedTime) => {
-    const currentTime = selectedTime || endTime;
-    setShowEndTimePicker(false);
-    setEndTime(currentTime);
-  };
+    fetchEquipmentDetails();
+    fetchRelatedEquipment();
+  }, [id]);
 
-  const increaseQuantity = () => {
-    if (quantity < availableQuantity) {
-      setQuantity((prevQuantity) => prevQuantity + 1);
-    } else {
-      Alert.alert(
-        "Limit Reached",
-        `You can only rent up to ${availableQuantity} items.`
-      );
-    }
-  };
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
-    }
-  };
-
-  const handleRent = () => {
-    if (quantity > 0) {
-      Alert.alert("Success", `You've rented ${quantity} tennis racket set(s)`);
-    } else {
-      Alert.alert("Error", "Quantity must be greater than 0");
-    }
-  };
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Failed to load equipment details: {error}
+        </Text>
+      </View>
+    );
+  }
 
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
-    Alert.alert(
-      isFavorite ? "Removed from Favorites" : "Added to Favorites",
-      `You have ${
-        isFavorite ? "removed" : "added"
-      } this item to your favorites.`
-    );
   };
 
+  const handleRent = () => {
+    if (rentQuantity > equipment.quantity) {
+      Alert.alert(
+        "Quantity Exceeded",
+        `Only ${equipment.quantity} items available for rent.`
+      );
+      return;
+    }
+    alert(`You have rented ${rentQuantity} of ${equipment.equipmentName}`);
+  };
+
+  const incrementQuantity = () => {
+    if (rentQuantity < equipment.quantity) {
+      setRentQuantity(rentQuantity + 1);
+    } else {
+      Alert.alert("Limit Reached", "Cannot exceed available quantity.");
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (rentQuantity > 1) {
+      setRentQuantity(rentQuantity - 1);
+    }
+  };
+
+  const openModal = () => setIsModalVisible(true);
+  const closeModal = () => setIsModalVisible(false);
+
   const renderRelatedItem = ({ item }) => (
-    <View style={styles.relatedItem}>
-      <Image source={{ uri: item.image }} style={styles.relatedItemImage} />
-      <Text style={styles.relatedItemTitle}>{item.title}</Text>
-      <Text style={styles.relatedItemPrice}>{item.price}</Text>
-    </View>
+    <TouchableOpacity
+      style={styles.relatedItem}
+      onPress={() => alert(`View details of ${item.equipmentName}`)}
+    >
+      <Image source={{ uri: item.image[0] }} style={styles.relatedImage} />
+      <Text style={styles.relatedName}>{item.equipmentName}</Text>
+    </TouchableOpacity>
   );
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.header}>Equipment Detail</Text>
-      <Image
-        source={{ uri: "https://via.placeholder.com/400x200" }}
-        style={styles.image}
-      />
-      <Text style={styles.title}>Tennis Racket Set</Text>
-      <Text style={styles.location}>📍 Sports Center</Text>
-      <Text style={styles.price}>Price: 50,000 VND/h</Text>
-      <Text style={styles.rating}>⭐ 4.5 (32 reviews)</Text>
-      <Text style={styles.availability}>Available: {availableQuantity}</Text>
+      <Text style={styles.header}>{equipment.equipmentName}</Text>
+      <TouchableOpacity onPress={openModal}>
+        <Image source={{ uri: mainImage }} style={styles.mainImage} />
+      </TouchableOpacity>
 
-      <View style={styles.quantityContainer}>
-        <Text style={styles.quantityLabel}>Quantity:</Text>
-        <TouchableOpacity
-          style={styles.quantityButton}
-          onPress={decreaseQuantity}
-        >
-          <Text style={styles.quantityButtonText}>-</Text>
-        </TouchableOpacity>
-        <Text style={styles.quantityText}>{quantity}</Text>
-        <TouchableOpacity
-          style={styles.quantityButton}
-          onPress={increaseQuantity}
-        >
-          <Text style={styles.quantityButtonText}>+</Text>
-        </TouchableOpacity>
+      <Modal visible={isModalVisible} transparent={true}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+            <X size={30} color="#fff" />
+          </TouchableOpacity>
+          <Image source={{ uri: mainImage }} style={styles.fullscreenImage} />
+        </View>
+      </Modal>
+
+      <ScrollView
+        horizontal
+        style={styles.thumbnailContainer}
+        showsHorizontalScrollIndicator={false}
+      >
+        {equipment.image.map((img, index) => (
+          <TouchableOpacity key={index} onPress={() => setMainImage(img)}>
+            <Image source={{ uri: img }} style={styles.thumbnailImage} />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      <View style={styles.detailsContainer}>
+        <Text style={styles.price}>
+          Price: {equipment.price.toLocaleString()} VND/h
+        </Text>
+        <Text style={styles.quantity}>
+          Available Quantity: {equipment.quantity}
+        </Text>
+        <Text style={styles.status}>
+          Status: {equipment.status === 1 ? "Available" : "Unavailable"}
+        </Text>
+
+        {/* Enhanced Quantity Selector */}
+        <View style={styles.quantitySelector}>
+          <TouchableOpacity
+            onPress={decrementQuantity}
+            style={styles.quantityControlButton}
+          >
+            <Minus size={20} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.quantityDisplay}>
+            <Text style={styles.quantityText}>{rentQuantity}</Text>
+          </View>
+          <TouchableOpacity
+            onPress={incrementQuantity}
+            style={styles.quantityControlButton}
+          >
+            <Plus size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Rent & Favorite Buttons */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.rentButton} onPress={handleRent}>
+            <ShoppingCart color="#fff" size={20} />
+            <Text style={styles.rentButtonText}>Rent Equipment</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.favoriteButton}
+            onPress={toggleFavorite}
+          >
+            {isFavorite ? (
+              <Heart color="red" size={20} />
+            ) : (
+              <HeartOff color="black" size={20} />
+            )}
+            <Text style={styles.favoriteButtonText}>
+              {isFavorite ? "Remove Favorites" : "Add to Favorites"}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.dateButton}
-        onPress={() => setShowDatePicker(true)}
-      >
-        <Text>Select Date: {date.toLocaleDateString()}</Text>
-      </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="default"
-          onChange={onDateChange}
-        />
-      )}
-
-      <TouchableOpacity
-        style={styles.timeButton}
-        onPress={() => setShowStartTimePicker(true)}
-      >
-        <Text>Start Time: {startTime.toLocaleTimeString()}</Text>
-      </TouchableOpacity>
-      {showStartTimePicker && (
-        <DateTimePicker
-          value={startTime}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onStartTimeChange}
-        />
-      )}
-
-      <TouchableOpacity
-        style={styles.timeButton}
-        onPress={() => setShowEndTimePicker(true)}
-      >
-        <Text>End Time: {endTime.toLocaleTimeString()}</Text>
-      </TouchableOpacity>
-      {showEndTimePicker && (
-        <DateTimePicker
-          value={endTime}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onEndTimeChange}
-        />
-      )}
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.rentButton} onPress={handleRent}>
-          <ShoppingCart color="#fff" size={20} />
-          <Text style={styles.rentButtonText}>Rent Equipment</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={toggleFavorite}
-        >
-          {isFavorite ? (
-            <Heart color="red" size={20} />
-          ) : (
-            <HeartOff color="black" size={20} />
-          )}
-          <Text style={styles.favoriteButtonText}>
-            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text style={styles.relatedItemsHeader}>Related Items</Text>
+      {/* Related Equipment Section */}
+      <Text style={styles.relatedHeader}>Related Equipment</Text>
       <FlatList
-        data={relatedItems}
+        data={relatedEquipment}
         renderItem={renderRelatedItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item._id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.relatedContainer}
       />
     </ScrollView>
   );
@@ -221,77 +224,62 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   header: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#333",
   },
-  image: {
+  mainImage: {
     width: "100%",
-    height: 200,
+    height: 250,
+    borderRadius: 10,
+    marginBottom: 10,
+    resizeMode: "cover",
+  },
+  thumbnailContainer: {
+    flexDirection: "row",
     marginBottom: 20,
   },
-  title: {
+  thumbnailImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    marginRight: 10,
+    resizeMode: "cover",
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  detailsContainer: {
+    marginBottom: 20,
+  },
+  price: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#007bff",
   },
-  location: {
+  quantity: {
     fontSize: 16,
     marginBottom: 10,
+    color: "#2ecc71",
   },
-  price: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  rating: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  availability: {
+  status: {
     fontSize: 16,
     marginBottom: 20,
-  },
-  quantityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  quantityLabel: {
-    fontSize: 16,
-    marginRight: 10,
-  },
-  quantityButton: {
-    backgroundColor: "lightgray",
-    padding: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  quantityButtonText: {
-    fontSize: 18,
-  },
-  quantityText: {
-    fontSize: 18,
-  },
-  dateButton: {
-    backgroundColor: "lightblue",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  timeButton: {
-    backgroundColor: "lightgreen",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    color: "#d32f2f",
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
   },
   rentButton: {
-    backgroundColor: "blue",
+    backgroundColor: "#007bff",
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
@@ -305,7 +293,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   favoriteButton: {
-    backgroundColor: "lightgray",
+    backgroundColor: "#f5f5f5",
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
@@ -316,28 +304,89 @@ const styles = StyleSheet.create({
   favoriteButtonText: {
     fontSize: 16,
     marginLeft: 5,
+    color: "#333",
   },
-  relatedItemsHeader: {
+  errorText: {
+    color: "red",
+    fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 1,
+  },
+  fullscreenImage: {
+    width: "90%",
+    height: "80%",
+    resizeMode: "contain",
+  },
+  quantitySelector: {
+    flexDirection: "row",
+    marginVertical: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  quantityControlButton: {
+    backgroundColor: "#ff7f50",
+    padding: 12,
+    borderRadius: 50,
+  },
+  quantityDisplay: {
+    marginHorizontal: 20,
+    minWidth: 40,
+    borderRadius: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  quantityText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  relatedHeader: {
     fontSize: 20,
     fontWeight: "bold",
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 10,
+    color: "#333",
+  },
+  relatedContainer: {
+    paddingLeft: 20,
   },
   relatedItem: {
-    marginRight: 10,
+    marginRight: 15,
+    width: 130,
     alignItems: "center",
-    paddingBottom: 50,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 8,
+    padding: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    marginBottom: 40,
   },
-  relatedItemImage: {
+  relatedImage: {
     width: 100,
-    height: 100,
+    height: 80,
+    borderRadius: 8,
+    marginBottom: 10,
+    resizeMode: "cover",
   },
-  relatedItemTitle: {
+  relatedName: {
     fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
     textAlign: "center",
-  },
-  relatedItemPrice: {
-    fontSize: 12,
-    color: "gray",
   },
 });
 

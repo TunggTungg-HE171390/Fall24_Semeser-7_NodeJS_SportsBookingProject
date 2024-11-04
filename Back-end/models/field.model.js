@@ -36,6 +36,10 @@ const FieldsSchema = new mongoose.Schema({
     required: true,
     min: [1, "There must be at least 1 field"],
   },
+  price: {
+    type: Number,
+    required: true,
+  },
   subFields: [
     {
       name: {
@@ -48,15 +52,11 @@ const FieldsSchema = new mongoose.Schema({
       fieldTime: [
         {
           start: {
-            type: Date,
+            type: String,
             required: true,
           },
           end: {
-            type: Date,
-            required: true,
-          },
-          price: {
-            type: Number,
+            type: String,
             required: true,
           },
           status: {

@@ -31,7 +31,7 @@ export default function Setting() {
 
   const handleLogout = async () => {
     axios
-      .post("http://172.22.240.1:3000/auth/sign-out")
+      .post("http://192.168.1.13:3000/auth/sign-out")
       .then(async (res) => {
         console.log(res.data.message);
         // Xóa token từ AsyncStorage

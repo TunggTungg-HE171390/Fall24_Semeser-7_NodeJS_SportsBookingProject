@@ -34,7 +34,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
     axios
-      .post("http://172.22.240.1:3000/auth/sign-up", {
+      .post("http://192.168.1.13:3000/auth/sign-up", {
         account: {
           email: email,
           password: password,

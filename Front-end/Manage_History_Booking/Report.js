@@ -35,7 +35,7 @@ export default function Report() {
       if (!userId) return;
       // console.log(userId);
       const res = await axios.get(
-        `http://172.22.240.1:3000/feedback/${userId}`
+        `http://192.168.1.13:3000/feedback/${userId}`
       );
       setReviews(res.data.feedbacks);
     } catch (error) {
@@ -60,7 +60,7 @@ export default function Report() {
       };
 
       await axios.put(
-        `http://172.22.240.1:3000/feedback/update/${selectedReview._id}`,
+        `http://192.168.1.13:3000/feedback/update/${selectedReview._id}`,
         updatedReview
       );
       Alert.alert("Success", "Feedback has been updated successfully");
@@ -89,7 +89,7 @@ export default function Report() {
       if (!selectedReview) return;
 
       await axios.delete(
-        `http://172.22.240.1:3000/feedback/delete/${selectedReview._id}`
+        `http://192.168.1.13:3000/feedback/delete/${selectedReview._id}`
       );
       setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
