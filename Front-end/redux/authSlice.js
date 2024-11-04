@@ -17,8 +17,14 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.user = null;
     },
+    updateUserName(state, action) {
+      // Kiểm tra nếu user tồn tại thì cập nhật tên
+      if (state.user) {
+        state.user.name = action.payload;
+      }
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, updateUserName } = authSlice.actions;
 export default authSlice.reducer;

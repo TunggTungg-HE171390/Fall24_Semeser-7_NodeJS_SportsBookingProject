@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Button, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar } from "react-native-calendars";
 import { useSelector } from "react-redux";
@@ -9,9 +9,8 @@ export default function History() {
   const [viewType, setViewType] = useState("monthly");
   const [markedDates, setMarkedDates] = useState({});
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [checkFeedback, setCheckFeedback] = useState("");
 
   const userId = useSelector((state) => state.auth.user?.id);
 
@@ -29,7 +28,7 @@ export default function History() {
         const [time, date] = order.orderDate.split(" ");
         const [day, month, year] = date.split("/");
         const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-        return { ...order, formattedOrderDate: formattedDate }; // Thêm trường formattedOrderDate với định dạng chuẩn
+        return { ...order, formattedOrderDate: formattedDate };
       });
       setOrders(updatedOrders);
 
@@ -50,59 +49,37 @@ export default function History() {
     }
   };
 
-
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
       const res = await axios.get(`http://192.168.1.38:3000/field-order/detail/${fieldOrderId}`);
-      setSelectedOrder(res.data.data);
-      setModalVisible(true);
+      console.log("Detail:", res.data.data);
+      return res.data.data;
     } catch (error) {
       console.log("Error fetching field order detail:", error);
+      return null;
     }
   };
 
-  const onCheckFeedback = (order) => {
-    if (order.fieldId) {
-      checkFeedbackExist(order.fieldId); // Gọi hàm với `fieldId` từ đơn hàng
-    } else {
-      console.log("Không tìm thấy fieldId trong đơn hàng");
-    }
-  };
+  const onDayPress = async (day) => {
+    console.log("Day pressed:", day); //Nó sẽ lọc các đơn hàng trong ngày đó và lấy chi tiết đơn hàng.
+    const ordersForDay = orders.filter((o) => o.formattedOrderDate === day.dateString);
 
-
-  const checkFeedbackExist = async (fieldId) => {
-    try {
-      const res = await axios.get(`http://192.168.1.38:3000/field/check-comment/${fieldId}/${userId}`);
-      setCheckFeedback(res.data.message)
-      console.log("Mess:"+fieldId, res.data.message)
-    } catch (error) {
-      console.log("Error fetching field order detail:", error);
-    }
-  }
-
-  const onDayPress = (day) => {
-    console.log("Day pressed:", day);
-    const ordersForDay = orders.filter((o) =>
-      o.formattedOrderDate === day.dateString // Collect all orders with the same formattedOrderDate
-    );
-  
     if (ordersForDay.length > 0) {
-      const fieldIds = ordersForDay.map(order => order.fieldId);
-      
-      // Nếu `checkFeedbackExist()` cần gọi cho từng ID riêng lẻ
-      fieldIds.forEach(order => {
-        checkFeedbackExist(order._id)
-      });
-      
-      console.log("ID2:", fieldIds.map(order => order._id));
-      
-      setSelectedOrder(ordersForDay);
-      setModalVisible(true);
+      try { //lấy chi tiết từng đơn hàng đồng thời.
+        const details = await Promise.all(
+          ordersForDay.map(order => getFieldOrderDetail(order._id))
+        );
+
+        const validDetails = details.filter(detail => detail !== null);
+        setSelectedOrders(validDetails);
+        setModalVisible(true);
+      } catch (error) {
+        console.log("Error fetching details for multiple orders:", error);
+      }
     } else {
       console.log("No orders found for the selected day.");
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -122,14 +99,13 @@ export default function History() {
         />
       </View>
 
-      {/* Modal hiển thị thông tin đơn đặt hàng */}
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Chi tiết đơn đặt hàng</Text>
             <ScrollView style={{ maxHeight: "80%" }}>
-              {selectedOrder?.length > 0 ? (
-                selectedOrder.map((order, index) => (
+              {selectedOrders.length > 0 ? (
+                selectedOrders.map((order, index) => (
                   <View key={index} style={{ marginBottom: 20 }}>
                     <Text style={{ fontWeight: "bold", color: "red" }}>Thông tin đặt sân {index + 1}</Text>
                     <Text>Khách hàng: {order.customerName || "N/A"}</Text>
@@ -139,6 +115,7 @@ export default function History() {
                         <Text>Địa điểm: {order.fieldName || "N/A"}</Text>
                         <Text>Tên sân: {order.subFieldName || "N/A"}</Text>
                         <Text>Thời gian: {order.fieldTime}</Text>
+                        <Text style={{ fontWeight: "bold", color: "blue" }}>Giá tiền: {order.fieldPrice}</Text>
                       </View>
                     ) : (
                       <Text>Thông tin thời gian không có sẵn</Text>
@@ -159,16 +136,16 @@ export default function History() {
                             ))}
                           </View>
                         ))}
-                        <Text style={{ fontWeight: "bold" }}>Tổng tiền: {order.totalPrice} VND</Text>
                       </View>
                     ) : (
                       <View>
                         <Text>Không có thiết bị đặt hàng</Text>
-                        <Text style={{ fontWeight: "bold" }}>Tổng tiền: 0 VND</Text>
                       </View>
                     )}
-                    <TouchableOpacity onPress={() => checkFeedbackExist(order.fieldId)}>
-                      <Text style={styles.feedbacks}>{checkFeedback}</Text>
+                    <Text style={{ fontWeight: "bold" }}>Tổng tiền: {order.totalPrice} VND</Text>
+
+                    <TouchableOpacity>
+                      <Text style={styles.feedbacks}>{order.Feedback}</Text>
                     </TouchableOpacity>
                   </View>
                 ))
@@ -182,7 +159,6 @@ export default function History() {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -272,7 +248,7 @@ const styles = StyleSheet.create({
     color: '#ccc', // Màu chữ của nút "Bộ lọc"
     fontSize: 14,
   },
-  feedbacks:{
+  feedbacks: {
     color: 'red',
   }
 });

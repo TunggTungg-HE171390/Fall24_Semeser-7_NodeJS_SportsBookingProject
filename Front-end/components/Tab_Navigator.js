@@ -5,8 +5,10 @@ import Profile from '../Manage_History_Booking/Profile';
 import History from '../Manage_History_Booking/History';
 import Report from '../Manage_History_Booking/Report';
 import Setting from '../Manage_History_Booking/Setting';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from "axios";
+import { updateUserName } from '../redux/authSlice'; 
+
 
 export default function CustomTabScreen() {
   const [selectedTab, setSelectedTab] = useState('Profile');
@@ -17,12 +19,14 @@ export default function CustomTabScreen() {
   const [visible, setVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const dispatch = useDispatch();
 
   const userName = useSelector(state => state.auth.user?.name);
   const userId = useSelector(state => state.auth.user?.id);
 
   useEffect(() => {
     if (userId) {
+      userInfoDetail();
       getCountFieldOrderByCustomerId();
     }
   }, [userId]);
@@ -56,6 +60,7 @@ export default function CustomTabScreen() {
       await axios.post(`http://192.168.1.38:3000/user/updateInfo/${userId}`, updatedData);
       console.log("User information updated successfully");
       Alert.alert("Success", "Update user information successfully");
+      dispatch(updateUserName(name));
       setVisible(false);
     } catch (error) {
       console.error("Error updating user information:", error);

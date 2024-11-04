@@ -362,8 +362,31 @@ async function getDetailByFieldOrdersId(req, res, next) {
     console.log("SubField ID:", detail_field_orders.subFieldId);
     console.log("Selected SubField:", selectedSubField);
 
+    const feedbacks = detail_field_orders.fieldId._id
+
+    const feedbackinField = await db.field.findById(feedbacks).populate("feedBackId");
+
+
+    const checkFeedbackExist = feedbackinField.feedBackId.find((feedback) => feedback.customerId.toString() === detail_field_orders.customerId._id.toString());
+    console.log("feedbacks.feedBackId: ", detail_field_orders.price)
+
+    let starRating = checkFeedbackExist ? checkFeedbackExist.starNumber : 0;
+    let starSymbols = "⭐".repeat(starRating) + "⭐".repeat(5 - starRating);
+
+
+    let checkFeedback = "";
+    if (!checkFeedbackExist) {
+      checkFeedback = 'Bạn chưa đánh giá về trải nghiệm ở sân này. ';
+      console.log('User has not commented on this field.');
+    } else {
+      checkFeedback = `Bạn đã đánh giá: ${starSymbols}`;
+      console.log('User has commented on this field.');
+    }
+
     const formattedFieldOrders = {
       _id: detail_field_orders._id,
+      fieldId: detail_field_orders.fieldId._id,
+      customerId: detail_field_orders.customerId._id,
       customerName: detail_field_orders.customerId?.profile?.name,
       fieldName: detail_field_orders.fieldId?.name,
       orderDate: new Date(detail_field_orders.orderDate).toLocaleString("vi-VN", {
@@ -376,17 +399,19 @@ async function getDetailByFieldOrdersId(req, res, next) {
 
       subFieldName: selectedSubField?.name || null,
       fieldTime: selectedSlot.start + " - " + selectedSlot.end,
+      fieldPrice: detail_field_orders.price,
 
       equipmentOrder: detail_field_orders.equipmentOrderId.map((e) => ({
         equipmentName: e.equipments.map((eName) => eName.equipment_id.equipmentName),
         quantity: e.equipments.map((q) => q.quantity),
         price: e.equipments.map((p) => p.price),
       })),
-      totalPrice: detail_field_orders.equipmentOrderId.reduce((total, e) => {
+      totalPrice: detail_field_orders.price + detail_field_orders.equipmentOrderId.reduce((total, e) => {
         return total + e.equipments.reduce((subTotal, equipment) => {
           return subTotal + (equipment.price * equipment.quantity);
         }, 0);
       }, 0),
+      Feedback: checkFeedback
     };
 
     console.log(formattedFieldOrders);
