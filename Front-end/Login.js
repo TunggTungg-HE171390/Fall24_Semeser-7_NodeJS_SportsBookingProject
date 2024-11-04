@@ -25,7 +25,7 @@ export default function Login({ navigation }) {
 
   const dispatch = useDispatch();
   const handleLogin = async () => {
-    console.log(api);
+    // console.log(api);
     try {
       const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,

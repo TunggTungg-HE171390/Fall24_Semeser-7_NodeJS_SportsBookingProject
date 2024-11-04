@@ -43,7 +43,7 @@ export default function FieldListScreen() {
     image: [],
   });
   const navigation = useNavigation();
-  const api = process.env.REACT_APP_IP_Address;
+  // const api = process.env.REACT_APP_IP_Address;
   // const apiEndpoint = `${api}/field`;
   const apiEndpoint = "http://192.168.0.104:3000/field";
 
@@ -210,7 +210,7 @@ export default function FieldListScreen() {
         image: field.image || [],
       });
 
-      console.log(JSON.stringify(formData, null, 2));
+      // console.log(JSON.stringify(formData, null, 2));
     } else {
       setIsEdit(false);
       resetForm();

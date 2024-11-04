@@ -62,7 +62,81 @@ const getAllFieldOrders = async (req, res) => {
   }
 };
 
+// const getFieldOrdersForDashboard = async (req, res) => {
+//   try {
+//     const orders = await FieldOrders.find({ status: "Completed" })
+//       .select("-_id price")
+
+//       .populate({
+//         path: "fieldId",
+//         select: "-_id ownerId",
+//         populate: {
+//           path: "ownerId",
+//           select: "profile.name -_id",
+//         },
+//       });
+//     // .populate({
+//     //   path: "equipmentOrderId",
+//     //   // select: "-_id ownerId",
+//     //   // populate: {
+//     //   //   path: "ownerId",
+//     //   //   select: "profile.name -_id",
+//     //   // },
+//     // });
+
+//     res.status(200).json({
+//       orders,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 // Create a new field order
+
+const getFieldOrdersForDashboard = async (req, res) => {
+  try {
+    const orders = await FieldOrders.find({ status: "Completed" })
+      .select("price")
+      .populate({
+        path: "fieldId",
+        select: "ownerId",
+        populate: {
+          path: "ownerId",
+          select: "profile.name",
+        },
+      });
+
+    // Tạo một đối tượng để lưu trữ tổng tiền của từng owner
+    const ownerTotals = {};
+
+    // Sử dụng map để lặp qua mỗi đơn hàng và tính tổng tiền cho mỗi chủ sở hữu
+    orders.map((order) => {
+      const ownerName = order.fieldId.ownerId.profile.name;
+      const price = order.price;
+
+      // Nếu owner đã tồn tại trong đối tượng ownerTotals, cộng thêm giá, nếu không thì khởi tạo
+      if (ownerTotals[ownerName]) {
+        ownerTotals[ownerName] += price;
+      } else {
+        ownerTotals[ownerName] = price;
+      }
+    });
+
+    // Chuyển đổi đối tượng thành một mảng kết quả
+    const result = Object.keys(ownerTotals).map((ownerName) => ({
+      ownerName,
+      totalAmount: ownerTotals[ownerName],
+    }));
+
+    res.status(200).json({
+      result,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const createFieldOrder = async (req, res) => {
   try {
     console.log(req.body);
@@ -414,4 +488,5 @@ module.exports = {
   getAvailableSlotsForField,
   getFieldOrdersByCustomerId,
   getDetailByFieldOrdersId,
+  getFieldOrdersForDashboard,
 };

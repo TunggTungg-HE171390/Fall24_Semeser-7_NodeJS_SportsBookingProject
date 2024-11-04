@@ -80,17 +80,17 @@ const ManageAccount = () => {
         .then((res) => {
           Alert.alert(
             "Success",
-            "Account added successfully. Password will send to email!"
+            // "Account added successfully. Password will send to email!"
+            "Account added successfully. Password default is 1"
           );
           fetchAccountsData();
           setIsModalVisible(false);
           setSelectedAccount(null);
         })
         .catch((error) => {
-          console.log(error?.response?.data);
+          console.log(error?.response?.data?.error?.message);
           const errorMessage =
-            error.response?.data?.message ||
-            "Add new account failed, Email exists";
+            error?.response?.data?.error?.message || "Somthing wrong";
 
           Alert.alert("Error", errorMessage);
         });

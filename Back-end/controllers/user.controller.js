@@ -14,10 +14,27 @@ const getAllUsers = async (req, res) => {
 
 const getAllUsersFromAdmin = async (req, res) => {
   try {
-    const users = await userModel.find({ status: 1 });
-    res.status(200).json(users);
+    const countRole = req.query.countRole;
+
+    if (countRole === "count") {
+      const users = await userModel.find({ status: 1 });
+      const roleCounts = users.reduce(
+        (acc, user) => {
+          if (user.role === 1) acc.customer++;
+          else if (user.role === 2) acc.fieldOwner++;
+          return acc;
+        },
+        { customer: 0, fieldOwner: 0 }
+      );
+
+      // Trả về kết quả
+      res.status(200).json(roleCounts);
+    } else {
+      const users = await userModel.find({ status: 1 });
+      res.status(200).json(users);
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: { status: 500, message: error.message } });
   }
 };
 
@@ -143,6 +160,7 @@ const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
 const editUserFromAdmin = async (req, res, next) => {
   try {
     const { id, name, phone, role } = req.body;

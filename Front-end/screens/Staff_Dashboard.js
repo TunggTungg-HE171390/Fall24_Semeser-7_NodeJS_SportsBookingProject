@@ -1,28 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, Platform, ScrollView } from "react-native";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import { PieChart, LineChart } from "react-native-chart-kit";
 import { Picker } from "@react-native-picker/picker";
-import axios from "axios";
+
 const Dashboard = () => {
-  const api = process.env.REACT_APP_IP_Address;
-  const [quantity, setQuantity] = useState({});
-  const fetchAccountsData = async () => {
-    try {
-      const response = await axios.get(
-        `${api}/user/list-from-admin?countRole=count`
-      );
-      setQuantity(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  // useEffect(() => {
-  //   fetchAccountsData();
-  // }, []);
-  useEffect(() => {
-    fetchAccountsData();
-  });
   const [selectedYear, setSelectedYear] = useState("2024");
 
   const years = ["2022", "2023", "2024", "2025"];
@@ -82,24 +64,24 @@ const Dashboard = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Card cho Monthly Recurring Revenue */}
-      {/* <View style={styles.card}>
+      <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>MONTHLY RECURING REVENUE</Text>
           <FontAwesome5 name="dollar-sign" size={24} color="#6a5acd" />
         </View>
         <Text style={styles.cardValue}>$15k</Text>
         <Text style={styles.cardChangePositive}>↑ 12% Since last month</Text>
-      </View> */}
+      </View>
 
       {/* Card cho Total Profit */}
-      {/* <View style={styles.card}>
+      <View style={styles.card}>
         <View style={styles.cardHeader}>
           <Text style={styles.cardTitle}>TOTAL PROFIT</Text>
           <FontAwesome5 name="file-invoice-dollar" size={24} color="#6a5acd" />
         </View>
         <Text style={styles.cardValue}>$24k</Text>
         <Text style={styles.cardChangeNegative}>↓ 16% Since last month</Text>
-      </View> */}
+      </View>
 
       {/* Card cho Total Field Owners */}
       <View style={styles.card}>
@@ -107,7 +89,7 @@ const Dashboard = () => {
           <Text style={styles.cardTitle}>TOTAL FIELD OWNERS</Text>
           <MaterialIcons name="group" size={24} color="#2ecc71" />
         </View>
-        <Text style={styles.cardValue}>{quantity?.fieldOwner}</Text>
+        <Text style={styles.cardValue}>30</Text>
       </View>
 
       {/* Card cho Total Customers */}
@@ -116,7 +98,7 @@ const Dashboard = () => {
           <Text style={styles.cardTitle}>TOTAL CUSTOMERS</Text>
           <MaterialIcons name="list" size={24} color="#f39c12" />
         </View>
-        <Text style={styles.cardValue}>{quantity?.customer}</Text>
+        <Text style={styles.cardValue}>1.6K</Text>
       </View>
 
       {/* Biểu đồ Pie cho Traffic Source */}

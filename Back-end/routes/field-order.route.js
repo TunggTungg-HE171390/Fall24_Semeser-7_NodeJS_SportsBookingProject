@@ -7,7 +7,7 @@ const { FieldOrderController } = require("../controllers");
 
 // Get all field orders
 router.get("/", FieldOrderController.getAllFieldOrders);
-
+router.get("/dasboard", FieldOrderController.getFieldOrdersForDashboard);
 // Get field order by ID
 router.get("/:id", FieldOrderController.getFieldOrderById);
 
@@ -25,5 +25,7 @@ router.get(
   "/fields/:fieldId/available-slots",
   FieldOrderController.getAvailableSlotsForField
 );
+
+//
 
 module.exports = router;
