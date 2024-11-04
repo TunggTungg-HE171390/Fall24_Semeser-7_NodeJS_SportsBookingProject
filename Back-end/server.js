@@ -1,8 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
-const httpErrors = require("http-errors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const getLocalIP = require("./utils/ipconfig");
@@ -57,8 +55,6 @@ app.use((err, req, res, next) => {
     status: err.status || 500,
   });
 });
-
-const ip = getLocalIP();
 
 app.listen(process.env.PORT, () => {
   const ip = getLocalIP();

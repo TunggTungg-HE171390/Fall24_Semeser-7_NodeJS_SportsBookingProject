@@ -22,20 +22,18 @@ export default function Login({ navigation }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   const api = process.env.REACT_APP_IP_Address;
-  console.log(api);
 
   const dispatch = useDispatch();
   const handleLogin = async () => {
     try {
-      console.log(api);
-      const res = await axios.post(`http://${api}:3000/auth/sign-in`, {
+      const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,
         password: password,
       });
 
-      console.log("Login successful");
       dispatch(login(res.data.userInfo));
-      console.log(res.data.userInfo);
+      // console.log("Login successful");
+      // console.log(res.data.userInfo);
       setErrorMessage("");
     } catch (error) {
       console.log("Login failed");

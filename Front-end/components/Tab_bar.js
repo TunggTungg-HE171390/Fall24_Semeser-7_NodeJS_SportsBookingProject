@@ -11,7 +11,13 @@ const getNavItems = (role) => {
       { name: "Booking", icon: "ticket" },
       { name: "Equipment", icon: "list" },
     ],
-    2: [{ name: "Field", icon: "plus" }],
+    2: [
+      { name: "Field", icon: "plus" },
+      {
+        name: "EquipmentStack",
+        icon: "list",
+      },
+    ],
     3: [{ name: "Admin", icon: "dashboard" }],
   };
 

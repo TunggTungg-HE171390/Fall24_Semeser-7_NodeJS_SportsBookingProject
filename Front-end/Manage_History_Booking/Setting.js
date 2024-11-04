@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Setting() {
   const [showModal, setShowModal] = useState(false);
@@ -32,20 +31,17 @@ export default function Setting() {
   };
 
   const handleLogout = async () => {
-    axios
-      .post(`${api}/auth/sign-out`)
-      .then(async (res) => {
-        console.log(res.data.message);
-        // Xóa token từ AsyncStorage
-        await AsyncStorage.removeItem("authToken");
-        dispatch(logout());
-
-        // Alert("You have been logged out.");
-      })
-      .catch((error) => {
-        console.log("Logout Error:", error.response);
-        Alert("An error occurred during logout.");
-      });
+    dispatch(logout());
+    // axios
+    //   .post(`${api}/auth/sign-out`)
+    //   .then(async (res) => {
+    //     // console.log(res.data.message);
+    //     dispatch(logout());
+    //   })
+    //   .catch((error) => {
+    //     console.log("Logout Error:", error.response);
+    //     Alert("An error occurred during logout.");
+    //   });
   };
 
   return (

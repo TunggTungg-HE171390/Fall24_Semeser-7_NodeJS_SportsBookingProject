@@ -49,6 +49,7 @@ const EquipmentListScreen = () => {
       const response = await axios.get(
         `${api}/equipment?page=${page}&limit=10&search=${searchTerm}`
       );
+      // console.log(`Check res: `, response.data);
       const { equipments, totalPages } = response.data;
       setEquipment(equipments);
       setTotalPages(totalPages);

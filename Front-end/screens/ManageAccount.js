@@ -30,6 +30,7 @@ const ManageAccount = () => {
   const fetchAccountsData = async () => {
     try {
       const response = await axios.get(`${api}/user/list-from-admin`);
+      // console.log("Account Data: ", response.data);
       const accounts = response.data.reverse();
       setAccounts(accounts);
     } catch (error) {
