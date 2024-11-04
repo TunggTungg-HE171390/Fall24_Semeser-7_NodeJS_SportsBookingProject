@@ -12,8 +12,12 @@ const getNavItems = (role) => {
       { name: "Equipment", icon: "list" },
     ],
     2: [
-      { name: "PostMain", icon: "comment" },
       { name: "Field", icon: "plus" },
+      { name: "PostMain", icon: "comment" },
+      {
+        name: "EquipmentStack",
+        icon: "list",
+      },
     ],
     3: [{ name: "Admin", icon: "dashboard" }],
   };

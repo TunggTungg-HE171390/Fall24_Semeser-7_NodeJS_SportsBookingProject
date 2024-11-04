@@ -53,8 +53,6 @@ function generateSubFields(
 const addField = async (req, res, next) => {
   try {
     const data = req.body;
-    console.log(data);
-
     const {
       totalFields,
       openingTime,
@@ -75,7 +73,8 @@ const addField = async (req, res, next) => {
       totalFields,
       openingTime,
       closingTime,
-      slotDuration
+      slotDuration,
+      price
     );
     const field = new Field({ ...data, subFields });
 
@@ -94,8 +93,6 @@ const updateField = async (req, res, next) => {
   try {
     const fieldId = req.params.id;
     const updateData = req.body;
-    console.log(updateData);
-
     const {
       ownerId,
       totalFields,
@@ -119,9 +116,9 @@ const updateField = async (req, res, next) => {
         totalFields,
         openingTime,
         closingTime,
-        slotDuration
+        slotDuration,
+        price
       );
-      console.log(updateData.subFields);
     }
 
     const updatedField = await Field.findByIdAndUpdate(fieldId, updateData, {
@@ -155,16 +152,27 @@ const deleteField = async (req, res, next) => {
     // Lưu lại trạng thái mới
     await field.save();
 
-    res
-      .status(200)
-      .json({
-        message: `Field status changed to ${newStatus} successfully!`,
-        field,
-      });
+    res.status(200).json({
+      message: `Field status changed to ${newStatus} successfully!`,
+      field,
+    });
   } catch (error) {
     next(error);
   }
 };
+
+// const deleteField = async (req, res, next) => {
+//   try {
+//     const fieldId = req.params.id;
+//     const deletedField = await Field.findByIdAndDelete(fieldId);
+//     if (!deletedField) {
+//       return res.status(404).json({ message: "Field not found." });
+//     }
+//     res.status(200).json({ message: "Field deleted successfully!" });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 // Hàm lấy danh sách các Field với phân trang và tìm kiếm theo tên
 const getFields = async (req, res, next) => {
@@ -227,6 +235,84 @@ const getFieldById = async (req, res, next) => {
   }
 };
 
+const getFieldByFeedbackId = async (req, res, next) => {
+  try {
+    const fieldDetail = await Field.findOne({
+      feedBackId: { $in: [req.params.feedbackId] },
+    }).populate("ownerId", "profile.name");
+
+    console.log(req.params.feedbackId);
+
+    if (!fieldDetail) {
+      return res.status(404).json({ message: "Field not found" });
+    }
+
+    const getField = await Field.findById(fieldDetail._id).populate({
+      path: "feedBackId",
+      select: "starNumber detail customerId",
+      populate: {
+        path: "customerId",
+        select: "profile.name",
+      },
+    });
+
+    const getAllFeedback = getField.feedBackId.map((f) => ({
+      starNumber: f.starNumber,
+      detail: f.detail,
+      customerName: f.customerId ? f.customerId.profile.name : "N/A",
+    }));
+
+    res.status(200).json({
+      fieldName: getField.name,
+      sportName: getField.sportName,
+      address: getField.address,
+      ownerName: fieldDetail.ownerId ? fieldDetail.ownerId.profile.name : "N/A",
+      totalFields: getField.totalFields,
+      image: getField.image,
+      feedback: getAllFeedback,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//Hàm kiểm tra xem field đó userId đã feedback chưa
+const checkFeedbackExist = async (req, res, next) => {
+  try {
+    const { fieldId, userId } = req.params;
+
+    const field = await Field.findById(fieldId).populate("feedBackId");
+
+    if (!field) {
+      console.log("Field not found");
+      return { message: "Field not found" };
+    }
+
+    const feedbacks = field.feedBackId.find(
+      (feedback) => feedback.customerId.toString() === userId
+    );
+
+    console.log(userId);
+    console.log(
+      field.feedBackId.map((feedback) => feedback.customerId.toString())
+    );
+
+    if (!feedbacks) {
+      console.log("User has not commented on this field.");
+      res.status(200).json({
+        message: "User has not commented on this field.",
+      });
+    } else {
+      console.log("User has not commented on this field.");
+      res.status(200).json({
+        message: "OKKKK",
+      });
+    }
+  } catch (error) {
+    console.error("Error checking user feedback:", error);
+  }
+};
+
 // Export các hàm để sử dụng trong các phần khác của ứng dụng
 module.exports = {
   addField,
@@ -234,4 +320,6 @@ module.exports = {
   deleteField,
   getFields,
   getFieldById,
+  getFieldByFeedbackId,
+  checkFeedbackExist,
 };

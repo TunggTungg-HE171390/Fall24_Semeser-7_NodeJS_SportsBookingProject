@@ -68,8 +68,8 @@ async function signIn(req, res, next) {
       throw new createHttpError(400, "Password is required");
     }
 
-    console.log("Identifier:", identifier);
-    console.log("Password:", password);
+    // console.log("Identifier:", identifier);
+    // console.log("Password:", password);
 
     const existUser = await db.user.findOne({
       $or: [{ "profile.name": identifier }, { "account.email": identifier }],

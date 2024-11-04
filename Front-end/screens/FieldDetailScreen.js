@@ -51,7 +51,7 @@ const FieldDetailScreen = ({ route }) => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
-
+  const api = process.env.REACT_APP_IP_Address;
   // Fetch available slots when both date and subfield are selected
   useEffect(() => {
     if (selectedDate && selectedSubField) {
@@ -63,7 +63,7 @@ const FieldDetailScreen = ({ route }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://192.168.1.70:3000/field-order/fields/${field._id}/available-slots`,
+        `${api}/field-order/fields/${field._id}/available-slots`,
         {
           params: {
             date: formatDate(selectedDate),
@@ -72,7 +72,7 @@ const FieldDetailScreen = ({ route }) => {
         }
       );
 
-      console.log(response.data);
+      // console.log(response.data);
       setAvailableSlots(response.data);
     } catch (error) {
       console.error("Error fetching available slots:", error);
@@ -101,13 +101,10 @@ const FieldDetailScreen = ({ route }) => {
       status: "Pending",
     };
 
-    console.log("bookingData: ", bookingData);
+    // console.log("bookingData: ", bookingData);
 
     try {
-      const response = await axios.post(
-        "http://192.168.1.70:3000/field-order",
-        bookingData
-      );
+      const response = await axios.post(`${api}/field-order`, bookingData);
       if (response.status === 201) {
         Alert.alert(
           "Booking Successful",
