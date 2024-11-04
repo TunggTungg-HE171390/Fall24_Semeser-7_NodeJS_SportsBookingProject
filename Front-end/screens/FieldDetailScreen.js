@@ -101,7 +101,7 @@ const FieldDetailScreen = ({ route }) => {
       status: "Pending",
     };
 
-    console.log("bookingData: ", bookingData);
+    // console.log("bookingData: ", bookingData);
 
     try {
       const response = await axios.post(

@@ -7,6 +7,7 @@ import axios from "axios";
 const Dashboard = () => {
   const api = process.env.REACT_APP_IP_Address;
   const [quantity, setQuantity] = useState({});
+  const [profit, setProfit] = useState({});
   const fetchAccountsData = async () => {
     try {
       const response = await axios.get(
@@ -17,12 +18,24 @@ const Dashboard = () => {
       console.error(error);
     }
   };
+
+  const fetchProfitData = async () => {
+    try {
+      const response = await axios.get(`${api}/field-order/dasboard`);
+      // console.log(`Data: `, response.data);
+      setProfit(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // useEffect(() => {
   //   fetchAccountsData();
   // }, []);
   useEffect(() => {
     fetchAccountsData();
-  });
+    fetchProfitData();
+  }, []);
   const [selectedYear, setSelectedYear] = useState("2024");
 
   const years = ["2022", "2023", "2024", "2025"];
@@ -174,19 +187,25 @@ const Dashboard = () => {
 
       {/* Bảng hiển thị 5 field owner có doanh thu cao nhất */}
       <View style={styles.chartCard}>
-        <Text style={styles.sectionTitle}>Top 5 Field Owners by Revenue</Text>
-        {topFieldOwners.map((owner) => (
-          <View style={styles.row} key={owner.name}>
-            <Text style={styles.rowText}>{owner.name}</Text>
-            <Text style={styles.rowText}>${owner.revenue}</Text>
+        <Text style={styles.sectionTitle}>Top Field Owners by Revenue</Text>
+        {profit?.result?.map((item) => (
+          <View style={styles.row} key={item.ownerName}>
+            <Text style={styles.rowText}>{item.ownerName}</Text>
+            <Text style={styles.rowText}>${item.totalAmount} VND</Text>
           </View>
         ))}
+        <Text style={styles.earn}>We earn:{profit.threePercentOfTotal}VND</Text>
       </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  earn: {
+    marginTop: 15,
+    alignSelf: "flex-end",
+    color: "red",
+  },
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5",

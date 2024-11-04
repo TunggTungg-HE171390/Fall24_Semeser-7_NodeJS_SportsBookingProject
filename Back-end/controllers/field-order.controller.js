@@ -62,38 +62,6 @@ const getAllFieldOrders = async (req, res) => {
   }
 };
 
-// const getFieldOrdersForDashboard = async (req, res) => {
-//   try {
-//     const orders = await FieldOrders.find({ status: "Completed" })
-//       .select("-_id price")
-
-//       .populate({
-//         path: "fieldId",
-//         select: "-_id ownerId",
-//         populate: {
-//           path: "ownerId",
-//           select: "profile.name -_id",
-//         },
-//       });
-//     // .populate({
-//     //   path: "equipmentOrderId",
-//     //   // select: "-_id ownerId",
-//     //   // populate: {
-//     //   //   path: "ownerId",
-//     //   //   select: "profile.name -_id",
-//     //   // },
-//     // });
-
-//     res.status(200).json({
-//       orders,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-// Create a new field order
-
 const getFieldOrdersForDashboard = async (req, res) => {
   try {
     const orders = await FieldOrders.find({ status: "Completed" })
@@ -123,7 +91,16 @@ const getFieldOrdersForDashboard = async (req, res) => {
       }
     });
 
-    // Chuyển đổi đối tượng thành một mảng kết quả
+    // Tính tổng số tiền của tất cả các owner
+    const totalAmountAllOwners = Object.values(ownerTotals).reduce(
+      (acc, amount) => acc + amount,
+      0
+    );
+
+    // Tính 3% của tổng số tiền
+    const threePercentOfTotal = totalAmountAllOwners * 0.03;
+
+    // Tạo mảng kết quả chứa tổng tiền cho từng chủ sở hữu
     const result = Object.keys(ownerTotals).map((ownerName) => ({
       ownerName,
       totalAmount: ownerTotals[ownerName],
@@ -131,12 +108,15 @@ const getFieldOrdersForDashboard = async (req, res) => {
 
     res.status(200).json({
       result,
+      totalAmountAllOwners,
+      threePercentOfTotal, // trả về 3% tổng số tiền của tất cả các chủ sở hữu
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// Create a new field order
 const createFieldOrder = async (req, res) => {
   try {
     console.log(req.body);
