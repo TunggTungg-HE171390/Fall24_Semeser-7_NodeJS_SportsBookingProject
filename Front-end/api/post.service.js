@@ -2,7 +2,7 @@ import authorizedAxiosInstance from "./authorizedAxios";
 
 class PostAPI {
   // Create post
-  static async createPost(postData) {
+  static async createPost(postData, userId, userRole) {
     try {
       // Ensure postData is a FormData object if necessary.
       if (!(postData instanceof FormData)) {
@@ -12,14 +12,10 @@ class PostAPI {
         });
         postData = formData;
       }
-
-      const ownerId = "670b420e1a81fd665035b288";
-
       const res = await authorizedAxiosInstance.post(
-        `/post/${ownerId}`,
+        `/post/${userId}`,
         postData
       );
-
       return res.data;
     } catch (err) {
       if (err.response) {
@@ -48,7 +44,23 @@ class PostAPI {
     }
   }
 
-  // Edit post
+  // Get posts by owner
+  static async getPostsByOwner(ownerId) {
+    try {
+      const res = await authorizedAxiosInstance.get(`/post/owner/${ownerId}`);
+      return res.data.result;
+    } catch (err) {
+      if (err.response) {
+        throw new Error(err.response.data.message || "Failed to fetch posts.");
+      } else if (err.request) {
+        throw new Error("No response received from the server.");
+      } else {
+        throw new Error("Error fetching posts: " + err.message);
+      }
+    }
+  }
+
+  // Edit post: cái này chưa sửa
   static async editPost(postData, postId) {
     console.log("Extracted postData.id:", postId);
     try {
@@ -79,13 +91,12 @@ class PostAPI {
     }
   }
 
-  static async deletePost(postId) {
+  static async deletePost(postId, userId, userRole) {
     try {
-      const res = await authorizedAxiosInstance.delete(`/post/${postId}`);
-      if (res.status === 200) {
-        console.log("Post successfully marked as deleted:", res.data.result);
-        return res.data.result;
-      }
+      const res = await authorizedAxiosInstance.delete(
+        `/post/${postId}?userId=${userId}`
+      );
+      return res.data.result;
     } catch (err) {
       if (err.response) {
         throw new Error(err.response.data.message || "Failed to delete post.");
@@ -94,6 +105,35 @@ class PostAPI {
       } else {
         throw new Error("Error deleting the post: " + err.message);
       }
+    }
+  }
+
+  static async getPostsPending() {
+    try {
+      const res = await authorizedAxiosInstance.get(`/post/get-pending`);
+      return res.data.result;
+    } catch (err) {
+      if (err.response) {
+        throw new Error(err.response.data.message || "Failed to delete post.");
+      } else if (err.request) {
+        throw new Error("No response received from the server.");
+      } else {
+        throw new Error("Error deleting the post: " + err.message);
+      }
+    }
+  }
+
+  static async updateStatusOfPosts(postIds, userId, newStatus) {
+    try {
+      const res = await authorizedAxiosInstance.put(`/post/update-status`, {
+        postIds: Array.from(postIds),
+        userId: userId,
+        newStatus: newStatus,
+      });
+
+      return res.data;
+    } catch (error) {
+      throw new Error(`Failed to ${newStatus} posts: ${error.message}`);
     }
   }
 }

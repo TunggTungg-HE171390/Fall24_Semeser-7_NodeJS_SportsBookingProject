@@ -1,4 +1,5 @@
 export const ROUTER = {
+  POST_APPROVAL: "PostApproval",
   DASHBOARD: "Dashboard",
   MANAGE_ACCOUNT: "ManageAccount",
   ACCOUNT_DETAIL: "AccountDetail",
@@ -10,4 +11,9 @@ export const ROLE_NAME = {
   3: "Admin",
 };
 
-export const API_ROOT = "http://172.22.240.1:3000";
+export const POST_STATUS = {
+  PENDING: 1,
+  PUBLISHED: 2,
+  DENIED: 3,
+  DELETED: 4,
+};

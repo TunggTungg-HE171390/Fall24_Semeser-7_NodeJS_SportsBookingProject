@@ -9,7 +9,8 @@ const USER_ROLES = {
 const POST_STATUS = {
   PENDING: 1,
   PUBLISHED: 2,
-  DELETED: 3,
+  DENIED: 3,
+  DELETED: 4,
 };
 
 module.exports = {

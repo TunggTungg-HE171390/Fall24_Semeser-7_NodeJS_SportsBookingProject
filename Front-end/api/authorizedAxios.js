@@ -1,5 +1,5 @@
 import axios from "axios";
-
+console.log("React App IP Address: ", process.env.REACT_APP_IP_Address);
 let authorizedAxiosInstance = axios.create({
   baseURL: process.env.REACT_APP_IP_Address,
 });
