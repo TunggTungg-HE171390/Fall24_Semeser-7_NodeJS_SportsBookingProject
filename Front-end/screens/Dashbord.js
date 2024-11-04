@@ -84,13 +84,6 @@ const Dashboard = () => {
   };
 
   // Dữ liệu cho danh sách field owner có doanh thu cao nhất
-  const topFieldOwners = [
-    { name: "Owner 1", revenue: 15000 },
-    { name: "Owner 2", revenue: 12000 },
-    { name: "Owner 3", revenue: 11000 },
-    { name: "Owner 4", revenue: 10000 },
-    { name: "Owner 5", revenue: 9000 },
-  ];
 
   return (
     <ScrollView style={styles.container}>
@@ -132,8 +125,7 @@ const Dashboard = () => {
         <Text style={styles.cardValue}>{quantity?.customer}</Text>
       </View>
 
-      {/* Biểu đồ Pie cho Traffic Source */}
-      <View style={styles.chartCard}>
+      {/* <View style={styles.chartCard}>
         <Text style={styles.sectionTitle}>Traffic Source</Text>
         <PieChart
           data={pieData}
@@ -149,13 +141,12 @@ const Dashboard = () => {
           backgroundColor="transparent"
           paddingLeft="15"
         />
-      </View>
+      </View> */}
 
       {/* Biểu đồ Line cho Monthly Revenue */}
-      <View style={styles.chartCard}>
+      {/* <View style={styles.chartCard}>
         <View style={styles.monthlyRevenueContainer}>
           <Text style={styles.sectionTitle}>Monthly Revenue</Text>
-          {/* Wrapped Picker in a View for the border */}
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={selectedYear}
@@ -183,7 +174,7 @@ const Dashboard = () => {
           }}
           bezier
         />
-      </View>
+      </View> */}
 
       {/* Bảng hiển thị 5 field owner có doanh thu cao nhất */}
       <View style={styles.chartCard}>

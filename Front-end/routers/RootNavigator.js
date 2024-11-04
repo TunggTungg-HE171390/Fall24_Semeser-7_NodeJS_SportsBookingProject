@@ -1,13 +1,13 @@
 // module ở đây
 import React from "react";
-import { SafeAreaView, StyleSheet, Text } from "react-native";
+import { SafeAreaView, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 
 // màn hình ở đây
 import Booking_screen from "../screens/Booking_screen";
 import Explore_screen from "../screens/Explore_screen";
-import SigninScreen from "../Login";
+import SigninScreen from "../layout/Login";
 import FieldDetailScreen from "../screens/FieldDetailScreen";
 import FieldListScreen from "../screens/FieldListScreen";
 import FieldAdminDetailScreen from "../screens/FieldAdminsDetail";
@@ -17,8 +17,8 @@ import Dashboard from "../screens/Dashbord";
 import RentalEquipmentScreen from "../screens/RentalEquipmentScreen";
 import EquipmentDetailScreen from "../screens/EquipmentDetailsScreen";
 import SportSelected from "../screens/SportSelected";
-import RegisterScreen from "../screens/Register_screen";
-import EquipmentListScreen from "../screens/EquipmentList";
+import RegisterScreen from "../layout/Register";
+import EquipmentListScreen from "../screens/EquipmentListScreen";
 import PostApprovalScreen from "../screens/PostApprovalScreen";
 
 // navigation

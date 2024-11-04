@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { logout } from "../redux/authSlice";
+import { logout } from "../../redux/authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 

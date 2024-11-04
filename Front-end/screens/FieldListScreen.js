@@ -43,9 +43,7 @@ export default function FieldListScreen() {
     image: [],
   });
   const navigation = useNavigation();
-  // const api = process.env.REACT_APP_IP_Address;
-  // const apiEndpoint = `${api}/field`;
-  const apiEndpoint = "http://192.168.0.104:3000/field";
+  const api = process.env.REACT_APP_IP_Address;
 
   useEffect(() => {
     fetchFields(page);
@@ -60,7 +58,7 @@ export default function FieldListScreen() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${apiEndpoint}?page=${currentPage}&limit=4`
+        `${api}/field?page=${currentPage}&limit=4`
       );
       const responseData = response.data;
       const fieldsData = responseData.data;

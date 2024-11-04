@@ -11,10 +11,10 @@ import {
   Label,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Profile from "../Manage_History_Booking/Profile";
-import History from "../Manage_History_Booking/History";
-import Report from "../Manage_History_Booking/Report";
-import Setting from "../Manage_History_Booking/Setting";
+import Profile from "../screens/Manage_History_Booking/Profile";
+import History from "../screens/Manage_History_Booking/History";
+import Report from "../screens/Manage_History_Booking/Report";
+import Setting from "../screens/Manage_History_Booking/Setting";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
@@ -29,7 +29,7 @@ export default function CustomTabScreen() {
 
   const userName = useSelector((state) => state.auth.user?.name);
   const userId = useSelector((state) => state.auth.user?.id);
-
+  const api = process.env.REACT_APP_IP_Address;
   useEffect(() => {
     if (userId) {
       getCountFieldOrderByCustomerId();
@@ -40,7 +40,7 @@ export default function CustomTabScreen() {
     try {
       console.log("Fetching count for user:", userId);
       const res = await axios.get(
-        `http://192.168.0.104:3000/field-order/count-by-customer/${userId}`
+        `${api}/field-order/count-by-customer/${userId}`
       );
       const count = res.data.data;
       setCount(count);
@@ -55,9 +55,7 @@ export default function CustomTabScreen() {
 
   const userInfoDetail = async () => {
     try {
-      const res = await axios.get(
-        `http://192.168.0.104:3000/user/userInfo/${userId}`
-      );
+      const res = await axios.get(`${api}/user/userInfo/${userId}`);
       setName(res.data.profile.name);
       setPhone(res.data.profile.phone);
       console.log(
@@ -73,10 +71,7 @@ export default function CustomTabScreen() {
   const handleUpdate = async () => {
     try {
       const updatedData = { name, phone };
-      await axios.post(
-        `http://192.168.0.104:3000/user/updateInfo/${userId}`,
-        updatedData
-      );
+      await axios.post(`${api}/user/updateInfo/${userId}`, updatedData);
       console.log("User information updated successfully");
       Alert.alert("Success", "Update user information successfully");
       setVisible(false);

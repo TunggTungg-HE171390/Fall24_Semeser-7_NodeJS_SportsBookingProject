@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useDispatch } from "react-redux";
-import { login } from "./redux/authSlice";
+import { login } from "../redux/authSlice";
 import axios from "axios";
 
 export default function Login({ navigation }) {
@@ -20,11 +20,11 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const api = process.env.REACT_APP_IP_Address;
   const dispatch = useDispatch();
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://192.168.0.104:3000/auth/sign-in", {
+      const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,
         password: password,
       });
