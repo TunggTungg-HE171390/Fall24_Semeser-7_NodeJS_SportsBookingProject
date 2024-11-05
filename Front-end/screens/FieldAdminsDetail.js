@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 
 export default function FieldAdminDetailScreen({ route }) {
   const { field } = route.params;
-
+  console.log("Field: ", field);
   return (
     <View style={styles.container}>
-      <Image source={field.image} style={styles.fieldImage} />
+      <Image source={{ uri: field.image[0] }} style={styles.fieldImage} />
       <Text style={styles.fieldName}>{field.name}</Text>
       <Text style={styles.fieldType}>Loại: {field.type}</Text>
       <Text style={styles.fieldLocation}>Địa điểm: {field.location}</Text>
@@ -27,6 +27,9 @@ export default function FieldAdminDetailScreen({ route }) {
         )}
       />
     </View>
+    // <>
+    //   <Text>Test</Text>
+    // </>
   );
 }
 

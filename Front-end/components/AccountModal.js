@@ -48,9 +48,9 @@ const AccountModal = ({ visible, onClose, onSubmit, data }) => {
       newErrors.email = "Email must contain @ and .";
     }
 
-    if (phone && !isValidPhone(phone)) {
-      newErrors.phone = "Phone number must be 10-11 digits";
-    }
+    // if (phone && !isValidPhone(phone)) {
+    //   newErrors.phone = "Phone number must be 10-11 digits";
+    // }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);

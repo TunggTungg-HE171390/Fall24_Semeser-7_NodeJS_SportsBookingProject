@@ -95,7 +95,7 @@ export default function Report() {
       };
 
       await axios.put(
-        `${api}/feedback/update/${selectedReview._id}`,
+        `http://192.168.0.104:3000/feedback/update/${selectedReview._id}`,
         updatedReview
       );
       Alert.alert("Success", "Feedback has been updated successfully");
@@ -130,7 +130,9 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(`${api}/feedback/delete/${selectedReview._id}`);
+      await axios.delete(
+        `http://192.168.0.104:3000/feedback/delete/${selectedReview._id}`
+      );
       setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);

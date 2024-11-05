@@ -35,7 +35,9 @@ const EquipmentDetailScreen = ({ route }) => {
   useEffect(() => {
     const fetchEquipmentDetails = async () => {
       try {
-        const response = await axios.get(`${api}/equipment/${id}`);
+        const response = await axios.get(
+          `http://192.168.0.104:3000/equipment/${id}`
+        );
         setEquipment(response.data);
         setMainImage(response.data.image[0]);
         setLoading(false);
@@ -47,7 +49,7 @@ const EquipmentDetailScreen = ({ route }) => {
 
     const fetchRelatedEquipment = async () => {
       try {
-        const response = await axios.get(`${api}/equipment`);
+        const response = await axios.get(`http://192.168.0.104:3000/equipment`);
         const filteredEquipment = response.data.equipments.filter(
           (item) => item._id !== id
         );

@@ -45,10 +45,12 @@ const EquipmentListScreen = () => {
 
   const fetchEquipment = async (page = 1, searchTerm = "") => {
     setLoading(true);
+    console.log("Handle Equipment Data");
     try {
       const response = await axios.get(
-        `${api}/equipment?page=${page}&limit=10&search=${searchTerm}`
+        `http://192.168.0.104:3000/equipment?page=${page}&limit=10&search=${searchTerm}`
       );
+      console.log("Equipment res: ", response.data);
       const { equipments, totalPages } = response.data;
       setEquipment(equipments);
       setTotalPages(totalPages);
@@ -76,7 +78,7 @@ const EquipmentListScreen = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.put(`${api}/equipment/delete/${id}`);
+      await axios.put(`http://192.168.0.104:3000/equipment/delete/${id}`);
       fetchEquipment(page, search);
     } catch (error) {
       console.error("Error deleting equipment:", error);
@@ -146,17 +148,24 @@ const EquipmentListScreen = () => {
       price: parseFloat(price),
       quantity: parseInt(quantity),
       status,
-      image: images, // Send selected images
+      image: editingEquipment
+        ? images
+        : [
+            "https://firebasestorage.googleapis.com/v0/b/sdn302-42d07.appspot.com/o/files%2Ffootball.jpg%202024-10-31%2010%3A56%3A22?alt=media&token=6b82a031-b363-4c2a-b48e-ad0493685838",
+          ], // Send selected images
+      ownerId: "670b420e1a81fd665035b286",
+      sportName: "Football",
     };
 
     try {
       if (editingEquipment) {
+        console.log(`data: `, payload);
         await axios.put(
-          `${api}/equipment/update/${editingEquipment._id}`,
+          `http://192.168.0.104:3000/equipment/update/${editingEquipment._id}`,
           payload
         );
       } else {
-        await axios.post(`${api}/equipment`, payload);
+        await axios.post(`http://192.168.0.104:3000/equipment`, payload);
       }
       fetchEquipment(page, search);
       closeModal();

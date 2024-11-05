@@ -40,6 +40,7 @@ const RentalEquipmentScreen = () => {
 
     setLoading(true);
     try {
+      console.log(api);
       const response = await axios.get(
         `${api}/equipment?page=${page}&limit=10`
       );

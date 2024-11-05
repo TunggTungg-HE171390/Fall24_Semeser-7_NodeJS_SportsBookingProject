@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  SafeAreaView,
 } from "react-native";
 import { Search, MapPin, Share2, Plus } from "lucide-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -69,7 +70,7 @@ const Explore_screen = () => {
   };
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <ScrollView style={styles.container}>
           <View style={styles.header}>
             <TextInput style={styles.searchInput} placeholder="Search Sports" />
@@ -95,7 +96,7 @@ const Explore_screen = () => {
           </ScrollView>
 
           {/* Post here */}
-          <Text style={styles.sectionTitle}>Your posts</Text>
+          <Text style={styles.sectionTitle}>List posts</Text>
           {posts.map((post) => (
             <EventCard key={post._id} post={post} />
           ))}
@@ -108,7 +109,7 @@ const Explore_screen = () => {
           event={selectedEvent || {}}
           onClose={() => setDetailedPostModalVisible(false)}
         />
-      </View>
+      </SafeAreaView>
     </GestureHandlerRootView>
   );
 };
@@ -119,6 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
+    marginTop: 30,
     flexDirection: "row",
     alignItems: "center",
     padding: 10,

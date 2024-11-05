@@ -57,6 +57,7 @@ const getPostsByOwner = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
+  console.log("Data: ", req.body);
   try {
     const ownerId = req.params.id;
 

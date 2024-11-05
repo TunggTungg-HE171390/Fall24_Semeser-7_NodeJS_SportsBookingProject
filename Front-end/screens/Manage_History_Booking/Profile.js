@@ -18,7 +18,10 @@ export default function Profile() {
 
   const userInfoDetail = async () => {
     try {
-      const res = await axios.get(`${api}/user/userInfo/${userId}`);
+      const res = await axios.get(
+        `http://192.168.0.104:3000/user/userInfo/${userId}`
+      );
+      console.log("User Infor: ", res.data);
       setUserDetails(res.data);
     } catch (error) {
       console.log("Error fetching user details:", error);
