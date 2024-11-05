@@ -34,7 +34,7 @@ export default function CustomTabScreen() {
   const getCountFieldOrderByCustomerId = async () => {
     try {
       console.log("Fetching count for user:", userId);
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/count-by-customer/${userId}`);
+      const res = await axios.get(`http://192.168.228.230:3000/field-order/count-by-customer/${userId}`);
       const count = res.data.data;
       setCount(count);
       console.log("Count fetched successfully:", count);
@@ -45,7 +45,7 @@ export default function CustomTabScreen() {
 
   const userInfoDetail = async () => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/user/userInfo/${userId}`);
+      const res = await axios.get(`http://192.168.228.230:3000/user/userInfo/${userId}`);
       setName(res.data.profile.name);
       setPhone(res.data.profile.phone);
       console.log("User details fetched:", res.data.profile.name, res.data.profile.phone);
@@ -57,7 +57,7 @@ export default function CustomTabScreen() {
   const handleUpdate = async () => {
     try {
       const updatedData = { name, phone };
-      await axios.post(`http://192.168.1.38:3000/user/updateInfo/${userId}`, updatedData);
+      await axios.post(`http://192.168.228.230:3000/user/updateInfo/${userId}`, updatedData);
       console.log("User information updated successfully");
       Alert.alert("Success", "Update user information successfully");
       dispatch(updateUserName(name));

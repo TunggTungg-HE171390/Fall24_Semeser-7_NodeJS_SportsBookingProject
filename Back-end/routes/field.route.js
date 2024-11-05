@@ -13,5 +13,6 @@ router.delete("/:id", FieldController.deleteField);
 router.get("/:id", FieldController.getFieldById);
 router.get("/fieldDetail/:feedbackId", FieldController.getFieldByFeedbackId);
 router.get("/check-comment/:fieldId/:userId", FieldController.checkFeedbackExist);
+router.get("/getAll", FieldController.getAllField);
 
 module.exports = router;

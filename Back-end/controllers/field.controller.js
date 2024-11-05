@@ -266,6 +266,16 @@ const checkFeedbackExist = async (req, res, next) => {
   }
 }
 
+const getAllField = async (req, res, next) => {
+  try {
+    const fields = await Field.find();
+    res.status(200).json(fields);
+  } catch (error) {
+    console.error('Error checking user feedback:', error);
+  }
+}
+
+
 module.exports = {
   addField,
   updateField,
@@ -273,5 +283,6 @@ module.exports = {
   getFields,
   getFieldById,
   getFieldByFeedbackId,
-  checkFeedbackExist
+  checkFeedbackExist,
+  getAllField
 };

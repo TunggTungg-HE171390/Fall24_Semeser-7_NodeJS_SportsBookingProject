@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, TextInput, Button, Alert } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar } from "react-native-calendars";
 import { useSelector } from "react-redux";
@@ -11,6 +11,11 @@ export default function History() {
   const [orders, setOrders] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisibleCreate, setModalVisibleCreate] = useState(false);
+
+  const [star, setStar] = useState(0);
+  const [comment, setComment] = useState("");
+  const [fieldId, setFieldId] = useState("");
 
   const userId = useSelector((state) => state.auth.user?.id);
 
@@ -22,7 +27,7 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/customer/${userId}`);
+      const res = await axios.get(`http://192.168.228.230:3000/field-order/customer/${userId}`);
       const fetchedOrders = res.data.data || [];
       const updatedOrders = fetchedOrders.map((order) => {
         const [time, date] = order.orderDate.split(" ");
@@ -51,13 +56,47 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`http://192.168.1.38:3000/field-order/detail/${fieldOrderId}`);
+      const res = await axios.get(`http://192.168.228.230:3000/field-order/detail/${fieldOrderId}`);
       console.log("Detail:", res.data.data);
       return res.data.data;
     } catch (error) {
       console.log("Error fetching field order detail:", error);
       return null;
     }
+  };
+
+  const createFeedback = async () => {
+    try {
+      const res = await axios.post(`http://192.168.228.230:3000/feedback/create`, {
+          fieldId: fieldId,
+          star: star,
+          comment: comment,
+          userId: userId
+      });
+      console.log("Feedback created:", res.data);
+      Alert.alert("Success", "Update feedback information successfully");
+      setModalVisibleCreate(false);
+      setStar(0);
+      setComment("");
+  } catch (error) {
+      console.log("Error creating feedback:", error);
+  }
+};
+
+  const renderStars = () => {
+    return (
+      <View style={styles.starsContainer}>
+        {[1, 2, 3, 4, 5].map((item) => (
+          <TouchableOpacity key={item} onPress={() => setStar(item)}>
+            <Icon
+              name="star"
+              size={30}
+              color={item <= star ? "gold" : "gray"}
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
   };
 
   const onDayPress = async (day) => {
@@ -80,6 +119,8 @@ export default function History() {
       console.log("No orders found for the selected day.");
     }
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -146,6 +187,12 @@ export default function History() {
 
                     <TouchableOpacity>
                       <Text style={styles.feedbacks}>{order.Feedback}</Text>
+
+                      {order.Feedback === 'Bạn chưa đánh giá về trải nghiệm ở sân này. ' && (
+                        <Text style={{ color: "blue" }} onPress={() => { setModalVisibleCreate(true); setFieldId(order.fieldId); }}>
+                          Bạn có muốn đánh giá không ?
+                        </Text>
+                      )}
                     </TouchableOpacity>
                   </View>
                 ))
@@ -159,6 +206,28 @@ export default function History() {
           </View>
         </View>
       </Modal>
+
+      {/* Modal đánh giá */}
+      <Modal visible={modalVisibleCreate} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Tạo đánh giá</Text>
+            {renderStars()}
+            <TextInput
+              style={styles.input}
+              placeholder="Nhận xét"
+              value={comment}
+              onChangeText={setComment}
+              multiline
+            />
+            <Button color="#ff6b01" title="Gửi đánh giá" onPress={createFeedback} />
+            <TouchableOpacity onPress={() => setModalVisibleCreate(false)}>
+              <Text style={styles.closeButton}>Hủy</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
@@ -250,5 +319,25 @@ const styles = StyleSheet.create({
   },
   feedbacks: {
     color: 'red',
-  }
+  },
+  starsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  input: {
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 30,
+    marginTop: 10,
+    borderRadius: 5,
+    width: "100%",
+  },
+  closeButton: {
+    color: "blue",
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 18,
+  },
 });

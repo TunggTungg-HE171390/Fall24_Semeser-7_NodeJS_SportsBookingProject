@@ -35,7 +35,7 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    axios.post("http://192.168.1.38:3000/auth/sign-up", {
+    axios.post("http://192.168.228.230:3000/auth/sign-up", {
       account: {
         email: email,
         password: password,
@@ -58,7 +58,7 @@ export default function RegisterScreen({ navigation }) {
           error.response?.data?.message || "Đăng ký thất bại";
         console.error("Lỗi:", errorMessage);
         setErrorMessage(errorMessage); // Lưu lỗi vào state để hiển thị
-        setModalVisible(true); // Hiển thị modal lỗi
+        setModalVisible(true); 
       });
   };
 
