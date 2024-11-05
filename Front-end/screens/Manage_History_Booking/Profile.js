@@ -7,7 +7,7 @@ import axios from "axios";
 export default function Profile() {
   const [viewType, setViewType] = useState("monthly");
   const [userDetails, setUserDetails] = useState(null);
-
+  const api = process.env.REACT_APP_IP_Address;
   const userName = useSelector((state) => state.auth.user?.name);
   const userId = useSelector((state) => state.auth.user?.id);
   const dispatch = useDispatch();
@@ -18,9 +18,7 @@ export default function Profile() {
 
   const userInfoDetail = async () => {
     try {
-      const res = await axios.get(
-        `http://192.168.0.104:3000/user/userInfo/${userId}`
-      );
+      const res = await axios.get(`${api}/user/userInfo/${userId}`);
       setUserDetails(res.data);
     } catch (error) {
       console.log("Error fetching user details:", error);

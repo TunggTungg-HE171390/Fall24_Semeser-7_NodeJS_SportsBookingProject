@@ -18,7 +18,7 @@ export default function Setting({ navigation }) {
   const [showModal, setShowModal] = useState(false);
   const userName = useSelector((state) => state.auth.user?.name);
   const userId = useSelector((state) => state.auth.user?.id);
-
+  const api = process.env.REACT_APP_IP_Address;
   const [formData, setFormData] = useState({
     name: userName,
     password: "",
@@ -39,10 +39,7 @@ export default function Setting({ navigation }) {
     }
 
     axios
-      .post(
-        `http://192.168.0.104:3000/user/change-password/${userId}`,
-        formData
-      )
+      .post(`${api}/user/change-password/${userId}`, formData)
       .then((res) => {
         console.log(res);
         Alert.alert("Success", "Password changed successfully");
@@ -63,7 +60,7 @@ export default function Setting({ navigation }) {
 
   const handleLogout = async () => {
     axios
-      .post("http://192.168.0.104:3000/auth/sign-out")
+      .post(`${api}/auth/sign-out`)
       .then(async (res) => {
         console.log(res.data.message);
         await AsyncStorage.removeItem("authToken");

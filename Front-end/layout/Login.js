@@ -23,6 +23,7 @@ export default function Login({ navigation }) {
   const api = process.env.REACT_APP_IP_Address;
   const dispatch = useDispatch();
   const handleLogin = async () => {
+    console.log(`Login Handle`);
     try {
       const res = await axios.post(`${api}/auth/sign-in`, {
         identifier: identifier,
