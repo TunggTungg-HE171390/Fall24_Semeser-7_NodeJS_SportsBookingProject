@@ -29,7 +29,7 @@ export default function Report() {
   const [selectedStarFilter, setSelectedStarFilter] = useState("all");
 
   const userId = useSelector((state) => state.auth.user?.id);
-
+  const api = process.env.REACT_APP_IP_Address;
   useEffect(() => {
     if (userId) {
       getFeedbackByCustomerId();
@@ -42,9 +42,7 @@ export default function Report() {
 
   const getFieldByFeedbackId = async (feedbackId) => {
     try {
-      const res = await axios.get(
-        `http://192.168.0.104:3000/field/fieldDetail/${feedbackId}`
-      );
+      const res = await axios.get(`${api}/field/fieldDetail/${feedbackId}`);
       setFieldDetail(res.data);
       setDetailsModalVisible(true);
     } catch (error) {
@@ -60,9 +58,7 @@ export default function Report() {
   const getFeedbackByCustomerId = async () => {
     try {
       if (!userId) return;
-      const res = await axios.get(
-        `http://192.168.0.104:3000/feedback/${userId}`
-      );
+      const res = await axios.get(`${api}/feedback/${userId}`);
       setReviews(res.data.feedbacks);
       setFilteredReviews(res.data.feedbacks);
     } catch (error) {
@@ -99,7 +95,7 @@ export default function Report() {
       };
 
       await axios.put(
-        `http://192.168.0.104:3000/feedback/update/${selectedReview._id}`,
+        `${api}/feedback/update/${selectedReview._id}`,
         updatedReview
       );
       Alert.alert("Success", "Feedback has been updated successfully");
@@ -134,9 +130,7 @@ export default function Report() {
     try {
       if (!selectedReview) return;
 
-      await axios.delete(
-        `http://192.168.0.104:3000/feedback/delete/${selectedReview._id}`
-      );
+      await axios.delete(`${api}/feedback/delete/${selectedReview._id}`);
       setReviews(reviews.filter((review) => review._id !== selectedReview._id));
       setDeleteModalVisible(false);
       setSelectedReview(null);
