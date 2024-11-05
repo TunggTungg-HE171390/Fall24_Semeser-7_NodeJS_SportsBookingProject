@@ -22,12 +22,12 @@ const BookingScreen = () => {
   const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
   const [selectedSport, setSelectedSport] = useState(null); // Sport filter
   const [openSport, setOpenSport] = useState(false); // State for DropDownPicker
-
+  const api = process.env.REACT_APP_IP_Address;
   // Fetch data from API
   const fetchFields = async (newPage = 1) => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://192.168.1.70:3000/field`, {
+      const response = await axios.get(`${api}/field`, {
         params: {
           page: newPage,
           limit: 2,
@@ -36,7 +36,7 @@ const BookingScreen = () => {
           sportName: selectedSport,
         },
       });
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
 
       const { data: fields, currentPage, totalPages } = response.data;
 

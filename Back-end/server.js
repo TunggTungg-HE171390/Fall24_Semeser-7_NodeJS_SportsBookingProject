@@ -1,8 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
-const httpErrors = require("http-errors");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 const getLocalIP = require("./utils/ipconfig");
@@ -17,6 +15,7 @@ const {
   FieldOrderRouter,
   FeedbackRouter,
   EquipmentRouter,
+  Equipment_OrderRouter,
 } = require("./routes");
 
 const db = require("./models");
@@ -41,6 +40,7 @@ app.use("/auth", AuthenticationRouter);
 app.use("/field-order", FieldOrderRouter);
 app.use("/feedback", FeedbackRouter);
 app.use("/equipment", EquipmentRouter);
+app.use("/equipment-order", Equipment_OrderRouter);
 
 app.use(async (err, req, res, next) => {
   res.status(err.status || 500).send({
@@ -58,10 +58,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-const ip = getLocalIP();
-
 app.listen(process.env.PORT, () => {
   const ip = getLocalIP();
   console.log(`IP Address: ${ip}`);
+  console.log(`Server running at http://${ip}:${process.env.PORT}`);
   db.connectDB();
 });

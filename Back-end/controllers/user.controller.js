@@ -14,10 +14,27 @@ const getAllUsers = async (req, res) => {
 
 const getAllUsersFromAdmin = async (req, res) => {
   try {
-    const users = await userModel.find({ status: 1 });
-    res.status(200).json(users);
+    const countRole = req.query.countRole;
+
+    if (countRole === "count") {
+      const users = await userModel.find({ status: 1 });
+      const roleCounts = users.reduce(
+        (acc, user) => {
+          if (user.role === 1) acc.customer++;
+          else if (user.role === 2) acc.fieldOwner++;
+          return acc;
+        },
+        { customer: 0, fieldOwner: 0 }
+      );
+
+      // Trả về kết quả
+      res.status(200).json(roleCounts);
+    } else {
+      const users = await userModel.find({ status: 1 });
+      res.status(200).json(users);
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: { status: 500, message: error.message } });
   }
 };
 
@@ -125,24 +142,58 @@ const getUserById = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
+    const userId = req.params.id;
     const newPhone = req.body.phone;
-    const newAvatar = req.body.avatar;
+    const newName = req.body.name;
+    console.log(newName);
 
-    const updateInfo = {
-      "profile.phone": newPhone,
-      "profile.avatar": newAvatar,
-    };
+    if (newName !== undefined) {
+      const checkNameExist = await userModel.findOne({
+        "profile.name": newName,
+        _id: { $ne: userId },
+      }); //bỏ qua user mình
+      if (checkNameExist) {
+        return res.status(400).json({ message: "Name already exists" });
+      }
+    }
 
-    const updatedUser = await userModel.findByIdAndUpdate(
-      req.params.id,
-      updateInfo,
-      { new: true }
-    );
+    if (newPhone !== undefined) {
+      const checkPhoneExist = await userModel.findOne({
+        "profile.phone": newPhone,
+        _id: { $ne: userId },
+      });
+      if (checkPhoneExist) {
+        return res.status(400).json({ message: "Phone already exists" });
+      }
+    }
+
+    const updateInfo = {};
+
+    if (newName !== undefined) {
+      updateInfo["profile.name"] = newName;
+    }
+    if (newPhone !== undefined) {
+      updateInfo["profile.phone"] = newPhone;
+    }
+
+    if (Object.keys(updateInfo).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updateInfo, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);
   }
 };
+
 const editUserFromAdmin = async (req, res, next) => {
   try {
     const { id, name, phone, role } = req.body;

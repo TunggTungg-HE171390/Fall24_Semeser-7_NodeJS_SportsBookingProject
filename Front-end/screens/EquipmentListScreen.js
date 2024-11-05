@@ -26,13 +26,13 @@ const EquipmentListScreen = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEquipment, setEditingEquipment] = useState(null);
-
+  const api = process.env.REACT_APP_IP_Address;
   const [equipmentName, setEquipmentName] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [status, setStatus] = useState(1);
   const [images, setImages] = useState([]);
-  const api = process.env.REACT_APP_IP_Address;
+
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);

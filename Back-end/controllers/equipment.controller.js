@@ -248,7 +248,6 @@ const getOrdersWithTimeFilter = async (req, res) => {
       .populate("customer_id", "name email")
       .populate("equipments.equipment_id", "name")
       .sort({ createdAt: -1 });
-
     res.status(200).json({ total: orders.length, orders });
   } catch (error) {
     res.status(500).json({ error: error.message });
