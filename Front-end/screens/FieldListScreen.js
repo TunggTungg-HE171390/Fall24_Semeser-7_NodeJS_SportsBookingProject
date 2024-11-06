@@ -124,7 +124,7 @@ export default function FieldListScreen() {
           formData
         );
         if (response.data) {
-          Alert.alert("Success", "Field updated successfully!", [
+          Alert.alert("Success", "Create field  successfully!", [
             {
               text: "OK",
               onPress: () => {

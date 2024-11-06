@@ -36,7 +36,7 @@ const BookingScreen = () => {
           sportName: selectedSport,
         },
       });
-      // console.log("Response:", response.data);
+      console.log("Response:", response.data);
 
       const { data: fields, currentPage, totalPages } = response.data;
 

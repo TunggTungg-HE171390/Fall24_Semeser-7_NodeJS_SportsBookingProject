@@ -188,7 +188,7 @@ const getFields = async (req, res, next) => {
       sortOrder = "asc",
       sportName,
     } = req.query;
-    const skip = (page - 1) * limit;
+    // const skip = (page - 1) * limit;
 
     // Build the query object based on search query and sport filter
     const query = {
@@ -200,10 +200,9 @@ const getFields = async (req, res, next) => {
     const sort = { price: sortOrder === "asc" ? 1 : -1 };
 
     // Execute the query with filters, sorting, and pagination
-    const fields = await Field.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(parseInt(limit));
+    const fields = await Field.find(query).sort(sort);
+    // .skip(skip)
+    // .limit(parseInt(limit));
 
     // Get total fields for pagination
     const totalFields = await Field.countDocuments(query);
@@ -211,9 +210,9 @@ const getFields = async (req, res, next) => {
 
     res.status(200).json({
       data: fields,
-      currentPage: parseInt(page),
-      totalPages,
-      totalFields,
+      // currentPage: parseInt(page),
+      // totalPages,
+      // totalFields,
     });
   } catch (error) {
     next(error);
