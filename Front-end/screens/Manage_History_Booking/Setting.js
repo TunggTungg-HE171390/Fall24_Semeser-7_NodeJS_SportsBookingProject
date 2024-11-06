@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/authSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 
 export default function Setting({ navigation }) {
@@ -39,7 +39,10 @@ export default function Setting({ navigation }) {
     }
 
     axios
-      .post(`${api}/user/change-password/${userId}`, formData)
+      .post(
+        `http://192.168.0.104:3000/user/change-password/${userId}`,
+        formData
+      )
       .then((res) => {
         console.log(res);
         Alert.alert("Success", "Password changed successfully");
@@ -60,10 +63,10 @@ export default function Setting({ navigation }) {
 
   const handleLogout = async () => {
     axios
-      .post(`${api}/auth/sign-out`)
+      .post(`http://192.168.0.104:3000/auth/sign-out`)
       .then(async (res) => {
         console.log(res.data.message);
-        await AsyncStorage.removeItem("authToken");
+        // await AsyncStorage.removeItem("authToken");
         dispatch(logout());
         // Alert.alert("Logged out", "You have been logged out.");
       })

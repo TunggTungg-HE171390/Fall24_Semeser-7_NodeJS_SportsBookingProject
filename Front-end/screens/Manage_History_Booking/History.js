@@ -31,7 +31,10 @@ export default function History() {
 
   const getFieldOrderByCustomerId = async () => {
     try {
-      const res = await axios.get(`${api}/field-order/customer/${userId}`);
+      console.log("api: ", api);
+      const res = await axios.get(
+        `http://192.168.0.104:3000/field-order/customer/${userId}`
+      );
       const fetchedOrders = res.data.data || [];
       const updatedOrders = fetchedOrders.map((order) => {
         const [time, date] = order.orderDate.split(" ");
@@ -63,7 +66,9 @@ export default function History() {
 
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
-      const res = await axios.get(`${api}/field-order/detail/${fieldOrderId}`);
+      const res = await axios.get(
+        `http://192.168.0.104:3000/field-order/detail/${fieldOrderId}`
+      );
       setSelectedOrder(res.data.data);
       setModalVisible(true);
     } catch (error) {
@@ -164,9 +169,9 @@ export default function History() {
                       <Text>Thông tin thời gian không có sẵn</Text>
                     )}
 
-                    <Text style={{ fontWeight: "bold" }}>
+                    {/* <Text style={{ fontWeight: "bold" }}>
                       Thiết bị đăng kí:
-                    </Text>
+                    </Text> */}
                     {order.equipmentOrder?.length > 0 ? (
                       <View style={{ marginVertical: 2 }}>
                         {order.equipmentOrder.map(
@@ -189,23 +194,23 @@ export default function History() {
                             </View>
                           )
                         )}
-                        <Text style={{ fontWeight: "bold" }}>
+                        {/* <Text style={{ fontWeight: "bold" }}>
                           Tổng tiền: {order.totalPrice} VND
-                        </Text>
+                        </Text> */}
                       </View>
                     ) : (
                       <View>
-                        <Text>Không có thiết bị đặt hàng</Text>
+                        {/* <Text>Không có thiết bị đặt hàng</Text>
                         <Text style={{ fontWeight: "bold" }}>
                           Tổng tiền: 0 VND
-                        </Text>
+                        </Text> */}
                       </View>
                     )}
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       onPress={() => checkFeedbackExist(order.fieldId)}
                     >
                       <Text style={styles.feedbacks}>{checkFeedback}</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 ))
               ) : (

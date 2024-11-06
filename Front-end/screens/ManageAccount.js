@@ -29,7 +29,9 @@ const ManageAccount = () => {
   const api = process.env.REACT_APP_IP_Address;
   const fetchAccountsData = async () => {
     try {
-      const response = await axios.get(`${api}/user/list-from-admin`);
+      const response = await axios.get(
+        `http://192.168.0.104:3000/user/list-from-admin`
+      );
       // console.log("Account Data: ", response.data);
       const accounts = response.data.reverse();
       setAccounts(accounts);
@@ -76,7 +78,7 @@ const ManageAccount = () => {
         });
     } else {
       axios
-        .post(`${api}/auth/sign-up`, accountData)
+        .post(`http://192.168.0.104:3000/auth/sign-up`, accountData)
         .then((res) => {
           Alert.alert(
             "Success",

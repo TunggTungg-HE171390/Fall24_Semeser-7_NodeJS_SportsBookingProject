@@ -3,6 +3,7 @@ import authorizedAxiosInstance from "./authorizedAxios";
 class PostAPI {
   // Create post
   static async createPost(postData, userId, userRole) {
+    console.log("userId: ", userId), console.log("Post Data: ", postData);
     try {
       // Ensure postData is a FormData object if necessary.
       if (!(postData instanceof FormData)) {

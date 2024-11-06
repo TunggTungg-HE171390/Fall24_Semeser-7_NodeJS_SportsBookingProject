@@ -27,7 +27,7 @@ const BookingScreen = () => {
   const fetchFields = async (newPage = 1) => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`${api}/field`, {
+      const response = await axios.get(`http://192.168.0.104:3000/field`, {
         params: {
           page: newPage,
           limit: 2,
@@ -36,7 +36,7 @@ const BookingScreen = () => {
           sportName: selectedSport,
         },
       });
-      // console.log("Response:", response.data);
+      console.log("Response:", response.data);
 
       const { data: fields, currentPage, totalPages } = response.data;
 

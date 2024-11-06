@@ -47,13 +47,22 @@ const getAllEquipments = async (req, res) => {
 };
 
 // Create new equipment
+// const createEquipment = async (req, res) => {
+//   try {
+//     const owner = await userModel.findById(req.body.ownerId);
+
+//     if (!owner) {
+//       return res.status(404).json({ message: "Owner not found" });
+//     }
+//     const equipment = await equipmentModel.create(req.body);
+//     res.status(201).json(equipment);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 const createEquipment = async (req, res) => {
   try {
-    const owner = await userModel.findById(req.body.ownerId);
-
-    if (!owner) {
-      return res.status(404).json({ message: "Owner not found" });
-    }
     const equipment = await equipmentModel.create(req.body);
     res.status(201).json(equipment);
   } catch (error) {
@@ -62,14 +71,31 @@ const createEquipment = async (req, res) => {
 };
 
 // Update equipment by ID
+// const updateEquipment = async (req, res) => {
+//   const equipmentId = req.params.id;
+//   console.log("eq Id: ", equipmentId);
+//   try {
+//     // const owner = await userModel.findById(req.body.ownerId);
+
+//     // if (!owner) {
+//     //   return res.status(404).json({ message: "Owner not found" });
+//     // }
+//     const updatedEquipment = await equipmentModel.findByIdAndUpdate(
+//       equipmentId,
+//       req.body,
+//       { new: true, runValidators: true }
+//     );
+//     if (!updatedEquipment) {
+//       return res.status(404).json({ message: "Equipment not found" });
+//     }
+//     res.status(200).json(updatedEquipment);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 const updateEquipment = async (req, res) => {
   try {
     const equipmentId = req.params.id;
-    const owner = await userModel.findById(req.body.ownerId);
-
-    if (!owner) {
-      return res.status(404).json({ message: "Owner not found" });
-    }
     const updatedEquipment = await equipmentModel.findByIdAndUpdate(
       equipmentId,
       req.body,
@@ -83,7 +109,6 @@ const updateEquipment = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 // Get equipment by ID
 const getEquipmentById = async (req, res) => {
   try {

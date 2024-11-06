@@ -147,7 +147,10 @@ const FieldDetailScreen = ({ route }) => {
         horizontal
         keyExtractor={(imageUrl, index) => `${imageUrl}-${index}`}
         renderItem={({ item: imageUrl }) => (
-          <Image source={{ uri: imageUrl }} style={styles.image} />
+          <>
+            {console.log("Image: ", imageUrl)}
+            <Image source={{ uri: imageUrl }} style={styles.image} />
+          </>
         )}
         style={styles.imageGallery}
       />
@@ -268,6 +271,10 @@ const FieldDetailScreen = ({ route }) => {
 export default FieldDetailScreen;
 
 const styles = StyleSheet.create({
+  image: {
+    width: 380,
+    height: 380,
+  },
   container: {
     flex: 1,
     padding: 16,

@@ -29,6 +29,7 @@ export default function CustomTabScreen() {
 
   const userName = useSelector((state) => state.auth.user?.name);
   const userId = useSelector((state) => state.auth.user?.id);
+  const role = useSelector((state) => state.auth.user?.role);
   const api = process.env.REACT_APP_IP_Address;
   useEffect(() => {
     if (userId) {
@@ -158,7 +159,23 @@ export default function CustomTabScreen() {
 
       <View style={styles.componentUnder}>
         <View style={styles.tabBarContainer}>
-          {["Profile", "History", "Report", "Setting"].map((tab) => (
+          {/* {["Profile", "History", "Report", "Setting"].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[
+                styles.tabButton,
+                selectedTab === tab && styles.activeTabButton,
+              ]}
+              onPress={() => setSelectedTab(tab)}
+            >
+              <Text style={styles.tabText}>{tab}</Text>
+            </TouchableOpacity>
+          ))} */}
+          {[
+            "Profile",
+            ...(role === 1 ? ["History", "Report"] : []),
+            "Setting",
+          ].map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[

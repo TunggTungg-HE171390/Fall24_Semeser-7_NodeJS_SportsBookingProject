@@ -3,18 +3,20 @@ import { View, Text, StyleSheet, FlatList, Image } from "react-native";
 
 export default function FieldAdminDetailScreen({ route }) {
   const { field } = route.params;
-
+  console.log("Field: ", field);
   return (
     <View style={styles.container}>
-      <Image source={field.image} style={styles.fieldImage} />
+      <Image source={{ uri: field.image[0] }} style={styles.fieldImage} />
       <Text style={styles.fieldName}>{field.name}</Text>
-      <Text style={styles.fieldType}>Loại: {field.type}</Text>
-      <Text style={styles.fieldLocation}>Địa điểm: {field.location}</Text>
+      <Text style={styles.fieldType}>Loại: {field.sportName}</Text>
+      <Text style={styles.fieldLocation}>Địa điểm: {field.address}</Text>
       <Text style={styles.fieldPrice}>Giá thuê: {field.price} VND/giờ</Text>
-      <Text style={styles.fieldRating}>Đánh giá: {field.rating}/5</Text>
+      <Text style={styles.fieldRating}>Đánh giá: 4.5/5</Text>
       <Text style={styles.totalFields}>Tổng số sân: {field.totalFields}</Text>
 
-      <Text style={styles.reviewTitle}>Đánh giá từ người dùng:</Text>
+      <Text style={styles.reviewTitle}>
+        Đánh giá từ người dùng: Chưa có đánh giá nào
+      </Text>
       <FlatList
         data={field.reviews}
         keyExtractor={(item, index) => index.toString()}
@@ -27,6 +29,9 @@ export default function FieldAdminDetailScreen({ route }) {
         )}
       />
     </View>
+    // <>
+    //   <Text>Test</Text>
+    // </>
   );
 }
 

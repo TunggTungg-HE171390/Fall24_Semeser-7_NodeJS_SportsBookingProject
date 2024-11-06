@@ -21,11 +21,13 @@ export default function Login({ navigation }) {
   const [codeSent, setCodeSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const api = process.env.REACT_APP_IP_Address;
+  console.log(api);
   const dispatch = useDispatch();
   const handleLogin = async () => {
     console.log(`Login Handle`);
+
     try {
-      const res = await axios.post(`${api}/auth/sign-in`, {
+      const res = await axios.post(`http://192.168.0.104:3000/auth/sign-in`, {
         identifier: identifier,
         password: password,
       });

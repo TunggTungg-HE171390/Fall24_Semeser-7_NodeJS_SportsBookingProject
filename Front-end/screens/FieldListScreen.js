@@ -56,9 +56,10 @@ export default function FieldListScreen() {
 
   const fetchFields = async (currentPage = 1) => {
     setLoading(true);
+    console.log("Handle Field List");
     try {
       const response = await axios.get(
-        `${api}/field?page=${currentPage}&limit=4`
+        `http://192.168.0.104:3000/field?page=${currentPage}&limit=4`
       );
       const responseData = response.data;
       const fieldsData = responseData.data;
@@ -98,7 +99,7 @@ export default function FieldListScreen() {
 
         // Update the existing field
         const response = await axios.put(
-          `${apiEndpoint}/${selectedField._id}`,
+          `http://192.168.0.104:3000/field/${selectedField._id}`,
           formData
         );
         if (response.data) {
@@ -118,9 +119,12 @@ export default function FieldListScreen() {
         }
       } else {
         // Create a new field
-        const response = await axios.post(apiEndpoint, formData);
+        const response = await axios.post(
+          "http://192.168.0.104:3000/field",
+          formData
+        );
         if (response.data) {
-          Alert.alert("Success", "Field updated successfully!", [
+          Alert.alert("Success", "Create field  successfully!", [
             {
               text: "OK",
               onPress: () => {
@@ -178,7 +182,7 @@ export default function FieldListScreen() {
         style: "destructive",
         onPress: async () => {
           try {
-            await axios.delete(`${apiEndpoint}/${fieldId}`);
+            await axios.delete(`http://192.168.0.104:3000/field/${fieldId}`);
             fetchFields(page);
           } catch (error) {
             console.error("Error deleting field:", error);
