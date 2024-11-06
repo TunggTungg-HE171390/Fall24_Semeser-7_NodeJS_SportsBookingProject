@@ -58,8 +58,23 @@ async function getAllFeedbacks(req, res, next) {
 
 async function createFeedback(req, res, next) {
     try {
-        const feedback = await db.feedback.create(req.body);
+        const feedback = await db.feedback.create({
+            starNumber: req.body.star,        
+            detail: req.body.comment,         
+            customerId: req.body.userId,      
+            status: 1
+        });
+
+        const fieldId = req.body.fieldId;
+        console.log("Field ID:", fieldId); 
+
+        await db.field.findByIdAndUpdate(
+            fieldId,
+            { $push: { feedBackId: feedback._id } },
+            { new: true, useFindAndModify: false }
+        );
         res.status(201).json({
+            message: "Feedback created successfully",
             feedback
         });
     } catch (error) {

@@ -241,7 +241,7 @@ const FieldDetailScreen = ({ route }) => {
         onPress={handleBooking}
         disabled={!selectedSlot}
       >
-        <Text style={styles.bookButtonText}>Đặt sân</Text>
+        <Text style={styles.bookButtonText}>Đặ t sân</Text>
       </TouchableOpacity>
       {/* Feedback Section */}
       <Text style={styles.sectionTitle}>Feedback</Text>

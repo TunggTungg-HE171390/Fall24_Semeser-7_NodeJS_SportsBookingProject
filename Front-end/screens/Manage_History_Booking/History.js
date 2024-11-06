@@ -5,8 +5,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
-  Button,
   ScrollView,
+  TextInput,
+  Button,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Calendar } from "react-native-calendars";
@@ -17,10 +19,15 @@ export default function History() {
   const [viewType, setViewType] = useState("monthly");
   const [markedDates, setMarkedDates] = useState({});
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [checkFeedback, setCheckFeedback] = useState("");
+  const [modalVisibleCreate, setModalVisibleCreate] = useState(false);
+
+  const [star, setStar] = useState(0);
+  const [comment, setComment] = useState("");
+  const [fieldId, setFieldId] = useState("");
   const api = process.env.REACT_APP_IP_Address;
+
   const userId = useSelector((state) => state.auth.user?.id);
 
   useEffect(() => {
@@ -40,7 +47,7 @@ export default function History() {
           2,
           "0"
         )}`;
-        return { ...order, formattedOrderDate: formattedDate }; // Thêm trường formattedOrderDate với định dạng chuẩn
+        return { ...order, formattedOrderDate: formattedDate };
       });
       setOrders(updatedOrders);
 
@@ -64,54 +71,67 @@ export default function History() {
   const getFieldOrderDetail = async (fieldOrderId) => {
     try {
       const res = await axios.get(`${api}/field-order/detail/${fieldOrderId}`);
-      setSelectedOrder(res.data.data);
-      setModalVisible(true);
+      console.log("Detail:", res.data.data);
+      return res.data.data;
     } catch (error) {
       console.log("Error fetching field order detail:", error);
+      return null;
     }
   };
 
-  const onCheckFeedback = (order) => {
-    if (order.fieldId) {
-      checkFeedbackExist(order.fieldId); // Gọi hàm với `fieldId` từ đơn hàng
-    } else {
-      console.log("Không tìm thấy fieldId trong đơn hàng");
-    }
-  };
-
-  const checkFeedbackExist = async (fieldId) => {
+  const createFeedback = async () => {
     try {
-      const res = await axios.get(
-        `${api}/field/check-comment/${fieldId}/${userId}`
-      );
-      setCheckFeedback(res.data.message);
-      console.log("Mess:" + fieldId, res.data.message);
+      const res = await axios.post(`${api}/feedback/create`, {
+        fieldId: fieldId,
+        star: star,
+        comment: comment,
+        userId: userId,
+      });
+      console.log("Feedback created:", res.data);
+      Alert.alert("Success", "Update feedback information successfully");
+      setModalVisibleCreate(false);
+      setStar(0);
+      setComment("");
     } catch (error) {
-      console.log("Error fetching field order detail:", error);
+      console.log("Error creating feedback:", error);
     }
   };
 
-  const onDayPress = (day) => {
-    console.log("Day pressed:", day);
+  const renderStars = () => {
+    return (
+      <View style={styles.starsContainer}>
+        {[1, 2, 3, 4, 5].map((item) => (
+          <TouchableOpacity key={item} onPress={() => setStar(item)}>
+            <Icon
+              name="star"
+              size={30}
+              color={item <= star ? "gold" : "gray"}
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
+  const onDayPress = async (day) => {
+    console.log("Day pressed:", day); //Nó sẽ lọc các đơn hàng trong ngày đó và lấy chi tiết đơn hàng.
     const ordersForDay = orders.filter(
-      (o) => o.formattedOrderDate === day.dateString // Collect all orders with the same formattedOrderDate
+      (o) => o.formattedOrderDate === day.dateString
     );
 
     if (ordersForDay.length > 0) {
-      const fieldIds = ordersForDay.map((order) => order.fieldId);
+      try {
+        //lấy chi tiết từng đơn hàng đồng thời.
+        const details = await Promise.all(
+          ordersForDay.map((order) => getFieldOrderDetail(order._id))
+        );
 
-      // Nếu `checkFeedbackExist()` cần gọi cho từng ID riêng lẻ
-      fieldIds.forEach((order) => {
-        checkFeedbackExist(order._id);
-      });
-
-      console.log(
-        "ID2:",
-        fieldIds.map((order) => order._id)
-      );
-
-      setSelectedOrder(ordersForDay);
-      setModalVisible(true);
+        const validDetails = details.filter((detail) => detail !== null);
+        setSelectedOrders(validDetails);
+        setModalVisible(true);
+      } catch (error) {
+        console.log("Error fetching details for multiple orders:", error);
+      }
     } else {
       console.log("No orders found for the selected day.");
     }
@@ -140,14 +160,13 @@ export default function History() {
         />
       </View>
 
-      {/* Modal hiển thị thông tin đơn đặt hàng */}
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Chi tiết đơn đặt hàng</Text>
             <ScrollView style={{ maxHeight: "80%" }}>
-              {selectedOrder?.length > 0 ? (
-                selectedOrder.map((order, index) => (
+              {selectedOrders.length > 0 ? (
+                selectedOrders.map((order, index) => (
                   <View key={index} style={{ marginBottom: 20 }}>
                     <Text style={{ fontWeight: "bold", color: "red" }}>
                       Thông tin đặt sân {index + 1}
@@ -159,6 +178,9 @@ export default function History() {
                         <Text>Địa điểm: {order.fieldName || "N/A"}</Text>
                         <Text>Tên sân: {order.subFieldName || "N/A"}</Text>
                         <Text>Thời gian: {order.fieldTime}</Text>
+                        <Text style={{ fontWeight: "bold", color: "blue" }}>
+                          Giá tiền: {order.fieldPrice}
+                        </Text>
                       </View>
                     ) : (
                       <Text>Thông tin thời gian không có sẵn</Text>
@@ -189,22 +211,31 @@ export default function History() {
                             </View>
                           )
                         )}
-                        <Text style={{ fontWeight: "bold" }}>
-                          Tổng tiền: {order.totalPrice} VND
-                        </Text>
                       </View>
                     ) : (
                       <View>
                         <Text>Không có thiết bị đặt hàng</Text>
-                        <Text style={{ fontWeight: "bold" }}>
-                          Tổng tiền: 0 VND
-                        </Text>
                       </View>
                     )}
-                    <TouchableOpacity
-                      onPress={() => checkFeedbackExist(order.fieldId)}
-                    >
-                      <Text style={styles.feedbacks}>{checkFeedback}</Text>
+                    <Text style={{ fontWeight: "bold" }}>
+                      Tổng tiền: {order.totalPrice} VND
+                    </Text>
+
+                    <TouchableOpacity>
+                      <Text style={styles.feedbacks}>{order.Feedback}</Text>
+
+                      {order.Feedback ===
+                        "Bạn chưa đánh giá về trải nghiệm ở sân này. " && (
+                        <Text
+                          style={{ color: "blue" }}
+                          onPress={() => {
+                            setModalVisibleCreate(true);
+                            setFieldId(order.fieldId);
+                          }}
+                        >
+                          Bạn có muốn đánh giá không ?
+                        </Text>
+                      )}
                     </TouchableOpacity>
                   </View>
                 ))
@@ -214,6 +245,35 @@ export default function History() {
             </ScrollView>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
               <Text style={styles.closeButton}>Đóng</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal đánh giá */}
+      <Modal
+        visible={modalVisibleCreate}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Tạo đánh giá</Text>
+            {renderStars()}
+            <TextInput
+              style={styles.input}
+              placeholder="Nhận xét"
+              value={comment}
+              onChangeText={setComment}
+              multiline
+            />
+            <Button
+              color="#ff6b01"
+              title="Gửi đánh giá"
+              onPress={createFeedback}
+            />
+            <TouchableOpacity onPress={() => setModalVisibleCreate(false)}>
+              <Text style={styles.closeButton}>Hủy</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -309,5 +369,25 @@ const styles = StyleSheet.create({
   },
   feedbacks: {
     color: "red",
+  },
+  starsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  input: {
+    borderColor: "#ddd",
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 30,
+    marginTop: 10,
+    borderRadius: 5,
+    width: "100%",
+  },
+  closeButton: {
+    color: "blue",
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 18,
   },
 });

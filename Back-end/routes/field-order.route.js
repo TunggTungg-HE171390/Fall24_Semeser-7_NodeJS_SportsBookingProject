@@ -7,12 +7,15 @@ const { FieldOrderController } = require("../controllers");
 
 // Get all field orders
 router.get("/", FieldOrderController.getAllFieldOrders);
-router.get("/dasboard", FieldOrderController.getFieldOrdersForDashboard);
+
 // Get field order by ID
 router.get("/:id", FieldOrderController.getFieldOrderById);
 
 // Create a new field order
 router.post("/", FieldOrderController.createFieldOrder);
+
+//get detail field order
+router.get("/detail/:id", FieldOrderController.getDetailByFieldOrdersId);
 
 // Update an existing field order by ID
 router.put("/:id", FieldOrderController.updateFieldOrder);
@@ -25,6 +28,8 @@ router.get(
   "/fields/:fieldId/available-slots",
   FieldOrderController.getAvailableSlotsForField
 );
+
+// Get field orders by customer ID
 router.get(
   "/customer/:customerId",
   FieldOrderController.getFieldOrdersByCustomerId
@@ -35,7 +40,5 @@ router.get(
   "/count-by-customer/:id",
   FieldOrderController.getCountFieldOrderByCustomerId
 );
-
-//
 
 module.exports = router;

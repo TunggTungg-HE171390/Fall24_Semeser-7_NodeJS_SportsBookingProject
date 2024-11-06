@@ -62,65 +62,9 @@ const getAllFieldOrders = async (req, res) => {
   }
 };
 
-const getFieldOrdersForDashboard = async (req, res) => {
-  try {
-    const orders = await FieldOrders.find({ status: "Completed" })
-      .select("price")
-      .populate({
-        path: "fieldId",
-        select: "ownerId",
-        populate: {
-          path: "ownerId",
-          select: "profile.name",
-        },
-      });
-
-    // Tạo một đối tượng để lưu trữ tổng tiền của từng owner
-    const ownerTotals = {};
-
-    // Sử dụng map để lặp qua mỗi đơn hàng và tính tổng tiền cho mỗi chủ sở hữu
-    orders.map((order) => {
-      const ownerName = order.fieldId.ownerId.profile.name;
-      const price = order.price;
-
-      // Nếu owner đã tồn tại trong đối tượng ownerTotals, cộng thêm giá, nếu không thì khởi tạo
-      if (ownerTotals[ownerName]) {
-        ownerTotals[ownerName] += price;
-      } else {
-        ownerTotals[ownerName] = price;
-      }
-    });
-
-    // Tính tổng số tiền của tất cả các owner
-    const totalAmountAllOwners = Object.values(ownerTotals).reduce(
-      (acc, amount) => acc + amount,
-      0
-    );
-
-    // Tính 3% của tổng số tiền
-    const threePercentOfTotal = totalAmountAllOwners * 0.03;
-
-    // Tạo mảng kết quả chứa tổng tiền cho từng chủ sở hữu
-    const result = Object.keys(ownerTotals).map((ownerName) => ({
-      ownerName,
-      totalAmount: ownerTotals[ownerName],
-    }));
-
-    res.status(200).json({
-      result,
-      totalAmountAllOwners,
-      threePercentOfTotal, // trả về 3% tổng số tiền của tất cả các chủ sở hữu
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 // Create a new field order
 const createFieldOrder = async (req, res) => {
   try {
-    console.log(req.body);
-
     const {
       customerId,
       fieldId,
@@ -129,26 +73,16 @@ const createFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
-      price,
     } = req.body;
 
     // Validate entity existence
     await checkExistence(customerId, fieldId, subFieldId, slotId);
 
     // Validate order date
-    if (orderDate) {
-      const currentDate = new Date();
-      const orderDateOnly = new Date(orderDate);
-
-      // Set the time components to zero for both dates to ignore hours, minutes, and seconds
-      currentDate.setHours(0, 0, 0, 0);
-      orderDateOnly.setHours(0, 0, 0, 0);
-
-      if (orderDateOnly < currentDate) {
-        return res
-          .status(400)
-          .json({ message: "Order date must be in the present or future." });
-      }
+    if (orderDate && new Date(orderDate) < new Date()) {
+      return res
+        .status(400)
+        .json({ message: "Order date must be in the present or future." });
     }
 
     // Check if the slot is available for the specific field and subField
@@ -167,7 +101,6 @@ const createFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
-      price,
     });
     const savedOrder = await newOrder.save();
     res.status(201).json(savedOrder);
@@ -187,7 +120,6 @@ const updateFieldOrder = async (req, res) => {
       orderDate,
       status,
       equipmentOrderId,
-      price,
     } = req.body;
 
     // Validate entity existence
@@ -223,7 +155,6 @@ const updateFieldOrder = async (req, res) => {
         orderDate,
         status,
         equipmentOrderId,
-        price,
       },
       { new: true }
     );
@@ -274,7 +205,7 @@ const deleteFieldOrder = async (req, res) => {
 const getAvailableSlotsForField = async (req, res) => {
   try {
     const { fieldId } = req.params;
-    const { date, subFieldId } = req.query;
+    const { date } = req.query;
 
     if (!date) {
       return res
@@ -282,33 +213,16 @@ const getAvailableSlotsForField = async (req, res) => {
         .json({ message: "Date query parameter is required" });
     }
 
-    console.log(`Date: ${date}`);
-
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Check if the selected date is today
-    const today = new Date();
-    const isToday =
-      startOfDay.getDate() === today.getDate() &&
-      startOfDay.getMonth() === today.getMonth() &&
-      startOfDay.getFullYear() === today.getFullYear();
-    console.log(isToday);
-
-    // Retrieve all booked slots for the day for the specific field and subFieldId if provided
-    const bookedSlotsQuery = {
+    // Retrieve all booked slots for the day for the specific field
+    const bookedSlots = await FieldOrders.find({
       fieldId,
       orderDate: { $gte: startOfDay, $lte: endOfDay },
-    };
-    if (subFieldId) {
-      bookedSlotsQuery.subFieldId = subFieldId;
-    }
-
-    const bookedSlots = await FieldOrders.find(bookedSlotsQuery).select(
-      "subFieldId slotId"
-    );
+    }).select("subFieldId slotId");
 
     const bookedSubFields = bookedSlots.map((slot) => ({
       subFieldId: slot.subFieldId,
@@ -321,96 +235,24 @@ const getAvailableSlotsForField = async (req, res) => {
       return res.status(404).json({ message: "Field not found" });
     }
 
-    // Get the current time if the selected date is today
-    const currentTime = isToday ? new Date() : null;
-
-    console.log(`Current time: ${currentTime}`);
-
-    // Filter for a specific subField or all subFields if no specific subFieldId is provided
-    const availableSlots = field.subFields
-      .filter((subField) => !subFieldId || subField._id.equals(subFieldId))
-      .map((subField) => ({
-        name: subField.name,
-        subFieldId: subField._id,
-        availableSlots: subField.fieldTime.filter((slot) => {
-          // Check if the slot is booked
-          const isBooked = bookedSubFields.some(
+    const availableSlots = field.subFields.map((subField) => ({
+      name: subField.name,
+      subFieldId: subField._id,
+      availableSlots: subField.fieldTime.filter(
+        (slot) =>
+          !bookedSubFields.some(
             (booked) =>
               booked.subFieldId.equals(subField._id) &&
               booked.slotId.equals(slot._id)
-          );
-
-          // If the slot is booked, skip it
-          if (isBooked) return false;
-
-          // If today, only include slots that start after the current time
-          if (isToday) {
-            // Log the current date and time
-            console.log("current time", currentTime);
-
-            // Assuming slot.start is a string like "20:00", split it to get hours and minutes
-            const [slotHour, slotMinute] = slot.start.split(":").map(Number);
-
-            // Create a Date object for the slot start time on the current day
-            const slotStartTime = new Date(currentTime);
-            slotStartTime.setHours(slotHour, slotMinute, 0, 0); // Set hours, minutes, seconds, and milliseconds
-
-            // Log the slot start time
-            console.log("slot start time", slotStartTime);
-
-            // Return whether the slot start time is after the current time
-            return slotStartTime > currentTime;
-          }
-
-          // For future dates, include all available slots
-          return true;
-        }),
-      }));
+          )
+      ),
+    }));
 
     res.json(availableSlots);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
-//bản gốc
-// async function getFieldOrdersByCustomerId(req, res, next) {
-//   try {
-//     console.log(req.params.id);
-//     const field_orders = await db.fieldOrder
-//       .find({ customerId: req.params.id })
-//       .populate("customerId", "profile.name")
-//       .populate("equipmentOrderId")
-//       .populate("equipmentOrderId.equipments.equipment_id", "equipmentName")
-//       .populate({
-//         path: "fieldTime.fieldId",
-//         model: "Fields",
-//         select: "name",
-//       });
-
-//     const formattedFieldOrders = field_orders.map((order) => ({
-//       _id: order._id,
-//       customerName: order.customerId?.profile?.name,
-//       fieldTime: order.fieldTime.map((time) => ({
-//         fieldName: time.fieldId?.name,
-//         start: time.start,
-//         end: time.end,
-//       })),
-//       equipmentOrder: order.equipmentOrderId,
-//     }));
-
-//     console.log(formattedFieldOrders);
-
-//     res.status(200).json({
-//       message: "Get field orders successfully",
-//       data: formattedFieldOrders,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// }
-
-//bản của tùng
 
 async function getFieldOrdersByCustomerId(req, res, next) {
   try {
@@ -486,59 +328,6 @@ async function getFieldOrdersByCustomerId(req, res, next) {
   }
 }
 
-// bản gốc
-// async function getDetailByFieldOrdersId(req, res, next) {
-//   try {
-//     const detail_field_orders = await db.fieldOrder
-//       .findOne({ _id: req.params.id })
-//       .populate("customerId", "profile.name")
-//       .populate({
-//         path: "fieldTime.fieldId",
-//         model: "Fields",
-//         select: "name",
-//       });
-
-//     // Kiểm tra nếu không tìm thấy đơn đặt hàng nào
-//     if (!detail_field_orders) {
-//       return res.status(404).json({
-//         message: "Field order not found",
-//       });
-//     }
-
-//     const formattedFieldOrders = {
-//       _id: detail_field_orders._id,
-//       customerName: detail_field_orders.customerId?.profile?.name,
-//       fieldTime: detail_field_orders.fieldTime.map((time) => ({
-//         fieldName: time.fieldId?.name,
-//         start: new Date(time.start).toLocaleString("vi-VN", {
-//           year: "numeric",
-//           month: "2-digit",
-//           day: "2-digit",
-//           hour: "2-digit",
-//           minute: "2-digit",
-//         }),
-//         end: new Date(time.end).toLocaleString("vi-VN", {
-//           year: "numeric",
-//           month: "2-digit",
-//           day: "2-digit",
-//           hour: "2-digit",
-//           minute: "2-digit",
-//         }),
-//       })),
-//       equipmentOrder: detail_field_orders.equipmentOrderId,
-//     };
-
-//     res.status(200).json({
-//       message: "Get field orders successfully",
-//       data: formattedFieldOrders,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// }
-
-// bản của tùng
-
 async function getDetailByFieldOrdersId(req, res, next) {
   try {
     console.log(req.params.id);
@@ -579,8 +368,35 @@ async function getDetailByFieldOrdersId(req, res, next) {
     console.log("SubField ID:", detail_field_orders.subFieldId);
     console.log("Selected SubField:", selectedSubField);
 
+    const feedbacks = detail_field_orders.fieldId._id;
+
+    const feedbackinField = await db.field
+      .findById(feedbacks)
+      .populate("feedBackId");
+
+    const checkFeedbackExist = feedbackinField.feedBackId.find(
+      (feedback) =>
+        feedback.customerId.toString() ===
+        detail_field_orders.customerId._id.toString()
+    );
+    console.log("feedbacks.feedBackId: ", detail_field_orders.price);
+
+    let starRating = checkFeedbackExist ? checkFeedbackExist.starNumber : 0;
+    let starSymbols = "⭐".repeat(starRating) + "⭐".repeat(5 - starRating);
+
+    let checkFeedback = "";
+    if (!checkFeedbackExist) {
+      checkFeedback = "Bạn chưa đánh giá về trải nghiệm ở sân này. ";
+      console.log("User has not commented on this field.");
+    } else {
+      checkFeedback = `Bạn đã đánh giá: ${starSymbols}`;
+      console.log("User has commented on this field.");
+    }
+
     const formattedFieldOrders = {
       _id: detail_field_orders._id,
+      fieldId: detail_field_orders.fieldId._id,
+      customerId: detail_field_orders.customerId._id,
       customerName: detail_field_orders.customerId?.profile?.name,
       fieldName: detail_field_orders.fieldId?.name,
       orderDate: new Date(detail_field_orders.orderDate).toLocaleString(
@@ -596,6 +412,7 @@ async function getDetailByFieldOrdersId(req, res, next) {
 
       subFieldName: selectedSubField?.name || null,
       fieldTime: selectedSlot.start + " - " + selectedSlot.end,
+      fieldPrice: detail_field_orders.price,
 
       equipmentOrder: detail_field_orders.equipmentOrderId.map((e) => ({
         equipmentName: e.equipments.map(
@@ -604,14 +421,17 @@ async function getDetailByFieldOrdersId(req, res, next) {
         quantity: e.equipments.map((q) => q.quantity),
         price: e.equipments.map((p) => p.price),
       })),
-      totalPrice: detail_field_orders.equipmentOrderId.reduce((total, e) => {
-        return (
-          total +
-          e.equipments.reduce((subTotal, equipment) => {
-            return subTotal + equipment.price * equipment.quantity;
-          }, 0)
-        );
-      }, 0),
+      totalPrice:
+        detail_field_orders.price +
+        detail_field_orders.equipmentOrderId.reduce((total, e) => {
+          return (
+            total +
+            e.equipments.reduce((subTotal, equipment) => {
+              return subTotal + equipment.price * equipment.quantity;
+            }, 0)
+          );
+        }, 0),
+      Feedback: checkFeedback,
     };
 
     console.log(formattedFieldOrders);
@@ -649,6 +469,5 @@ module.exports = {
   getAvailableSlotsForField,
   getFieldOrdersByCustomerId,
   getDetailByFieldOrdersId,
-  getFieldOrdersForDashboard,
   getCountFieldOrderByCustomerId,
 };
