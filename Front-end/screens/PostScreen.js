@@ -45,7 +45,7 @@ const PostScreen = () => {
       res.filter((post) => post.status === POST_STATUS.PENDING) || []
     );
     setDeniedPosts(
-      res.filter((post) => post.status === POST_STATUS.DELETED) || []
+      res.filter((post) => post.status === POST_STATUS.DENIED) || []
     );
   }
 
