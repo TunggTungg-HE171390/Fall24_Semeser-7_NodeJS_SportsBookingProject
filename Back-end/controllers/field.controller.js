@@ -53,6 +53,9 @@ function generateSubFields(
 const addField = async (req, res, next) => {
   try {
     const data = req.body;
+    const image = [
+      "https://firebasestorage.googleapis.com/v0/b/sdn302-42d07.appspot.com/o/files%2Fsan-bong-da-o-quan-12.jpg?alt=media&token=8fbb4374-40c2-441f-b687-bbc63c569f34",
+    ];
     const {
       totalFields,
       openingTime,
@@ -61,6 +64,7 @@ const addField = async (req, res, next) => {
       ownerId,
       price,
     } = data;
+    data.image = image;
     const ownerExists = await User.findById(ownerId);
 
     if (!ownerExists) {

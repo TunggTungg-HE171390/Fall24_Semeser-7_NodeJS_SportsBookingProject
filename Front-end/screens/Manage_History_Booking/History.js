@@ -169,9 +169,9 @@ export default function History() {
                       <Text>Thông tin thời gian không có sẵn</Text>
                     )}
 
-                    <Text style={{ fontWeight: "bold" }}>
+                    {/* <Text style={{ fontWeight: "bold" }}>
                       Thiết bị đăng kí:
-                    </Text>
+                    </Text> */}
                     {order.equipmentOrder?.length > 0 ? (
                       <View style={{ marginVertical: 2 }}>
                         {order.equipmentOrder.map(
@@ -194,23 +194,23 @@ export default function History() {
                             </View>
                           )
                         )}
-                        <Text style={{ fontWeight: "bold" }}>
+                        {/* <Text style={{ fontWeight: "bold" }}>
                           Tổng tiền: {order.totalPrice} VND
-                        </Text>
+                        </Text> */}
                       </View>
                     ) : (
                       <View>
-                        <Text>Không có thiết bị đặt hàng</Text>
+                        {/* <Text>Không có thiết bị đặt hàng</Text>
                         <Text style={{ fontWeight: "bold" }}>
                           Tổng tiền: 0 VND
-                        </Text>
+                        </Text> */}
                       </View>
                     )}
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       onPress={() => checkFeedbackExist(order.fieldId)}
                     >
                       <Text style={styles.feedbacks}>{checkFeedback}</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 ))
               ) : (

@@ -68,22 +68,25 @@ export default function Profile() {
               <Text
                 style={[
                   styles.buttonText,
+                  // {
+                  //   color:
+                  //     userDetails.role === 1
+                  //       ? "green"
+                  //       : userDetails.role === 2
+                  //       ? "red"
+                  //       : "black",
+                  // },
                   {
-                    color:
-                      userDetails.role === 1
-                        ? "green"
-                        : userDetails.role === 2
-                        ? "red"
-                        : "black",
+                    color: userDetails?.role && "green",
                   },
                 ]}
               >
-                {" "}
-                {userDetails.role === 1
+                {userDetails?.role && "ACTIVE"}
+                {/* {userDetails.role === 1
                   ? "ACTIVE"
                   : userDetails.role === 2
                   ? "BLOCK"
-                  : "Chưa xác định"}
+                  : "Chưa xác định"} */}
               </Text>
             </Text>
           </TouchableOpacity>
